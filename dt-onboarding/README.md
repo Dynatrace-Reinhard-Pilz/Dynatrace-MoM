@@ -69,8 +69,11 @@ searches for a file named `{@application} {@environment} JBoss.profile.xml` with
 
 ### Example - Creating a System Profile and a Dashboard
 `java –Dconfig.templates.profile=”{@application} {@environment} JBoss” –Dconfig.templates.dashboard=“{@environment}_{@application}_JBoss Monitoring”  –jar dt-onboarding.jar`
+
 or alternatively
+
 `java –Dconfig.templates.profile=”{@application} {@environment} JBoss.profile.xml” –Dconfig.templates.dashboard=“{@environment}_{@application}_JBoss Monitoring.dashboard.xml”  –jar dt-onboarding.jar`
+
 deploys a Dashboard alongside with the System Profile.
 * The Template for this Dashboard is a file named `{@environment}_{@application}_JBoss Monitoring.dashboard.xml` which either needs to be embedded within `dt-onboarding.jar` or can be found among the Dashboards on the dynaTrace Server.
 * Make sure you wrap quotes `“` around the template name in case it contains white spaces.
@@ -83,6 +86,7 @@ deploys a Dashboard alongside with the System Profile.
 
 ### Example - Creating a System Profile and two Dashboard
 `java –Dconfig.templates.profile=”{@application} {@environment} JBoss” –Dconfig.templates.dashboards.DASHBOARD1.name=“{@environment}_{@application}_JBoss Monitoring” –Dconfig.templates.dashboards.DASHBOARD2.name=”{@environment}_{@application}_TRIAGE_DASHBOARD” –jar dt-onboarding.jar`
+
 will deploy two Dashboards on the dynaTrace Server
 * The Dashboard Template files `{@environment}_{@application}_JBoss Monitoring.dashboard.xml` and `{@environment}_{@application}_TRIAGE_DASHBOARD.dashboard.xml` to either be located on the dynaTrace Server or embedded within `dt-onboarding.jar`.
 * Both resulting Dashboards will have the System Profile deployed alongside with them assigned as their source.
@@ -90,30 +94,35 @@ will deploy two Dashboards on the dynaTrace Server
 
 ### Example - Creating a System Profile grant access to an LDAP Group
 `java –Dconfig.templates.profile=”{@application} {@environment} JBoss” –Dconfig.user.group.name=GROUPNAME –jar dt-onboarding.jar`
+
 will deploy a System Profile using the given Template on the dynaTrace Server and grant the the User Group `GROUPNAME` the Role Administrator for this System Profile.
 * If the User Group does not exist yet, it will create a new LDAP group
   - The new User Group will have the `Guest Role` as `Management Role` on the dynaTrace Server
 
 ### Example - Creating a System Profile grant access to an LDAP Group (2)
 `java –Dconfig.templates.profile=”{@application} {@environment} JBoss” –Dconfig.user.group.name=GROUPNAME –Dconfig.user.group.profile.role=Guest –jar dt-onboarding.jar`
+
 will deploy a System Profile using the given Template on the dynaTrace Server and grant the the User Group `GROUPNAME` the Role `Guest` for this System Profile.
 * If the User Group does not exist yet, it will create a new LDAP group
   - The new User Group will have the `Guest Role` as `Management Role` on the dynaTrace Server
 
 ### Example - Creating a System Profile grant access to multiple LDAP Groups
 `java –Dconfig.templates.profile=”{@application} {@environment} JBoss” –Dconfig.user.groups.GRP2.name=GROUPNAME1 –Dconfig.user.groups.GRP1.name=GROUPNAME2 –Dconfig.user.group. GRP1.profile.role=Guest –Dconfig.user.group.GRP2.profile.role=Administrator –jar dt-onboarding.jar`
+
 will deploy a System Profile using the given Template on the dynaTrace Server and grant the the User Group `GROUPNAME1` the Role Guest for this System Profile and the User Group `GROUPNAME2` the Role `Administrator` for this System Profile.
 * If User Group does not exist yet, it will create a new LDAP group
   - The new User Group will have the `Guest Role` as `Management Role` on the dynaTrace Server
 
 ### Example - Creating a System Profile grant access to an LDAP Group (3)
 `java –Dconfig.templates.profile=”{@application} {@environment} JBoss” –Dconfig.user.group.name=GROUPNAME –Dconfig.user.group.profile.role=Guest –Dconfig.user.group.management.role=Administrator –jar dt-onboarding.jar`
+
 will deploy a System Profile using the given Template on the dynaTrace Server and grant the the User Group `GROUPNAME` the Role Guest for this System Profile.
 * If the User Group does not exist yet, it will create a new LDAP group
   - The new User Group will have the `Administrator Role` as `Management Role` on the dynaTrace Server
 
 ### Example - Creating System Profiles and Dashboards and grant access to LDAP Groups (1)
 `java –Dconfig.templates.profile=”{@application} {@environment} JBoss” –Dconfig.templates.dashboard=“{@environment}_{@application}_JBoss Monitoring.dashboard.xml” –Dconfig.user.group.name=GROUPNAME –Dconfig.user.group.profile.role=Guest –Dconfig.user.group.management.role=Administrator –Dconfig.user.group.dashboard.permission=Read_Write –jar dt-onboarding.jar`
+
 will deploy a System Profile and a Dashboard using the given Templates on the dynaTrace Server and grant the the User Group `GROUPNAME` the Role Guest for this System Profile.
 * The User Group will have `Read/Write` access to the new Dashboard
 * If the User Group does not exist yet, it will create a new LDAP group
@@ -121,6 +130,7 @@ will deploy a System Profile and a Dashboard using the given Templates on the dy
 
 ### Example - Creating System Profiles and Dashboards and grant access to LDAP Groups (2)
 `java –Dconfig.templates.profile=”{@application} {@environment} JBoss” –Dconfig.templates.dashboards.DASHBOARD1.name=“{@environment}_{@application}_JBoss Monitoring” –Dconfig.templates.dashboards.DASHBOARD2.name=”{@environment}_{@application}_TRIAGE_DASHBOARD” –Dconfig.user.group.name=GROUPNAME –Dconfig.user.group.profile.role=Guest –Dconfig.user.group.management.role=Administrator –Dconfig.user.group.dashboard.permission=Read_Write –jar dt-onboarding.jar`
+
 will deploy a System Profile and two Dashboards using the given Templates on the dynaTrace Server and grant the the User Group `GROUPNAME` the Role Guest for this System Profile.
 * The User Group will have `Read/Write` access to the new Dashboards
 * If the User Group does not exist yet, it will create a new LDAP group
@@ -128,6 +138,7 @@ will deploy a System Profile and two Dashboards using the given Templates on the
 
 ### Example - Creating System Profiles and Dashboards and grant access to LDAP Groups (3)
 `java –Dconfig.templates.profile=”{@application} {@environment} JBoss” –Dconfig.templates.dashboards.DASHBOARD1.name=“{@environment}_{@application}_JBoss Monitoring” –Dconfig.templates.dashboards.DASHBOARD2.name=”{@environment}_{@application}_TRIAGE_DASHBOARD” –Dconfig.user.group.name=GROUPNAME –Dconfig.user.group.profile.role=Guest –Dconfig.user.group.management.role=Administrator –Dconfig.user.group.dashboards.DASHBOARD1.permission=Read_Write –Dconfig.user.group.dashboards.DASHBOARD2.permission=Read –jar dt-onboarding.jar`
+
 will deploy a System Profile and two Dashboards using the given Templates on the dynaTrace Server and grant the the User Group GROUPNAME the Role Guest for this System Profile.
 * The User Group will have Read access to one of the Dashboards and `Read/Write` access to the other one
 * If the User Group does not exist yet, it will create a new LDAP group
@@ -135,6 +146,7 @@ will deploy a System Profile and two Dashboards using the given Templates on the
 
 ### Example - Creating System Profiles and Dashboards and grant access to LDAP Groups (4)
 `java –Dconfig.templates.profile=”{@application} {@environment} JBoss” –Dconfig.templates.dashboards.DASHBOARD1.name=“{@environment}_{@application}_JBoss Monitoring” –Dconfig.templates.dashboards.DASHBOARD2.name=”{@environment}_{@application}_TRIAGE_DASHBOARD” –Dconfig.user.groups.GRP1.name=GROUPNAME1 –Dconfig.user.groups.GRP2.name=GROUPNAME2 –Dconfig.user.group.profile.role=Guest –Dconfig.user.group.management.role=Administrator –Dconfig.user.groups.dashboards.DASHBOARD2.permission=Read –Dconfig.user.groups.GRP1.dashboards.DASHBOARD1.permission=Read –Dconfig.user.groups.GRP2.dashboards.DASHBOARD1.permission=Read_Write –Dconfig.user.group.dashboards.DASHBOARD2.permission=Read –jar dt-onboarding.jar`
+
 will deploy a System Profile and two Dashboards using the given Templates on the dynaTrace Server and grant the the User Group `GROUPNAME` the Role Guest for this System Profile.
 * User Group `GROUPNAME1` will have `Read` access to the `Triage Dashboard` and the `Monitoring Dashboard`
   - Because `–Dconfig.user.group.dashboards.DASHBOARD2.permission=Read` states, that by default every group should get `Read` access to it
