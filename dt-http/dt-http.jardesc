@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="dt-http/dt-http.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/dt-http/dt-http.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="false" exportJavaFiles="true" exportOutputFolder="true">
+        <file path="/dt-http/build.xml"/>
+        <javaElement handleIdentifier="=dt-http/src\/main\/resources"/>
+        <javaElement handleIdentifier="=dt-http/src\/main\/java"/>
+        <javaElement handleIdentifier="=dt-utils"/>
+        <file path="/dt-http/pom.xml"/>
+        <folder path="/dt-http/target"/>
+        <file path="/dt-http/.project"/>
+        <javaElement handleIdentifier="=dt-http/src\/test\/java"/>
+        <folder path="/dt-http/src"/>
+        <javaElement handleIdentifier="=dt-http/src\/test\/resources"/>
+        <file path="/dt-http/.classpath"/>
+        <file path="/dt-http/dt-http.jardesc"/>
+    </selectedElements>
+</jardesc>

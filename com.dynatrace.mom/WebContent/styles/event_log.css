@@ -1,0 +1,313 @@
+.event_log {
+	width: 300px; 
+	background: #F8F8F5;
+	border-left: 1px solid #BBBBBB;
+	position: absolute;
+	top: 0; right: 0; bottom: 0;
+}
+
+.event_log_header {
+	width: 100%;
+	height: 140px;
+	padding: 5px 10px;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	border-bottom: 1px solid #777777;
+	background-image: linear-gradient(bottom, rgb(173,182,188) 0%, rgb(206,213,217) 100%);
+	background-image: -o-linear-gradient(bottom, rgb(173,182,188) 0%, rgb(206,213,217) 100%);
+	background-image: -moz-linear-gradient(bottom, rgb(173,182,188) 0%, rgb(206,213,217) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgb(173,182,188) 0%, rgb(206,213,217) 100%);
+	background-image: -ms-linear-gradient(bottom, rgb(173,182,188) 0%, rgb(206,213,217) 100%);
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, rgb(173,182,188)),
+		color-stop(1, rgb(206,213,217))
+	);	
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ced5d9', endColorstr='#adb6bc',GradientType=0 ); /* IE6-9 */
+}
+
+.event_log_header .title {
+	float: left;
+	width: 100%;
+}
+
+.event_log_header .text {
+	float: left;
+	clear: none;
+}
+
+.event_log_header .header_text {
+	color: #565B5E;
+	font-size: 24px;
+	font-family: SourceSansPro;
+	text-shadow: 0px 1px 1px #F3F3F3;
+}
+
+.event_log_header .combobox_container {
+	float: left;
+}
+
+.event_log_header .select-labeled select {	
+}
+
+.event_log_header .filter_checkbox {
+	float: left;
+	padding-top: 9px;
+	padding-left: 20px;
+}
+
+.event_log_header .filter_checkbox .checkbox {
+	vertical-align: middle;
+	margin-top: 0px;
+}
+
+.event_log_header .filter_checkbox .checkbox_label {
+	font-weight: bold;
+}
+
+.event_log_content {
+	overflow-x: hidden;
+	overflow-y: auto;
+	position: absolute;
+	top: 140px;
+	bottom: 0px;
+	width: 300px;
+	border: none;
+	background: #e6ebed;
+}
+
+.event_log_content .message {
+	font-family: SourceSansPro;
+	font-size: 13px;
+	font-style: italic;
+	text-align: center;
+}
+.event_log_content .message.no_events {
+ 	display: none;
+	margin-top: 50px;
+}
+.event_log_content .message.shortened {
+	padding: 20px;
+}
+
+.event {
+	border-top: 1px solid White;
+	border-bottom: 1px solid #adb6bc;
+	font-family: Tahoma, Geneva, sans-serif;
+	position: relative;
+}
+
+.event.selected {
+	border-bottom: 1px solid #878d91;
+}
+
+.event.error .error_bar, 
+.event.selected.error .error_bar {
+	position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 8px;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	background-image: linear-gradient(bottom, rgb(181,0,0) 0%, rgb(243,62,62) 100%);
+	background-image: -o-linear-gradient(bottom, rgb(181,0,0) 0%, rgb(243,62,62) 100%);
+	background-image: -moz-linear-gradient(bottom, rgb(181,0,0) 0%, rgb(243,62,62) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgb(181,0,0) 0%, rgb(243,62,62) 100%);
+	background-image: -ms-linear-gradient(bottom, rgb(181,0,0) 0%, rgb(243,62,62) 100%);
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, rgb(181,0,0)),
+		color-stop(1, rgb(243,62,62))
+	);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f33e3e', endColorstr='#b50000',GradientType=0 ); /* IE6-9 */
+}
+
+.event.error .error_bar .error_inner,
+.event.selected.error .error_bar .error_inner {
+	background: url(../images/red_strip.gif);
+	height: 100%;
+	width: 100%;
+}
+
+.event .event_content {
+	font-size: 11px;
+	word-wrap: break-word;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	background: #e6ebed;
+}
+
+.event.selected .event_content {
+	background: #ced5d9;
+}
+
+.event .event_header {	
+	height: 31px;
+	font-size: 14px;
+	font-weight: bold;
+	font-family: Tahoma;
+	text-shadow: 0px 1px 0px White;
+	padding-left: 18px;
+	padding-right: 8px;
+}
+
+.event.selected .event_header {
+	color: White;
+	text-shadow: 0px -1px 0px #05427f;
+	border-top: 1px soild #3073C4;
+	border-bottom-width: 0px;
+	background: #459de5; /* Old browsers */
+	background: -moz-linear-gradient(top, #459de5 0%, #2673bf 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#459de5), color-stop(100%,#2673bf)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #459de5 0%,#2673bf 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #459de5 0%,#2673bf 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #459de5 0%,#2673bf 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #459de5 0%,#2673bf 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#459de5', endColorstr='#2673bf',GradientType=0 ); /* IE6-9 */	
+}
+
+.event .event_title {
+	padding-top: 7px;
+	float: left;
+}
+
+.event .event_ind {
+	margin-top: 2px;
+	margin-right: 4px;
+	float: right;
+	height: 26px;
+	width: 26px;
+	background-repeat: no-repeat;
+}
+
+.event .event_ind.error {
+	background-image: url(../images/icon_error.png);
+}
+
+.event .event_ind.warning {
+	background-image: url(../images/icon_warning.png);	
+}
+
+.event .event_ind.info {
+	background-image: url(../images/icon_info.png);	
+}
+
+.event .event_ind.debug {
+	background-image: url(../images/icon_debug.png);	
+}
+
+.event .event_ind.trace {
+	background-image: url(../images/icon_trace.png);	
+}
+
+.event hr {
+	margin: 0px 10px 0px 14px;
+	border-width: 0px;
+	border-bottom: 1px solid #f0f4f4;
+	border-top: 1px solid #ced5d9;
+}
+
+.event.selected hr {
+	margin-left: 0px;
+	margin-right: 0px;
+	border-top-color: #3073C4;
+	border-bottom-color: #E3E8EB;
+}
+
+.event .event_subheader {
+	padding: 12px 12px 16px 18px;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.event .event_subheader .event_id {
+	float: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 60%;
+}
+
+.event .event_subheader .event_date {
+	float: right;
+	font-size: 10px;
+	color: #878d91;
+}
+
+.event .event_message {
+	padding-left: 18px;
+	padding-right: 12px;
+}
+
+.event .event_message .message_count {
+	padding-top: 10px;
+}
+
+.event .event_footer {
+	padding: 12px 12px 12px 18px;
+}
+
+.event .event_footer .link_details {
+	float: left;
+	text-decoration: underline;
+	color: #333;
+	cursor: pointer;
+}
+
+.event .event_footer .link_investigate {
+	float: right;
+	text-decoration: underline;
+	color: #333;
+	cursor: pointer;
+}
+
+.event_log .time_zone_info {
+	font-family: SourceSansPro;
+	font-size: 11px;
+	margin: 10px 0;
+}
+
+.event_log .controls {
+	float: left;
+	width: 100%;
+	padding-top: 8px;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.event_log .event_log_header label {
+	color: #282828;
+	text-shadow: 0px 1px 1px #E7E7E7;
+	padding-left: 0px;
+}
+
+.incidents-count {
+	color: #bb0000;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.events-count {
+	font-size: 14px;
+	font-weight: bold;
+}
+.type-filter {
+	font-size: 13px;
+	margin-left: -4px;
+	margin-top: 5px;
+	margin-bottom: 10px;
+}
+.type-filter label {
+	margin-right: 16px;
+}
+.count-info {
+	margin: 0 20px;
+	vertical-align: top;
+	display: inline-block;
+	padding-top: 6px;
+}

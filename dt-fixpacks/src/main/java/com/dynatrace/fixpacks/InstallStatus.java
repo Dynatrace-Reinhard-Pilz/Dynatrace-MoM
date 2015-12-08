@@ -1,0 +1,12 @@
+package com.dynatrace.fixpacks;
+
+public enum InstallStatus {
+
+	NOTINSTALLED,
+	SCHEDULED,
+	UPLOADING,
+	INSTALLING,
+	INSTALLED,
+	RESTARTREQUIRED,
+	COLLECTORRESTARTREQUIRED
+}

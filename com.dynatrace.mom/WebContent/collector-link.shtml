@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<div class="row">
+	<div class="label">{name}</div>
+	<div class="data">{server}</div>
+	<div class="data">{version.major}.{version.minor}.{version.revision}.{version.build}</div>
+	<div class="data">{host}</div>
+	<div class="data"><a href="#">2000 Agents</a></div>
+</div>

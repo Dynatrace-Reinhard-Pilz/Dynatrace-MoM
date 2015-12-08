@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE xml>
+<servers href="https://dl.dropboxusercontent.com/u/38494039/mom/servers.xml" follow="false">
+    <server name="localhost" status="ONLINE">
+        <config>
+            <connection protocol="HTTPS" host="127.0.0.1" port="8021"/>
+            <credentials user="admin" pass="admin"/>
+        </config>
+        <version major="6" minor="2" revision="0" build="1239"/>
+    </server>
+</servers>

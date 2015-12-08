@@ -1,0 +1,17 @@
+<%@page session="false"
+%>		<div class="page_header">
+			<div class="logo"><a href="/"><img src="${pageContext.request.contextPath}/images/Dynatrace_logo_header.png" alt="dynaTrace Logo" /></a></div>
+			<div id="spinner" class="spinner"></div>
+			<div id="autorefresh_message" class="auto_refresh">Auto Refresh</div>
+			<div id="connection_problems" class="connection_problems">Unable to connect to server</div>
+			<div class="searchbox" style="display: none">
+				<input type="text" placeholder="Search" id="search_filter" />
+				<i class="icon-magnifier"></i>
+			</div>	
+			<div class="user_menu" style="display: none">
+				<div class="content">
+					<div class="user_name">${pageContext.request.remoteUser}</div>
+					<div class="logout_btn"><a class="logout_icon" href="${pageContext.request.contextPath}/login" ></a></div>
+				</div>
+			</div>
+		</div>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<onboarding>
+    <group ldap="true" iseditable="true" description="" name="onboarding-test-group" managementrole="Guest">
+        <systemrole system="APPLICATION-A ENVIRONMENT-A JBoss" role="Administrator"/>
+        <dashboardpermission autoopen="true" permission="Read_Write" dashboard="ENVIRONMENT-A_APPLICATION-A_TRIAGE_DASHBOARD"/>
+        <dashboardpermission autoopen="true" permission="Read_Write" dashboard="ENVIRONMENT-A_APPLICATION-A_JBoss Monitoring"/>
+    </group>
+</onboarding>

@@ -1,0 +1,124 @@
+.page_header {
+	height:32px;
+	min-width:450px;
+	background-image: linear-gradient(bottom, rgb(52,60,67) 0%, rgb(120,122,125) 100%);
+	background-image: -o-linear-gradient(bottom, rgb(52,60,67) 0%, rgb(120,122,125) 100%);
+	background-image: -moz-linear-gradient(bottom, rgb(52,60,67) 0%, rgb(120,122,125) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgb(52,60,67) 0%, rgb(120,122,125) 100%);
+	background-image: -ms-linear-gradient(bottom, rgb(52,60,67) 0%, rgb(120,122,125) 100%);
+
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, rgb(52,60,67)),
+		color-stop(1, rgb(120,122,125))
+	);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#343c43', endColorstr='#787a7d',GradientType=0 ); /* IE6-9 */	
+	position: relative;
+}
+
+.page_header .logo {
+	float:left;		
+	height: 32px;
+	line-height: 32px;
+	text-align: center;
+	padding: 0px 10px;
+	background-image: linear-gradient(bottom, rgb(31,32,36) 0%, rgb(52,56,55) 100%);
+	background-image: -o-linear-gradient(bottom, rgb(31,32,36) 0%, rgb(52,56,55) 100%);
+	background-image: -moz-linear-gradient(bottom, rgb(31,32,36) 0%, rgb(52,56,55) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgb(31,32,36) 0%, rgb(52,56,55) 100%);
+	background-image: -ms-linear-gradient(bottom, rgb(31,32,36) 0%, rgb(52,56,55) 100%);
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, rgb(31,32,36)),
+		color-stop(1, rgb(52,56,55))
+	);	
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1f2024', endColorstr='#343837',GradientType=0 ); /* IE6-9 */	
+}
+
+.page_header .logo a {
+	position: relative;
+	top: 5px;
+}
+
+.page_header .user_menu {
+	position: absolute;
+	top: 0;
+	right: 0;	
+	height:32px;
+}
+
+.page_header .user_menu .content {
+	float:right;
+	clear: none;
+	width:301px;
+	height:32px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	background-image: linear-gradient(bottom, rgb(26,28,32) 0%, rgb(55,58,59) 100%);
+	background-image: -o-linear-gradient(bottom, rgb(26,28,32) 0%, rgb(55,58,59) 100%);
+	background-image: -moz-linear-gradient(bottom, rgb(26,28,32) 0%, rgb(55,58,59) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgb(26,28,32) 0%, rgb(55,58,59) 100%);
+	background-image: -ms-linear-gradient(bottom, rgb(26,28,32) 0%, rgb(55,58,59) 100%);
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, rgb(26,28,32)),
+		color-stop(1, rgb(55,58,59))
+	);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1a1c20', endColorstr='#373a3b',GradientType=0 ); /* IE6-9 */
+	border-left: 1px solid #1a1c20;
+}
+
+.page_header .user_menu .logout_btn {
+	cursor: pointer;
+	float:right;
+	clear: none;
+	width:32px;
+	height:32px;
+}
+
+.page_header .user_menu .logout_btn:hover {
+	background-image: linear-gradient(bottom, rgb(12,13,13) 2%, rgb(43,45,46) 100%);
+	background-image: -o-linear-gradient(bottom, rgb(12,13,13) 2%, rgb(43,45,46) 100%);
+	background-image: -moz-linear-gradient(bottom, rgb(12,13,13) 2%, rgb(43,45,46) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgb(12,13,13) 2%, rgb(43,45,46) 100%);
+	background-image: -ms-linear-gradient(bottom, rgb(12,13,13) 2%, rgb(43,45,46) 100%);
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0.02, rgb(12,13,13)),
+		color-stop(1, rgb(43,45,46))
+	);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0c0d0d', endColorstr='#2b2d2e',GradientType=0 ); /* IE6-9 */	
+}
+
+.page_header .user_menu .user_name {
+	color: white;
+	font-size: 11px;
+	/*font-family: Tahoma;*/
+	width: 266px;
+	height: 32px;
+	line-height: 32px;
+	text-align: center;
+	float: left;
+	clear: none;
+	border-right: 1px solid #1A1C20;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.page_header .user_menu .logout_btn .logout_icon {
+	background: url(../images/logout.png) no-repeat center center;
+	width: 32px;
+	height: 32px;
+	float: right;
+	clear: none;
+	border-left: 1px solid #565A5B;
+}

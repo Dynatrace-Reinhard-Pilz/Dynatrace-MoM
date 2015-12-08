@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>An error occured</title>
+
+		<link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/debug.css" />
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/icomoon.css" />
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/main.css" />
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/header.css" />
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/widgets.css" />
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/event_log.css" />
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/stack_details.css" />
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/components/popup.css" />
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/lib/jquery-ui-1.9.0.custom.min.css" />
+		<script src="${pageContext.request.contextPath}/scripts/jquery.min.js"></script>
+		<script src="${pageContext.request.contextPath}/scripts/utils.js"></script>
+		<script src="${pageContext.request.contextPath}/scripts/commands.js"></script>
+	</head>
+	<body>
+		<div class="page_header">
+			<div class="logo"><a href="/"><img src="${pageContext.request.contextPath}/images/Dynatrace_logo_header.png" alt="dynaTrace Logo" /></a></div>
+			<div class="user_menu">
+				<div class="content">
+					<div class="user_name">${pageContext.request.remoteUser}</div>
+					<div class="logout_btn"><a class="logout_icon" href="${pageContext.request.contextPath}/login" /></a></div>
+				</div>
+			</div>
+		</div>	
+		<div class="main_content">
+			<div class="work_area">
+				<div class="stack_details_container">
+					<div id="stack-details">
+					<div class="instance_content">
+					<div id="tab_license" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+						<div class="tab_content tab_license">
+							<pre>
+${pageContext.request.errorMessage}
+							</pre>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

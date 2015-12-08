@@ -1,0 +1,101 @@
+<%@page
+session="false"
+import="com.dynatrace.mom.runtime.components.ServerRecord,
+com.dynatrace.reporting.IncidentOverview,
+java.util.Collection,
+com.dynatrace.utils.Version,
+com.dynatrace.mom.runtime.ServerRepository,
+com.dynatrace.http.ConnectionStatus,
+com.dynatrace.reporting.Availability"
+%><%
+
+	ServerRecord curServer = (ServerRecord)pageContext.getAttribute(ServerRecord.class.getName());
+	if (curServer != null) {
+%>									<tr>
+										<td rowspan="2" class="icon-column" style="width: 1px; white-space: nowrap; padding-right: 15px; line-height: 2em"><%
+											%><a href="${pageContext.request.contextPath}/servers/<%= curServer.getName() %>" style="text-decoration: none; line-height: 2em; vertical-align: middle; padding: 0px 0px 0px 18px; background-image: url(${pageContext.request.contextPath}/images/green_light.png); background-repeat: no-repeat; background-position: left middle; background-size: 16px"><%= curServer.getName() %></a><%
+											%><div style="font-size: 80%; color: #888888; font-style: italic; padding-left: 1em"><%= curServer.getHost() %>:<%= curServer.getPort() %></div><%
+										%></td><%
+											String vClass = "";
+											if (Version.isValid(curServer.getVersion())) {
+												vClass = " class=\"fixpack";
+												if (!curServer.isVersionOutdated()) {
+													vClass = vClass + " ok";
+												}
+												vClass = vClass + "\"";
+											}
+										%><td<%= vClass %> style="width: 30px; white-space: nowrap; padding-right: 15px"><%
+											if (Version.isValid(curServer.getVersion())) {
+											if (curServer.isVersionOutdated()) {
+												%><a href="${pageContext.request.contextPath}/servers/<%= curServer.getName() %>/fixpacks"><%= curServer.getVersion().toString() %></a><%
+											} else {
+												%><%= curServer.getVersion().toString() %><%
+											}
+											}
+										%></td><%
+											String lClass = "";
+											String lic = curServer.getLicenseInfo().getLicenseEdition();
+											if (lic != null) {
+												lClass = "class=\"license\"";
+											} else {
+												lic = "";
+											}
+										%>
+										<td <%= lClass %> style="width: 1px; white-space: nowrap; padding-right: 15px"><%= lic %></td><%
+											Availability availability = curServer.getHealthDashboardAvailability();
+											if (availability == Availability.Available) { %>
+										<td class="health" style="width: 1px; white-space: nowrap; padding-right: 15px">
+												<a href="${pageContext.request.contextPath}/servers/<%= curServer.getName() %>/charts">Health Charts</a><%
+										%></td><%
+											} else { %>
+										<td style="width: 1px; white-space: nowrap; padding-right: 15px; font-style: italic; font-size: 90%; color: #888888; line-height: 1em; text-align: center">Health Charts<br />unavailable</td><%
+											}
+											int incidentCount = curServer.getOpenIncidentCount();
+											if (incidentCount > 0) { %>
+										<td class="incidents" style="width: 1px; white-space: nowrap; padding-right: 15px">
+												<a href="${pageContext.request.contextPath}/servers/<%= curServer.getName() %>/incidents"><%= curServer.getOpenIncidentCount() %> Incidents</a><%
+										%></td><%
+											} else { %>
+										<td style="width: 1px; white-space: nowrap; padding-right: 15px; font-style: italic; font-size: 90%; color: #888888">no incidents</td><%
+											}
+											int collectorCount = curServer.getCollectors().size();
+											if (collectorCount > 0) { %>
+										<td class="collectors" style="width: 1px; white-space: nowrap; padding-right: 15px"><a href="${pageContext.request.contextPath}/servers/<%= curServer.getName() %>/collectors"><%= curServer.getCollectors().size() %> Collectors</a></td><%
+											} else { %>
+										<td style="width: 1px; white-space: nowrap; padding-right: 15px; font-style: italic; font-size: 90%; color: #888888; line-height: 1em; text-align: center">No Collectors<br />connected</td><%
+											}
+											int agentCount = curServer.getAgentCount();
+											if (agentCount > 0) { %>
+										<td class="agents" style="width: 1px; white-space: nowrap; padding-right: 15px"><a href="${pageContext.request.contextPath}/servers/<%= curServer.getName() %>/agents"><%= curServer.getAgentCount() %> Agents</a></td><%
+											}  else { %>
+										<td style="width: 1px; white-space: nowrap; padding-right: 15px; font-style: italic; font-size: 90%; color: #888888; line-height: 1em; text-align: center">No Agents<br />connected</td><%
+											} %>
+										<td class="status" style="text-align: right"><%
+											ConnectionStatus connectionStatus = curServer.getConnectionStatus();
+										%><form style="display: inline" method="post" action="${pageContext.request.contextPath}/servers/<%= curServer.getName() %>/restart"><%
+											if (connectionStatus == null) {
+												%><button class="btn btn-blue btn-compact failover_button">Restart Required</button><%
+											} else if (connectionStatus == ConnectionStatus.RESTARTING) {						
+												%><button class="btn btn-blue btn-compact failover_button busy" disabled="disabled">Restarting</button><%
+											} else if (connectionStatus == ConnectionStatus.RESTARTSCHEDULED) {						
+												%><button class="btn btn-blue btn-compact failover_button busy" disabled="disabled">Restart Scheduled</button><%
+											} else if (connectionStatus == ConnectionStatus.ONLINE) {						
+												%><button class="btn btn-blue btn-compact failover_button">Restart</button><%
+											} else if (connectionStatus == ConnectionStatus.OFFLINE) {
+												%><div style="white-space: nowrap; padding-right: 15px; font-style: italic; font-weight: bold; color: red">offline</div><%
+											}
+										%></form><img src="${pageContext.request.contextPath}/images/grey_action_delete.png" style="vertical-align: middle; padding: 0px 5px 0px 5px" /><%
+										%></td>
+									</tr>
+									<tr>
+										<td colspan="8" style="line-height: 20px; padding: 0; font-size: 80%"><%
+											String lightIcon = "red_light.png";
+											if (curServer.isPWHConnected()) {
+												lightIcon = "green_light.png";
+											} %>
+											<div style="display: inline; vertical-align: middle; padding: 0px 0px 0px 12px; background-image: url(${pageContext.request.contextPath}/images/<%= lightIcon %>); background-repeat: no-repeat; background-position: left middle; background-size: 10px">Performance Warehouse</div>
+											<a href="#" style="margin-left: 1.5em; background-image: url(${pageContext.request.contextPath}/images/external-link-16.png); background-repeat: no-repeat; background-position: left center; padding-left: 10px; background-size: 8px">Launch dynaTrace Client</a>
+										</td>
+									</tr><%
+}
+%>

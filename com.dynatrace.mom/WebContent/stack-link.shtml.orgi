@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+						<a class="stack-link" href="{href}">
+							<div class="instance_tile tile_border">
+								<div class="tile_body">
+									<div class="tile_name">{name}</div>
+								</div>
+								<div class="tile_status_icon">
+									<div class="status {status == ONLINE ? green : red}"><div class="inner"></div></div>
+								</div>
+								<div class="tile_info">
+									<div class="tile_status">
+										<div class="tile_status_text">
+											<div class="tile_version">{version.major}.{version.minor}.{version.revision}.{version.build}</div>
+											<span>Operating normally</span>
+											<span>{agentcount} agents connected</span>
+										</div>
+									</div>
+									<div class="tile_messages new_messages">
+										<div class="new_messages_icon"></div>
+									</div>
+								</div>
+							</div>
+						</a>

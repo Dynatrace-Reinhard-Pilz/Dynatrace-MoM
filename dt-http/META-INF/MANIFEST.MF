@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: dt-http
+Bundle-SymbolicName: dt-http
+Bundle-Version: 1.0.0.qualifier
+Export-Package: com.dynatrace,
+ com.dynatrace.http,
+ com.dynatrace.http.ant,
+ com.dynatrace.http.config,
+ com.dynatrace.http.impl,
+ com.dynatrace.http.permissions,
+ com.dynatrace.http.request

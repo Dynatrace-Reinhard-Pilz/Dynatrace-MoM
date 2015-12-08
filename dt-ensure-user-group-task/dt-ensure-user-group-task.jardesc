@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="dt-ensure-user-group-task/dt-ensure-user-group-task.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/dt-ensure-user-group-task/dt-ensure-user-group-task.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="false" manifestLocation="/dt-ensure-user-group-task/META-INF/MANIFEST.MF" manifestVersion="1.0" reuseManifest="true" saveManifest="true" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="false" exportJavaFiles="true" exportOutputFolder="true">
+        <javaElement handleIdentifier="=dt-ensure-user-group-task/src\/main\/resources"/>
+        <javaElement handleIdentifier="=dt-ensure-user-group-task/src\/test\/java"/>
+        <file path="/dt-ensure-user-group-task/pom.xml"/>
+        <javaElement handleIdentifier="=dt-ensure-user-group-task/src\/main\/java"/>
+        <javaElement handleIdentifier="=dt-ensure-user-group-task/src\/test\/resources"/>
+        <folder path="/dt-ensure-user-group-task/src"/>
+        <file path="/dt-ensure-user-group-task/.classpath"/>
+        <folder path="/dt-ensure-user-group-task/META-INF"/>
+        <file path="/dt-ensure-user-group-task/build.properties"/>
+        <file path="/dt-ensure-user-group-task/.project"/>
+        <file path="/dt-ensure-user-group-task/plugin.xml"/>
+        <folder path="/dt-ensure-user-group-task/target"/>
+    </selectedElements>
+</jardesc>

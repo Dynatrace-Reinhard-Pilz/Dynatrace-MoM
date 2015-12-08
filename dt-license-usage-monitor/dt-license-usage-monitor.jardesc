@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="dt-license-usage-monitor/dt-license-usage-monitor.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/dt-license-usage-monitor/dt-license-usage-monitor.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="false" manifestLocation="/dt-license-usage-monitor/META-INF/MANIFEST.MF" manifestVersion="1.0" reuseManifest="true" saveManifest="true" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=dt-fastpacks/src\/main\/java&lt;com.dynatrace.fastpacks.metadata.manifest"/>
+        <javaElement handleIdentifier="=dt-http/src\/main\/java&lt;com.dynatrace.http.request"/>
+        <javaElement handleIdentifier="=dt-http/src\/main\/resources"/>
+        <javaElement handleIdentifier="=dt-license-usage-monitor/src\/main\/java"/>
+        <javaElement handleIdentifier="=dt-license-usage-monitor/src\/main\/resources"/>
+        <file path="/dt-license-usage-monitor/plugin.xml"/>
+        <file path="/dt-license-usage-monitor/dynaTrace 6.2.target"/>
+        <javaElement handleIdentifier="=dt-security/src\/main\/resources"/>
+        <javaElement handleIdentifier="=dt-cmd/src\/main\/resources"/>
+        <javaElement handleIdentifier="=dt-security/src\/main\/java"/>
+        <javaElement handleIdentifier="=dt-license/src\/main\/resources"/>
+        <folder path="/dt-license-usage-monitor/META-INF"/>
+        <javaElement handleIdentifier="=dt-fixpacks/src\/main\/resources"/>
+        <javaElement handleIdentifier="=dt-http/src\/main\/java&lt;com.dynatrace.http.ant"/>
+        <javaElement handleIdentifier="=dt-profiles/src\/main\/java&lt;com.dynatrace.profiles.metainfo"/>
+        <javaElement handleIdentifier="=dt-fastpacks/src\/main\/java&lt;com.dynatrace.fastpacks.metadata.instances"/>
+        <javaElement handleIdentifier="=dt-fixpacks/src\/main\/java&lt;com.dynatrace.fixpacks"/>
+        <javaElement handleIdentifier="=dt-utils/src\/main\/java&lt;com.dynatrace.utils"/>
+        <javaElement handleIdentifier="=dt-fastpacks/src\/main\/java&lt;com.dynatrace.fastpacks"/>
+        <file path="/dt-license-usage-monitor/.project"/>
+        <javaElement handleIdentifier="=dt-incidents/src\/main\/resources"/>
+        <file path="/dt-license-usage-monitor/pom.xml"/>
+        <javaElement handleIdentifier="=dt-profiles/src\/main\/java&lt;com.dynatrace.profiles"/>
+        <javaElement handleIdentifier="=dt-collectors/src\/main\/resources"/>
+        <javaElement handleIdentifier="=dt-http/src\/main\/java&lt;com.dynatrace.http.config"/>
+        <javaElement handleIdentifier="=dt-dashboards/src\/main\/java&lt;com.dynatrace.dashboards"/>
+        <javaElement handleIdentifier="=dt-sysinfo/src\/main\/resources"/>
+        <javaElement handleIdentifier="=dt-collectors/src\/main\/java&lt;com.dynatrace.collectors.web"/>
+        <javaElement handleIdentifier="=dt-fastpacks/src\/main\/resources"/>
+        <javaElement handleIdentifier="=dt-http/src\/main\/java&lt;com.dynatrace.http"/>
+        <javaElement handleIdentifier="=dt-fastpacks/src\/main\/java&lt;com.dynatrace.fastpacks.metadata"/>
+        <javaElement handleIdentifier="=dt-http/src\/main\/java&lt;com.dynatrace.http.permissions"/>
+        <javaElement handleIdentifier="=dt-reporting/src\/main\/java&lt;com.dynatrace.reporting"/>
+        <javaElement handleIdentifier="=dt-incidents/src\/main\/java&lt;com.dynatrace.incidents"/>
+        <folder path="/dt-license-usage-monitor/target"/>
+        <folder path="/dt-license-usage-monitor/src"/>
+        <file path="/dt-license-usage-monitor/.classpath"/>
+        <javaElement handleIdentifier="=dt-reporting/src\/main\/resources"/>
+        <file path="/dt-license-usage-monitor/build.properties"/>
+        <javaElement handleIdentifier="=dt-agents/src\/main\/java&lt;com.dynatrace.agents"/>
+        <javaElement handleIdentifier="=dt-cmd/src\/main\/java&lt;com.dynatrace.cmd"/>
+        <folder path="/dt-license-usage-monitor/lib"/>
+        <javaElement handleIdentifier="=dt-dashboards/src\/main\/resources"/>
+        <javaElement handleIdentifier="=dt-agents/src\/main\/resources"/>
+        <javaElement handleIdentifier="=dt-collectors/src\/main\/java&lt;com.dynatrace.collectors"/>
+        <javaElement handleIdentifier="=dt-fastpacks/src\/main\/java&lt;com.dynatrace.fastpacks.metadata.resources"/>
+        <javaElement handleIdentifier="=dt-http/src\/main\/java&lt;com.dynatrace.http.impl"/>
+        <javaElement handleIdentifier="=dt-utils/src\/main\/resources"/>
+        <javaElement handleIdentifier="=dt-profiles/src\/main\/resources"/>
+        <javaElement handleIdentifier="=dt-utils/src\/main\/java&lt;com.dynatrace.xml"/>
+        <javaElement handleIdentifier="=dt-license/src\/main\/java&lt;com.dynatrace.license"/>
+        <javaElement handleIdentifier="=dt-sysinfo/src\/main\/java&lt;com.dynatrace.sysinfo"/>
+    </selectedElements>
+</jardesc>

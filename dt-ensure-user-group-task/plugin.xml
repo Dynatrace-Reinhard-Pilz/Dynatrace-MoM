@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="com.dynatrace.user.group.ensure.task.config"
+         name="Permission User Group Task"
+         point="com.dynatrace.diagnostics.pdk.pluginconfig">
+      <information>
+         <author
+               value="Reinhard Pilz">
+         </author>
+         <supportlevel
+               value="unsupported">
+         </supportlevel>
+         <displayname
+               value="Ensure User Groups">
+         </displayname>
+         <description
+               value="Ensures that specific User Groups are configured">
+         </description>
+         <shortversion
+               value="1.0">
+         </shortversion></information>
+      <configuration></configuration>
+   </extension>
+   <extension
+         id="com.dynatrace.tasks.ensure.user.groups.task"
+         name="Ensure User Groups Task"
+         point="com.dynatrace.diagnostics.pdk.task">
+      <plugin
+            class="com.dynatrace.tasks.EnsureUserGroupsTask"
+            configid="com.dynatrace.user.group.ensure.task.config">
+      </plugin>
+      <information>
+         <author
+               value="Reinhard Pilz">
+         </author>
+      </information>
+   </extension>
+
+</plugin>

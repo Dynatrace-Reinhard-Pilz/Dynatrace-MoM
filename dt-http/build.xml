@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE project>
+<project name="dt-fastpack" default="send-fast-pack">
+
+	<taskdef resource="antlib.xml" classpath="./dt-fastpacks.jar" />
+	
+    <target name="send-fast-pack">
+    	<fastpack dest="localhost:8020">
+    		<profile file="IIS.profile.xml" />
+    		<dashboard file="IIS Overview.dashboard.xml" />
+    	</fastpack>
+    </target>	
+	
+</project>
+
+
+

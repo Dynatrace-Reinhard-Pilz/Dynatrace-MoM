@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<div class="row">
+	<div class="data">{name}</div>
+	<div class="data">{version.major}.{version.minor}.{version.revision}.{version.build}</div>
+	<div class="data">{license.licenseedition}</div>
+	<div class="data"><a href="{href}/collectors">1 Collectors</a></div>
+	<div class="data"><a href="{href}/agents">2000 Agents</a></div>
+	<div class="data">{config.connection.host}</div>
+	<div class="data">{config.connection.port}</div>
+</div>

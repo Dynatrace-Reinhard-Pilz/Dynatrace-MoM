@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: dt-license
+Bundle-SymbolicName: dt-license;singleton:=true
+Bundle-Version: 1.0.0.0
+Export-Package: com.dynatrace.license
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

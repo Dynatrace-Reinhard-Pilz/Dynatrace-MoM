@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="100%" height="100%" viewBox="0 0 128 128" enable-background="new 0 0 128 128" xml:space="preserve">
+<g>
+	<path opacity="0.3" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M64,127c-4.349,0-7.875-3.522-7.875-7.876v-15.75
+		c0-4.345,3.526-7.875,7.875-7.875c4.348,0,7.875,3.53,7.875,7.875v15.75C71.874,123.478,68.348,127,64,127z"/>
+	<path opacity="0.15" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M119.124,71.874h-15.75
+		c-4.353,0-7.875-3.522-7.875-7.875c0-4.345,3.522-7.875,7.875-7.875h15.75c4.354,0,7.876,3.53,7.876,7.875
+		C127,68.352,123.478,71.874,119.124,71.874z"/>
+	<path opacity="0.4" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M30.588,108.55c-3.076,3.076-8.059,3.076-11.136,0
+		c-3.076-3.076-3.076-8.067,0-11.137l11.136-11.143c3.076-3.068,8.063-3.068,11.136,0c3.075,3.076,3.075,8.068,0,11.143
+		L30.588,108.55z"/>
+	<path opacity="0.2" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M97.407,86.271l11.134,11.143
+		c3.077,3.069,3.077,8.061,0,11.137c-3.074,3.076-8.059,3.076-11.134,0L86.271,97.413c-3.077-3.074-3.077-8.066,0-11.143
+		C89.347,83.202,94.331,83.202,97.407,86.271z"/>
+	<path opacity="0.1" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M97.407,41.728c-3.076,3.076-8.061,3.076-11.137,0
+		c-3.077-3.076-3.077-8.059,0-11.136l11.137-11.144c3.075-3.069,8.06-3.069,11.134,0c3.077,3.076,3.077,8.068,0,11.144
+		L97.407,41.728z"/>
+	<path opacity="0.05" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M64,32.499c-4.349,0-7.875-3.521-7.875-7.874
+		V8.875C56.125,4.529,59.65,1,64,1c4.348,0,7.875,3.529,7.875,7.875v15.75C71.874,28.978,68.348,32.499,64,32.499z"/>
+	<path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M32.499,64c0,4.352-3.526,7.875-7.874,7.875H8.875
+		C4.525,71.874,1,68.352,1,64c0-4.345,3.525-7.875,7.875-7.875h15.75C28.973,56.125,32.499,59.654,32.499,64z"/>
+	<path opacity="0.6" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M30.588,41.728L19.453,30.592
+		c-3.076-3.076-3.076-8.067,0-11.144c3.077-3.069,8.06-3.069,11.136,0l11.136,11.144c3.075,3.077,3.075,8.06,0,11.136
+		C38.652,44.804,33.665,44.804,30.588,41.728z"/>
+	
+	<animateTransform attributeName="transform" attributeType="XML" type="rotate" begin="0s" dur="1s" repeatCount="indefinite"
+		calcMode="discrete" values="0 64 64; 45 64 64; 90 64 64; 135 64 64; 180 64 64; 225 64 64; 270 64 64; 315 64 64"/>
+</g>
+</svg>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE project>
+<project name="dt-http" default="run" xmlns:http="http://dynatrace.com/ant/http">
+
+	<taskdef uri="http://dynatrace.com/ant/http" resource="antlib.xml" classpath="./dt-http.jar" />
+	
+    <target name="run" description="description">
+<!--    	
+        <http:get url="https://ant.apache.org/manual/develop.html" />
+-->        
+    	<http:post>
+    		REINI WAR DA
+    	</http:post>
+    	
+    	<fastpack>
+    		<profile file="IIS.profile.xml" />
+    		<dashboard file="IIS Overview.dashboard.xml" />
+    	</fastpack>
+    </target>
+	
+    <target name="send-fast-pack">
+    	<fastpack dest="localhost:8020">
+    		<profile file="IIS.profile.xml" />
+    		<dashboard file="IIS Overview.dashboard.xml" />
+    	</fastpack>
+    </target>	
+	
+</project>

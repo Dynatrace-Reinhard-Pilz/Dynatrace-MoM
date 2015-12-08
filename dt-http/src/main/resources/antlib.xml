@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!DOCTYPE xml>
+<antlib>
+	<typedef name="get" classname="com.dynatrace.http.ant.HttpGetTask" />
+	<typedef name="post" classname="com.dynatrace.http.ant.HttpPostTask" />
+	<typedef name="upload" classname="com.dynatrace.http.ant.HttpUploadTask" />
+</antlib>

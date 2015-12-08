@@ -1,0 +1,145 @@
+@charset "utf-8";
+/* CSS Document */
+
+.login_content{
+    bottom: 0;
+    left: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 100%;
+    background-image: linear-gradient(bottom, rgb(173,182,188) 0%, rgb(206,213,217) 100%);
+    background-image: -o-linear-gradient(bottom, rgb(173,182,188) 0%, rgb(206,213,217) 100%);
+    background-image: -moz-linear-gradient(bottom, rgb(173,182,188) 0%, rgb(206,213,217) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgb(173,182,188) 0%, rgb(206,213,217) 100%);
+    background-image: -ms-linear-gradient(bottom, rgb(173,182,188) 0%, rgb(206,213,217) 100%);
+    background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0, rgb(173,182,188)),
+        color-stop(1, rgb(206,213,217))
+    );    
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#adb6bc', endColorstr='#ced5d9',GradientType=0 ); /* IE6-9 */
+}
+
+.login_form{
+    margin: 15% auto 0 auto;
+    padding: 1px;
+    width: 400px;
+}
+
+.login_form .login_form_content{
+    padding: 1px;
+    margin: 0px auto;
+    margin-bottom: 8px;
+    width: 400px;
+}
+
+.login_form .login_form_header {
+    color: #525959;
+    text-align: center;
+    font-size: 28px;
+    font-family: SourceSansPro;
+    text-shadow: 0px 1px 0px White;
+}
+
+.login_form .login_form_content .login_form_element{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.login_form .login_form_content .login_form_element input {
+    width: 400px;
+    padding: 6px 12px;
+    background: #f0f4f4;
+    -webkit-box-shadow: 0px 1px 0px 0px rgba(255, 255, 255, 1);
+    box-shadow: 0px 1px 0px 0px rgba(255, 255, 255, 1);
+    border-width: 0px;
+    border-top: 1px solid #adb6bc;
+    margin-top: 10px;
+}
+
+.login_form .login_form_submit {
+    text-align: right;
+}
+
+.login_form .login_form_submit .version_space{
+    float: left;
+    width: 200px;
+    margin-left: 5px;
+}
+
+.login_form .login_form_submit .ui-widget{
+    float: right;
+    width: 70px;
+    text-align: center;
+}
+
+.login_form .login_form_submit input {
+    font-size: 18px;
+    font-family: SourceSansPro;
+    font-weight: bold;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 120px;
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    padding: 0px;
+    text-shadow: 0px 1px 0px #105625;
+    background-image: linear-gradient(bottom, rgb(60,166,76) 0%, rgb(44,188,63) 100%);
+    background-image: -o-linear-gradient(bottom, rgb(60,166,76) 0%, rgb(44,188,63) 100%);
+    background-image: -moz-linear-gradient(bottom, rgb(60,166,76) 0%, rgb(44,188,63) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgb(60,166,76) 0%, rgb(44,188,63) 100%);
+    background-image: -ms-linear-gradient(bottom, rgb(60,166,76) 0%, rgb(44,188,63) 100%);
+    background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0, rgb(60,166,76)),
+        color-stop(1, rgb(44,188,63))
+    );    
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3ca64c', endColorstr='#2cbc3f',GradientType=0 ); /* IE6-9 */    
+    border-color: #1a6f2c;
+}
+
+.login_form .status {
+    font-size: 18px;
+    color: #D12121;
+    text-align: center;
+    font-family: SourceSansPro;
+    text-shadow: 0px 1px 0px #DFD1CE;
+    margin-top: 10px;
+}
+.login_form .status div {
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
+
+.login_form .footer {
+    color: #525959;
+    font-size: 12px;
+    font-family: SourceSansPro;
+    margin-top: 30px;
+    text-shadow: 0px 1px 0px #CAD3D7;
+    text-align: center;
+}
+
+.login_form .footer .link {
+	margin-left: 30px;
+	color: #525959;
+}
+
+.login_form .footer .link i {
+	font-size: 10px;
+	margin-left: 2px;
+	text-decoration: none;
+}
+
+.maintenanceMode {
+	font-size: 24px;
+	color: red;	
+}

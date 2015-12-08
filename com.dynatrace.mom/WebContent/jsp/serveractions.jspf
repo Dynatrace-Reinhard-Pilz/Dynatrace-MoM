@@ -1,0 +1,42 @@
+<%@page import="com.dynatrace.mom.web.ServerModel,
+com.dynatrace.mom.runtime.components.ServerRecord,
+com.dynatrace.http.ConnectionStatus,
+com.dynatrace.mom.web.breadcrumbs.ActivePage,
+com.dynatrace.mom.runtime.components.ServerRecord"
+%><%
+if (false) {
+	ServerRecord serverRecord = null;
+	ServerModel serverModel = (ServerModel) request.getAttribute(ServerModel.class.getName());
+	if (serverModel != null) {
+		serverRecord = serverModel.getServerRecord();
+	}
+	if (serverRecord == null) {
+		serverRecord = (ServerRecord) request.getAttribute(ServerRecord.class.getName());
+	}
+	ConnectionStatus serverStatus = ConnectionStatus.OFFLINE;
+	if (serverRecord != null) {
+		serverStatus = serverRecord.getConnectionStatus();
+	}
+	ActivePage activePage = (ActivePage) pageContext.getRequest().getAttribute("activepage");
+	
+	if (serverRecord != null) { %>
+					<div class="wrapper" id="reload-breadcrumb-buttons" style="text-align: right; position: absolute; right: 10px">
+						<div class="crumb"><%
+						if (serverStatus == ConnectionStatus.RESTARTING) { %>
+							<a href="#" onclick="restartServer();" style="background-image: url(${pageContext.request.contextPath}/images/chart-loader.gif); background-position: 3px 0px; background-repeat: no-repeat; background-size: 12px 12px; padding-left: 5px"><div class="text">Restart</div></a><%
+						} else { %>	
+							<a href="#" onclick="restartServer();"><div class="text"><img src="${pageContext.request.contextPath}/images/restart.png" width="11" height="11" style="margin-left: -3px; margin-right: 7px; display: inline" alt="Edit Server Settings" />Restart</div></a><%
+						} %>
+						</div>
+						<div class="crumb">
+							<a href="${pageContext.request.contextPath}/web/servers"><div class="text"><img src="${pageContext.request.contextPath}/images/shutdown.png" width="11" height="11" style="margin-left: -3px; margin-right: 7px; display: inline" alt="Edit Server Settings" />Shutdown</div></a>
+						</div><%
+						String cls = activePage == ActivePage.config ? "crumb on" : "crumb";
+						%>
+						<div class="<%= cls %>">
+							<a href="${pageContext.request.contextPath}/servers/<%= serverRecord.getName() %>/config"><div class="text"><img src="${pageContext.request.contextPath}/images/configuration.png" width="11" height="11" style="margin-left: -3px; margin-right: 7px; display: inline" alt="Edit Server Settings" /> Edit</div></a>
+						</div>
+					</div><%
+	}
+}
+%>

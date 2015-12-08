@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: dt-fastpacks
+Bundle-SymbolicName: dt-fastpacks
+Bundle-Version: 1.0.0.qualifier
+Export-Package: com.dynatrace.fastpacks,
+ com.dynatrace.fastpacks.metadata,
+ com.dynatrace.fastpacks.metadata.instances,
+ com.dynatrace.fastpacks.metadata.manifest,
+ com.dynatrace.fastpacks.metadata.resources

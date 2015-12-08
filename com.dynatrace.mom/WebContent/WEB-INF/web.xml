@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="mom" version="3.1">
+  <display-name>mom</display-name>
+  <welcome-file-list>
+    <welcome-file>/servers</welcome-file>
+  </welcome-file-list>
+  <error-page>
+    <error-code>500</error-code>
+    <location>/general-error.html</location>
+  </error-page>
+  <servlet-mapping>
+    <servlet-name>jsp</servlet-name>
+    <url-pattern>/jsp/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>jsp</servlet-name>
+    <url-pattern>*.jsp</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>jsp</servlet-name>
+    <url-pattern>*.jspf</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/general-error.html</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/favicon.ico</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/scripts/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/styles/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/images/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description>JAX-RS Tools Generated - Do not modify</description>
+    <servlet-name>JAX-RS Servlet</servlet-name>
+    <servlet-class>com.dynatrace.mom.JerseyServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JAX-RS Servlet</servlet-name>
+    <url-pattern>/jaxrs/*</url-pattern>
+  </servlet-mapping>
+</web-app>

@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: dt-license-usage-monitor
+Bundle-SymbolicName: dt-license-usage-monitor;singleton:=true
+Bundle-Version: 1.0.0.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-Vendor: Dynatrace
+Require-Bundle: com.dynatrace.diagnostics.sdk,
+ dt-utils;resolution:=optional;visibility:=reexport
+Bundle-ClassPath: lib/ojdbc7.jar,
+ .
+Export-Package: com.dynatrace.monitors.license.usage

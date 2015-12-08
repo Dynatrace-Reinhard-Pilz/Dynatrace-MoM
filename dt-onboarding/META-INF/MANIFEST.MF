@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: dt-onboarding
+Bundle-SymbolicName: dt-onboarding
+Bundle-Version: 1.0.0.qualifier
+Export-Package: com.dynatrace.onboarding,
+ com.dynatrace.onboarding.config,
+ com.dynatrace.onboarding.dashboards,
+ com.dynatrace.onboarding.fastpacks,
+ com.dynatrace.onboarding.profiles,
+ com.dynatrace.onboarding.serverconfig,
+ com.dynatrace.onboarding.usergroups,
+ com.dynatrace.onboarding.variables

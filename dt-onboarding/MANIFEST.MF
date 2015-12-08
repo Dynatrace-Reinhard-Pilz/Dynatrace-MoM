@@ -1,0 +1,37 @@
+Manifest-Version: 1.0
+Class-Path: .
+Main-Class: com.dynatrace.onboarding.OnBoardingMain
+
+Name: javax/el/
+Specification-Title: Expression Language
+Implementation-Title: javax.el
+Implementation-Version: 2.2.FR
+Specification-Version: 2.2
+Specification-Vendor: Sun Microsystems, Inc.
+Implementation-Vendor: Apache Software Foundation
+
+Name: javax/servlet/jsp/
+Specification-Title: Java API for JavaServer Pages
+Implementation-Title: javax.servlet.jsp
+Implementation-Version: 2.2.FR
+Specification-Version: 2.2
+Specification-Vendor: Sun Microsystems, Inc.
+Implementation-Vendor: Apache Software Foundation
+
+Name: org/apache/tools/ant/
+Implementation-Title: org.apache.tools.ant
+Implementation-Version: 1.7.0
+Specification-Vendor: Apache Software Foundation
+Specification-Title: Apache Ant
+Extension-name: org.apache.tools.ant
+Specification-Version: 1.7.0
+Implementation-Vendor: Apache Software Foundation
+
+Name: javax/servlet/
+Specification-Title: Java API for Servlets (Annotations)
+Implementation-Title: javax.servlet
+Implementation-Version: 3.0.FR
+Specification-Version: 3.0
+Specification-Vendor: Sun Microsystems, Inc.
+Implementation-Vendor: Apache Software Foundation
+

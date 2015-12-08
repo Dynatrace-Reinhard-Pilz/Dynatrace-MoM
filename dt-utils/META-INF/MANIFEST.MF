@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: dt-utils
+Bundle-SymbolicName: dt-utils
+Bundle-Version: 1.0.0.qualifier
+Export-Package: com.dynatrace,
+ com.dynatrace.utils,
+ com.dynatrace.version,
+ com.dynatrace.xml,
+ com.dynatrace.xml.classes,
+ com.dynatrace.xml.mock

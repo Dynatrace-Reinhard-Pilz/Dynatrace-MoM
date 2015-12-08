@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: dt-ensure-user-group-task
+Bundle-SymbolicName: dt-ensure-user-group-task;singleton:=true
+Bundle-Version: 1.0.0.0
+Require-Bundle: com.dynatrace.diagnostics.sdk,
+ com.dynatrace.diagnostics.server
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: com.dynatrace.tasks
