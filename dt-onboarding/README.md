@@ -36,7 +36,7 @@ The Dashboard the utility eventually deploys to the dynaTrace Server will automa
 By typing in ```java –jar dt-onboarding.jar usage``` you will get a detailed list of configuration options available, which is listed at the end of this message.
 Configuration options are all implemented as System Properties, so make sure you specify them before the ```–jar``` argument.
 
-In order to perform all required operations the utility is connecting to the REST API of the dynaTrace Server. Therefore you are required to specify user credentials of a user configured on the dynaTrace Server that requires the following permissions
+In order to perform all required operations the utility is connecting to the [REST API](https://community.dynatrace.com/community/display/DOCDT62/REST+Interfaces) of the dynaTrace Server. Therefore you are required to specify user credentials of a user configured on the dynaTrace Server that requires the following permissions
 * Access the WebService Interface
 * Create Support Archives
 * Create System Profiles
