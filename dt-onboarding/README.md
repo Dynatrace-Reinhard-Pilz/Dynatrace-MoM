@@ -55,8 +55,11 @@ How do I specify the dynaTrace Server and user credentials the utility should de
 
 ### Example - Creating a System Profile
 `java –Dconfig.templates.profile=”{@application} {@environment} JBoss” –jar dt-onboarding.jar`
+
 or alternatively
+
 `java –Dconfig. templates.profile=”{@application} {@environment} JBoss.profile.xml” –jar dt-onboarding.jar`
+
 searches for a file named `{@application} {@environment} JBoss.profile.xml` within `dt-onboarding.jar` or on the dynaTrace Server and creates a new System Profile based on this Template on the dynaTrace Server.
 * Make sure you wrap quotes `“` around the template name in case it contains white spaces.
 * The name of the System Profile that is going to be deployed on the dynaTrace Server depends on the values you have defined for the variables application and environment.
