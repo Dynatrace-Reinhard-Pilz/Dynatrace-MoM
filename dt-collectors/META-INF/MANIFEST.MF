@@ -5,3 +5,4 @@ Bundle-SymbolicName: dt-collectors
 Bundle-Version: 1.0.0.qualifier
 Export-Package: com.dynatrace.collectors,
  com.dynatrace.collectors.web
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

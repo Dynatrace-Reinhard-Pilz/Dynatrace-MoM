@@ -9,3 +9,4 @@ Export-Package: com.dynatrace,
  com.dynatrace.xml,
  com.dynatrace.xml.classes,
  com.dynatrace.xml.mock
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

@@ -4,3 +4,4 @@ Bundle-Name: dt-sysinfo
 Bundle-SymbolicName: dt-sysinfo
 Bundle-Version: 1.0.0.qualifier
 Export-Package: com.dynatrace.sysinfo
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

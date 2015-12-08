@@ -4,3 +4,4 @@ Bundle-Name: dt-reporting
 Bundle-SymbolicName: dt-reporting
 Bundle-Version: 1.0.0.qualifier
 Export-Package: com.dynatrace.reporting
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

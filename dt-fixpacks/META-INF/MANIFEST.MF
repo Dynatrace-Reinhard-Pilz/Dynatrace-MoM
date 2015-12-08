@@ -4,3 +4,4 @@ Bundle-Name: dt-fixpacks
 Bundle-SymbolicName: dt-fixpacks
 Bundle-Version: 1.0.0.qualifier
 Export-Package: com.dynatrace.fixpacks
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

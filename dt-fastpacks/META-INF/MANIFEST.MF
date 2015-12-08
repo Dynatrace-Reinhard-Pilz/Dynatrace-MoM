@@ -8,3 +8,4 @@ Export-Package: com.dynatrace.fastpacks,
  com.dynatrace.fastpacks.metadata.instances,
  com.dynatrace.fastpacks.metadata.manifest,
  com.dynatrace.fastpacks.metadata.resources
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

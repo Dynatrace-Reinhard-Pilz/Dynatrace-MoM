@@ -4,3 +4,4 @@ Bundle-Name: dt-agents
 Bundle-SymbolicName: dt-agents
 Bundle-Version: 1.0.0.qualifier
 Export-Package: com.dynatrace.agents
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

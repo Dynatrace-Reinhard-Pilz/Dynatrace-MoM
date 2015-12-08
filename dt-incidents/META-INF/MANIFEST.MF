@@ -4,3 +4,4 @@ Bundle-Name: dt-incidents
 Bundle-SymbolicName: dt-incidents
 Bundle-Version: 1.0.0.qualifier
 Export-Package: com.dynatrace.incidents
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

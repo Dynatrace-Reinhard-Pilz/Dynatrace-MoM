@@ -11,3 +11,4 @@ Export-Package: com.dynatrace.onboarding,
  com.dynatrace.onboarding.serverconfig,
  com.dynatrace.onboarding.usergroups,
  com.dynatrace.onboarding.variables
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

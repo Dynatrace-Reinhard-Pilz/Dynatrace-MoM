@@ -10,3 +10,4 @@ Export-Package: com.dynatrace,
  com.dynatrace.http.impl,
  com.dynatrace.http.permissions,
  com.dynatrace.http.request
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

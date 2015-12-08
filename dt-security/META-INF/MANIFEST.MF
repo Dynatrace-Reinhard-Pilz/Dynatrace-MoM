@@ -4,3 +4,4 @@ Bundle-Name: dt-security
 Bundle-SymbolicName: dt-security
 Bundle-Version: 1.0.0.qualifier
 Export-Package: com.dynatrace.security
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
