@@ -1,4 +1,4 @@
-# dt-onboarding
+# Dynatrace Onboarding
 dt-onboarding is a command line tool for creating System Profiles based on Templates.
 The latest stable release can be downloaded [here](https://github.com/Dynatrace-Reinhard-Pilz/Dynatrace-MoM/blob/master/dt-onboarding/dt-onboarding.jar?raw=true) 
 
