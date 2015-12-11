@@ -235,7 +235,7 @@ public class Resources {
 			}
 		}
 		Map<String, File> resources = new HashMap<>();
-	    if (en.hasMoreElements()) {
+	    while (en.hasMoreElements()) {
 	        URL url = en.nextElement();
 	        URLConnection conn = null;
 	        try {
