@@ -23,7 +23,7 @@ public class Dashboard {
 		this.file = file;
 		this.key = key;
 		if (!file.getName().endsWith(FILE_EXTENSION)) {
-			throw new IllegalArgumentException("This is not a System Profile: " + file.getAbsolutePath());
+			throw new IllegalArgumentException("This is not a Dashboard: " + file.getAbsolutePath());
 		}
 		Document document = DomUtil.build(file);
 		version = DomUtil.extractVersion(document, file.getName());
