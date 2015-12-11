@@ -2,13 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dynatrace</groupId>
   <artifactId>dt-cmd</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0.qualifier</version>
   <name>dt-cmd</name>
   <dependencies>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-utils</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   </dependencies>
   <build>

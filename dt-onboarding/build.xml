@@ -1,0 +1,8 @@
+<project name="dt-onboarding" default="link">
+
+	<import file="../build-ant/build-common.xml" />
+	
+	<property name="dependencies" value="dt-utils dt-cmd dt-http dt-incidents dt-profiles dt-sysinfo dt-fastpacks" />
+	<property name="main.class" value="com.dynatrace.onboarding.OnBoardingMain" />
+	
+</project>

@@ -1,0 +1,6 @@
+<project name="dt-utils" default="link">
+
+	<import file="../build-ant/build-common.xml" />
+	<property name="dependencies" value="" />
+	
+</project>

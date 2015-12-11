@@ -1,17 +1,7 @@
-<?xml version="1.0"?>
-<!DOCTYPE project>
-<project name="dt-fastpack" default="send-fast-pack">
+<project name="dt-http" default="link">
 
-	<taskdef resource="antlib.xml" classpath="./dt-fastpacks.jar" />
+	<import file="../build-ant/build-common.xml" />
 	
-    <target name="send-fast-pack">
-    	<fastpack dest="localhost:8020">
-    		<profile file="IIS.profile.xml" />
-    		<dashboard file="IIS Overview.dashboard.xml" />
-    	</fastpack>
-    </target>	
+	<property name="dependencies" value="dt-utils dt-cmd" />
 	
 </project>
-
-
-

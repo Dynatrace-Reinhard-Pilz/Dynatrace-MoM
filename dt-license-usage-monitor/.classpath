@@ -28,7 +28,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/ojdbc7.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/dt-http"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/dt-profiles"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/dt-sysinfo"/>

@@ -52,7 +52,6 @@
         <file path="/dt-license-usage-monitor/build.properties"/>
         <javaElement handleIdentifier="=dt-agents/src\/main\/java&lt;com.dynatrace.agents"/>
         <javaElement handleIdentifier="=dt-cmd/src\/main\/java&lt;com.dynatrace.cmd"/>
-        <folder path="/dt-license-usage-monitor/lib"/>
         <javaElement handleIdentifier="=dt-dashboards/src\/main\/resources"/>
         <javaElement handleIdentifier="=dt-agents/src\/main\/resources"/>
         <javaElement handleIdentifier="=dt-collectors/src\/main\/java&lt;com.dynatrace.collectors"/>

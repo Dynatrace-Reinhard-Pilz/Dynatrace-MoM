@@ -1,10 +1,14 @@
 package com.dynatrace.monitors.license.usage;
 
 import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -218,6 +222,32 @@ public class UsageMonitor implements Monitor {
 			LOGGER.log(Level.SEVERE, "Execution failed", e);
 			LOGGER.log(Level.SEVERE, "Execution failed", ExceptionHelper.stackTraceToString(e));
 			return new Status(StatusCode.ErrorInternalException, "Execution failed", "Execution Failed", e);
+		} finally {
+			flush(LOGGER);
+		}
+	}
+	
+	private void flush(Logger logger) {
+		if (logger == null) {
+			return;
+		}
+		flush(logger.getHandlers());
+		flush(logger.getParent());
+	}
+	
+	private void flush(Handler handler) {
+		if (handler == null) {
+			return;
+		}
+		handler.flush();
+	}
+	
+	private void flush(Handler[] handlers) {
+		if (handlers == null) {
+			return;
+		}
+		for (Handler handler : handlers) {
+			flush(handler);
 		}
 	}
 
@@ -243,6 +273,10 @@ public class UsageMonitor implements Monitor {
 			return;
 		}
 		for (MonitorMeasure measure : measures) {
+			String measureName = measure.getMeasureName();
+			String metricName = measure.getMetricName();
+			LOGGER.log(Level.INFO, "MEASURE[name='" + measureName + "', metric='" + metricName + "'");
+			resetMeasurement(measure);
 			Iterable<String> keys = statistics.getKeys();
 			for (String key : keys) {
 				MonitorMeasure dynamicMeasure =	env.createDynamicMeasure(
@@ -251,6 +285,34 @@ public class UsageMonitor implements Monitor {
 					key
 				);
 				dynamicMeasure.setValue(statistics.get(key));
+			}
+			MonitorMeasure global = env.createDynamicMeasure(measure, dynKey, dynKey);
+			global.setValue(Double.NaN);
+		}
+	}
+	
+	private static void resetMeasurement(MonitorMeasure measure) {
+		if (measure == null) {
+			return;
+		}
+		Class<? extends MonitorMeasure> clazz = measure.getClass();
+		Field[] fields = clazz.getDeclaredFields();
+		if (fields == null) {
+			return;
+		}
+		for (Field field : fields) {
+			if (field == null) {
+				continue;
+			}
+			Class<?> fieldType = field.getType();
+			if (fieldType.equals(Number.class)) {
+				field.setAccessible(true);
+				try {
+					field.set(measure, null);
+				} catch (Throwable t) {
+					LOGGER.log(Level.SEVERE, "Failed miserably", t);
+					LOGGER.log(Level.SEVERE, stackTraceToString(t));
+				}
 			}
 		}
 	}
@@ -264,5 +326,29 @@ public class UsageMonitor implements Monitor {
 	public void teardown(MonitorEnvironment env) throws Exception {
 		PROFILE_CACHE.clear();
 	}
+	
+	public static final String stackTraceToString(Throwable throwable) {
+		if (throwable != null) {
+			try {
+				StringWriter stringWriter = new StringWriter();
+				try {
+					PrintWriter printWriter = new PrintWriter(stringWriter);
+					try {
+						throwable.printStackTrace(printWriter);
+						printWriter.flush();
+					} finally {
+						printWriter.close();
+					}
+				} finally {
+					stringWriter.close();
+				}
+				return stringWriter.toString();
+			} catch (Exception e) {
+			}
+		}
+
+		return "";
+	}
+	
 
 }

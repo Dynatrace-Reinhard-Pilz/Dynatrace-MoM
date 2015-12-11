@@ -2,13 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dynatrace</groupId>
   <artifactId>dt-sysinfo</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0.qualifier</version>
   <name>dt-sysinfo</name>
   <dependencies>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-utils</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>junit</groupId>
@@ -17,29 +17,30 @@
   		<scope>test</scope>
   	</dependency>
   	<dependency>
-  		<groupId>ant</groupId>
+  		<groupId>org.apache.ant</groupId>
   		<artifactId>ant</artifactId>
   		<version>1.7.0</version>
+  		<scope>provided</scope>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-cmd</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-incidents</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-http</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-profiles</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   </dependencies>
   <build>

@@ -75,8 +75,10 @@
             displayname="License Usage"
             monitorid="com.dynatrace.monitors.usagemonitor">
          <metric
+               defaultrate="sec"
                description="Consumed Licenses"
                displayname="Consumed Licenses"
+               hidedisplayaggregation="avg min max sum cnt"
                name="Consumed Licenses"
                unit="number">
          </metric>

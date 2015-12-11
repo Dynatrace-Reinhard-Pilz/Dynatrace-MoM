@@ -60,76 +60,77 @@
   		<groupId>javax.mail</groupId>
   		<artifactId>mail</artifactId>
   		<version>1.5.0-b01</version>
+  		<scope>provided</scope>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-utils</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-cmd</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-license</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-agents</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-collectors</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-dashboards</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-fastpacks</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-fixpacks</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-http</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-incidents</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-profiles</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-reporting</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-sysinfo</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-web-base</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>1.0.0.qualifier</version>
   	</dependency>
   </dependencies>
   <build>

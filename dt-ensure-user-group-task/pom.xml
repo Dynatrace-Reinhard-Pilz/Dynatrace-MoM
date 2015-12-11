@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dynatrace</groupId>
   <artifactId>dt-ensure-user-group-task</artifactId>
-  <version>1.0.0.0</version>
+  <version>1.0.0.qualifier</version>
   <name>dt-ensure-user-group-task</name>
   <build>
   	<plugins>

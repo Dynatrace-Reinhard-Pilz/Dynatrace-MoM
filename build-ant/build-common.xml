@@ -1,0 +1,214 @@
+<project name="build-ant">
+	
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="../build-ant/lib/ant-contrib-1.0b3.jar" />
+	<taskdef resource="org/apache/maven/artifact/ant/antlib.xml" classpath="../build-ant/lib/maven-ant-tasks-2.1.3.jar" />
+	
+	<tstamp>
+		<format property="build.timestamp" pattern="YYYYMMDDHHssSSS" />
+	</tstamp>
+	
+	<property file="version.properties" />
+	<property file="../version.properties" />
+	<property name="spec-version" value="${version.major}.${version.minor}.${version.revision}" />
+	<property name="version" value="${version.major}.${version.minor}.${version.revision}.${build.timestamp}" />
+	
+	<property name="dir-src" value="src" />
+	<property name="dir-java-src" value="${dir-src}/main/java" />
+	<property name="dir-resources-src" value="${dir-src}/main/resources" />
+	
+	<property name="dir-build" value="build" />
+	<property name="dir-build-classes" value="${dir-build}/classes" />
+	<property name="dir-build-resources" value="${dir-build}/resources" />
+	
+	<property
+		name="lastbuild.properties"
+		location="${dir-build}/lastbuild.properties"/>
+	<property file="${lastbuild.properties}" prefix="local" />
+	
+	<condition property="built">
+		<equals arg1="${local.build.timestamp}" arg2="${build.timestamp}" />
+	</condition>
+	
+	<macrodef name="ant-dependencies">
+		<attribute name="projects" />
+		<attribute name="target" />
+		<sequential>
+			<for list="@{projects}" param="project" delimiter=" ">
+                <sequential>
+            		<ant
+            			antfile="../@{project}/build.xml"
+            			target="@{target}"
+            			inheritall="false"
+            			dir="../@{project}">
+            			<property
+            				name="build.timestamp"
+            				value="${build.timestamp}"
+            			/>
+            		</ant>
+                </sequential>				
+			</for>
+		</sequential>
+	</macrodef>
+	
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+	<target name="clean" unless="built">
+		<delete dir="${dir-build}" failonerror="false" />
+	</target>
+	
+	<!-- ================================= 
+          target: init              
+         ================================= -->
+	<target name="init" depends="clean" unless="built">
+		<mkdir dir="${dir-build}" />
+		<mkdir dir="${dir-build-classes}" />
+		<mkdir dir="${dir-build-resources}" />
+		<copy file="pom.xml" tofile="${dir-build}/pom.xml" verbose="true" />
+		<replace
+			file="${dir-build}/pom.xml"
+			token="1.0.0.qualifier"
+			value="${version}" />
+		<mkdir dir="${dir-build-resources}/META-INF" />
+		<copy todir="${dir-build-resources}/META-INF">
+			<fileset dir="META-INF">
+				<include name="MANIFEST.MF"/>
+			</fileset>
+		</copy>
+		<echoproperties destfile="${lastbuild.properties}">
+			<propertyset>
+				<propertyref name="build.timestamp" />
+			</propertyset>
+		</echoproperties>
+	</target>
+	
+	<!-- ================================= 
+          target: compile              
+         ================================= -->
+	<target name="compile" depends="init" unless="built">
+		<ant-dependencies projects="${dependencies}" target="install" />
+		<dependencies pathId="dependency.classpath">
+			<pom file="${dir-build}/pom.xml" />
+		</dependencies>
+		<javac
+			includeantruntime="false"
+			sourcepath=""
+			destdir="${dir-build-classes}"
+			target="1.7">
+			<src location="${dir-java-src}" />
+			<classpath refid="dependency.classpath" />			
+		</javac>
+	</target>
+	
+	<!-- ================================= 
+          target: set-main-class              
+         ================================= -->
+	<target name="set-main-class" if="main.class">
+		<manifest
+			file="${dir-build-resources}/META-INF/MANIFEST.MF"
+				mode="update">
+			<attribute name="Main-Class" value="${main.class}" />
+		</manifest>
+	</target>
+	
+	<macrodef name="link">
+		<attribute name="bundle-name" />
+		<sequential>
+			<copy todir="${dir-build-resources}">
+				<fileset dir="${dir-resources-src}">
+					<include name="**" />
+				</fileset>
+			</copy>
+			<manifest
+				file="${dir-build-resources}/META-INF/MANIFEST.MF"
+					mode="update">
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Bundle-Version" value="${version}" />
+				<attribute name="Bundle-Name" value="@{bundle-name}" />
+				<attribute name="Bundle-SymbolicName" value="@{bundle-name}" />
+				<attribute
+					name="Specification-Version"
+					value="${spec-version}" />
+				<attribute name="Specification-Vendor" value="Dynatrace" />
+				<attribute name="Implementation-Title" value="@{bundle-name}" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Implementation-Vendor" value="Dynatrace" />
+			</manifest>
+			<ant target="set-main-class" />
+			<replace
+				file="${dir-build}/pom.xml"
+				token="${ant.project.name}"
+				value="@{bundle-name}" />
+			<jar
+				jarfile="${dir-build}/@{bundle-name}_${version}.jar"
+				manifest="${dir-build-resources}/META-INF/MANIFEST.MF">
+				<fileset dir="${dir-build-classes}">
+					<include name="**" />
+				</fileset>
+				<fileset dir="${dir-build-resources}">
+					<include name="**" />
+				</fileset>
+			</jar>
+		</sequential>
+	</macrodef>
+	
+	<!-- ================================= 
+          target: link              
+         ================================= -->
+	<target name="link" depends="compile" unless="built" description="">
+		<link bundle-name="${ant.project.name}" />
+	</target>
+	
+	<!-- ================================= 
+          target: link-bundled              
+         ================================= -->
+	<target name="link-bundle" depends="compile" unless="built" description="">
+		<dependencies pathId="dependency.classpath" scopes="compile">
+			<pom file="${dir-build}/pom.xml" />
+		</dependencies>
+		<pathconvert
+			property="dependency-jars"
+			refid="dependency.classpath"
+			pathsep=";" />
+		<for list="${dependency-jars}" param="dependency-jar" delimiter=";">
+			<sequential>
+				<unjar
+					src="@{dependency-jar}"
+					dest="${dir-build-classes}"
+					overwrite="false">
+					<patternset>
+						<include name="**/*.class" />
+					</patternset>
+				</unjar>
+				<unjar
+					src="@{dependency-jar}"
+					dest="${dir-build-resources}"
+					overwrite="false">
+					<patternset>
+						<exclude name="**/*.class" />
+					</patternset>
+				</unjar>
+			</sequential>
+		</for>
+		<link bundle-name="${ant.project.name}-bundle" />
+	</target>
+	
+	<!-- ================================= 
+          target: install              
+         ================================= -->
+	<target name="install" depends="link" unless="built">
+		<install file="${dir-build}/${ant.project.name}_${version}.jar">
+			<pom file="${dir-build}/pom.xml" />
+		</install>
+	</target>
+
+	<!-- ================================= 
+          target: install-bundle              
+         ================================= -->
+	<target name="install-bundle" depends="link-bundle" unless="built">
+		<install file="${dir-build}/${ant.project.name}-bundle_${version}.jar">
+			<pom file="${dir-build}/pom.xml" />
+		</install>
+	</target>
+	
+</project>

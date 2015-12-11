@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dynatrace</groupId>
   <artifactId>dt-license-usage-monitor</artifactId>
-  <version>1.0.0.0</version>
+  <version>1.0.0.qualifier</version>
   <name>dt-license-usage-monitor</name>
   <build>
   	<plugins>
