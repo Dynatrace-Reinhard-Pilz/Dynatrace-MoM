@@ -5,4 +5,14 @@
 	<property name="dependencies" value="dt-utils dt-cmd dt-http dt-incidents dt-profiles dt-sysinfo dt-fastpacks" />
 	<property name="main.class" value="com.dynatrace.onboarding.OnBoardingMain" />
 	
+	<target name="assemble" description="">
+		<ant target="link-bundle">
+			<property
+				name="build.timestamp"
+				value="${build.timestamp}"
+			/>
+		</ant>
+		<copy file="${dir-build}/${ant.project.name}-bundle_${version}.jar" tofile="${ant.project.name}.jar" />
+	</target>
+	
 </project>
