@@ -211,7 +211,7 @@ public class ServerProperties {
 	
 	public Collection<Dashboard> dashboards() {
 		Collection<Dashboard> dashboards = new ArrayList<>();
-		File dashboardsFolder = getProfilesFolder();
+		File dashboardsFolder = getDashboardFolder();
 		File[] files = dashboardsFolder.listFiles();
 		if (files == null) {
 			return dashboards;
