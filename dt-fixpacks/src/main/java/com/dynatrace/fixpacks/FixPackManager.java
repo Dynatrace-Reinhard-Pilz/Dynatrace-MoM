@@ -144,7 +144,8 @@ public final class FixPackManager {
 		this.ctx = ctx;
 		fixPackFolder = ctx.getStorageSubFolder(
 			ExecutionContext.ATTRIBUTE_FIXPACKS_FOLDER,
-			"fixpacks"
+			"fixpacks",
+			false
 		);
 		final File[] fixPackFiles = this.fixPackFolder.listFiles();
 		for (File fixPackFile : fixPackFiles) {

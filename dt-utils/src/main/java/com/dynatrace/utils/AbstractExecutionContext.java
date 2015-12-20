@@ -67,12 +67,18 @@ public abstract class AbstractExecutionContext implements ExecutionContext, Thre
 	}
 	
 	@Override
+	public File getStorageSubFolder(String attribute, String folderName, boolean delete) {
+		return getStorageSubFolder(attribute, folderName, true);
+	}
+	
+	@Override
 	public synchronized File getStorageSubFolder(String attribute, String folderName) {
 		File folder = getAttribute(attribute);
 		if (folder != null) {
 			return folder;
 		}
 		folder = new File(getStorageFolder(), folderName);
+		Closeables.purge(folder);
 		folder.mkdirs();
 		setAttribute(attribute, folder);
 		return folder;

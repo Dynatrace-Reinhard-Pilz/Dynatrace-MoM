@@ -33,5 +33,6 @@ public interface ExecutionContext extends Executor {
 	
 	File getStorageFolder();
 	File getStorageSubFolder(String attribute, String folderName);
+	File getStorageSubFolder(String attribute, String folderName, boolean delete);
 
 }

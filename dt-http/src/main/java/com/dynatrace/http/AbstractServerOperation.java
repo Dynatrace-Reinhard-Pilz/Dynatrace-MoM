@@ -203,6 +203,11 @@ implements Runnable, ExecutionContext {
 	}
 
 	@Override
+	public File getStorageSubFolder(String attribute, String folderName, boolean delete) {
+		return ctx.getStorageSubFolder(attribute, folderName, delete);
+	}
+	
+	@Override
 	public File getStorageSubFolder(String attribute, String folderName) {
 		return ctx.getStorageSubFolder(attribute, folderName);
 	}
