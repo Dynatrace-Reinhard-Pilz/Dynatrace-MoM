@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +22,7 @@ import com.dynatrace.http.UnexpectedResponseCodeException;
 import com.dynatrace.http.config.ServerConfig;
 import com.dynatrace.http.request.Request;
 import com.dynatrace.utils.Closeables;
+import com.dynatrace.utils.TempFiles;
 
 public class SysInfoRequest implements Request<SysInfoResult> {
 	
@@ -43,6 +45,9 @@ public class SysInfoRequest implements Request<SysInfoResult> {
 		"componentproperties"	
 	};
 	
+	private static final File TEMP =
+			TempFiles.getTempFolder(SysInfoRequest.class.getSimpleName());
+	
 	@Override
 	public HttpResponse<SysInfoResult> execute(ServerConfig serverConfig) {
 		LOGGER.log(Level.FINE, MessageFormat.format(
@@ -60,7 +65,7 @@ public class SysInfoRequest implements Request<SysInfoResult> {
 		File tmpSysInfoFile = null;
 		FileOutputStream fos;
 		try {
-			tmpSysInfoFile = File.createTempFile("sysinfo.", ".tmp");
+			tmpSysInfoFile = new File(TEMP, UUID.randomUUID().toString());
 			tmpSysInfoFile.deleteOnExit();
 			fos = new FileOutputStream(tmpSysInfoFile);
 		} catch (IOException e) {
