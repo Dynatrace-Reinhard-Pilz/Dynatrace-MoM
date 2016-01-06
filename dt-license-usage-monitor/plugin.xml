@@ -9,63 +9,57 @@
             class="com.dynatrace.monitors.license.usage.UsageMonitor"
             configid="com.dynatrace.monitors.usagemonitor.config">
       </plugin>
+      <information>
+         <author
+               value="reinhard.pilz@dynatrace.com">
+         </author>
+         <displayname
+               value="License Usage Monitor">
+         </displayname>
+      </information>
    </extension>
    <extension
          id="com.dynatrace.monitors.usagemonitor.config"
          name="License Usage Monitor"
          point="com.dynatrace.diagnostics.pdk.pluginconfig">
       <information>
-         <author
-               value="Reinhard Pilz">
-         </author>
-         <displayname
-               value="License Usage Monitor">
-         </displayname>
-         <shortversion
-               value="1.0">
-         </shortversion>
-         <supportlevel
-               value="unsupported">
-         </supportlevel></information>
+         <author value="reinhard.pilz@dynatrace.com" />
+         <displayname value="License Usage Monitor Configuration" />
+         <shortversion value="1.0" />
+         <supportlevel value="unsupported" />
+      </information>   
       <configuration>
          <property
                default="admin"
                key="com.dynatrace.monitors.usagemonitor.config.user"
                label="user"
-               type="string">
-         </property>
+               type="string" />
          <property
                default="admin"
                key="com.dynatrace.monitors.usagemonitor.config.pass"
                label="pass"
-               type="password">
-         </property>
+               type="password" />
          <property
                default="8021"
                key="com.dynatrace.monitors.usagemonitor.config.port"
                label="dynaTrace Server WebService Port"
-               type="long">
-         </property>
+               type="long" />
          <property
                default="https"
                key="com.dynatrace.monitors.usagemonitor.config.protocol"
                label="Protocol"
                type="list">
             <list>
-               <item
-                     value="http">
-               </item>
-               <item
-                     value="https">
-               </item>
+               <item value="http" />
+               <item value="https" />
             </list>
          </property>
          <property
                default="5"
                key="com.dynatrace.monitors.usagemonitor.config.maxProfileCacheAge"
                label="Profile Cache Max Age (minutes)"
-               type="long">
-         </property></configuration>
+               type="long" />
+      </configuration>
    </extension>
    <extension
          id="com.dynatrace.monitors.usagemonitor.metricgroups"
@@ -80,14 +74,13 @@
                displayname="Consumed Licenses"
                hidedisplayaggregation="avg min max sum cnt"
                name="Consumed Licenses"
-               unit="number">
-         </metric>
+               unit="number" />
       </metricgroup>
       <information>
-         <author
-               value="Reinhard Pilz">
-         </author>
+         <author value="reinhard.pilz@dynatrace.com" />
+         <description
+               value="Metric Group for Monitoring consumed Licenses">
+         </description>
       </information>
    </extension>
-
 </plugin>

@@ -27,6 +27,11 @@
   		<artifactId>dt-cmd</artifactId>
   		<version>1.0.0.qualifier</version>
   	</dependency>
+  	<dependency>
+  		<groupId>com.dynatrace</groupId>
+  		<artifactId>dt-authentication-api</artifactId>
+  		<version>1.0.0.qualifier</version>
+  	</dependency>
   </dependencies>
   <build>
   	<plugins>

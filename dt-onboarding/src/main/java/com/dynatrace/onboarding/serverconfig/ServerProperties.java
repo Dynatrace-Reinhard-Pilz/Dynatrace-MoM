@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
@@ -27,12 +26,12 @@ import com.dynatrace.http.HttpResponse;
 import com.dynatrace.http.UnexpectedResponseCodeException;
 import com.dynatrace.http.config.ServerConfig;
 import com.dynatrace.http.permissions.Unauthorized;
-import com.dynatrace.onboarding.config.Debug;
 import com.dynatrace.onboarding.dashboards.Dashboard;
 import com.dynatrace.onboarding.profiles.Profile;
 import com.dynatrace.sysinfo.SysInfoRequest;
 import com.dynatrace.sysinfo.SysInfoResult;
 import com.dynatrace.utils.Closeables;
+import com.dynatrace.utils.TempFiles;
 
 public class ServerProperties {
 	
@@ -43,22 +42,9 @@ public class ServerProperties {
 	private final File SERVER_FOLDER = prepareServerFolder();
 	
 	private static File createTempFolder() {
-		if (Debug.DEBUG) {
-			File tempFolder = new File(ServerProperties.class.getSimpleName() + "-" + UUID.randomUUID().toString());
-			if (tempFolder.exists()) {
-				Closeables.purge(tempFolder);
-			}
-			LOGGER.log(Level.FINEST, "Working Folder: " + tempFolder.getAbsolutePath());
-			tempFolder.mkdirs();
-			return tempFolder;
-		}
-		File tempFolder = null;
-		try {
-			tempFolder = Files.createTempDirectory(ServerProperties.class.getSimpleName()).toFile();
-		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Unable to create temp folder", e);
-		}
-		LOGGER.log(Level.FINEST, "Working Folder: " + tempFolder.getAbsolutePath());
+		File tempFolder = TempFiles.getTempFolder(
+			ServerProperties.class.getSimpleName()
+		);
 		tempFolder.deleteOnExit();
 		return tempFolder;
 	}
@@ -201,7 +187,6 @@ public class ServerProperties {
 					profile = new Profile(file);
 					profiles.add(profile);
 				} catch (IOException e) {
-					LOGGER.log(Level.WARNING, file.getName() + " is not a valid System Profile and will not get considered");
 					LOGGER.log(Level.FINE, file.getName() + " is not a valid System Profile and will not get considered", e);
 				}
 			}
@@ -226,7 +211,6 @@ public class ServerProperties {
 					dashboard = new Dashboard(file, UUID.randomUUID().toString());
 					dashboards.add(dashboard);
 				} catch (IOException e) {
-					LOGGER.log(Level.WARNING, file.getName() + " is not a valid Dashboard and will not get considered");
 					LOGGER.log(Level.FINE, file.getName() + " is not a valid Dashboard and will not get considered", e);
 				}
 			}
@@ -240,6 +224,7 @@ public class ServerProperties {
 		if (profileFile.exists()) {
 			Closeables.purge(profileFile);
 		}
+		profileFile.deleteOnExit();
 		try (OutputStream out = new FileOutputStream(profileFile)) {
 			Closeables.copy(in, out);
 		}
@@ -262,13 +247,14 @@ public class ServerProperties {
 		if (dashboardFile.exists()) {
 			Closeables.purge(dashboardFile);
 		}
+		dashboardFile.deleteOnExit();
 		try (OutputStream out = new FileOutputStream(dashboardFile)) {
 			Closeables.copy(in, out);
 		}
 	}
 	
 	private void handleServerXml(InputStream in) throws IOException {
-		File serverConfigXml = File.createTempFile("server.config.xml", ".tmp");
+		File serverConfigXml = new File(SERVER_FOLDER, "server.config.xml");
 		serverConfigXml.deleteOnExit();
 		try (OutputStream out = new FileOutputStream(serverConfigXml)) {
 			Closeables.copy(in, out);

@@ -32,6 +32,9 @@
         <dependent-module archiveName="dt-http-1.0.0.qualifier.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/dt-http/dt-http">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="dt-authentication-api-1.0.0.qualifier.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/dt-authentication-api/dt-authentication-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <dependent-module archiveName="dt-incidents-1.0.0.qualifier.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/dt-incidents/dt-incidents">
             <dependency-type>uses</dependency-type>
         </dependent-module>

@@ -2,7 +2,6 @@ package com.dynatrace.mom.web;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.Filter;
@@ -21,6 +20,7 @@ import com.dynatrace.mom.MomConfig;
 @WebFilter(servletNames = "jersey-servlet")
 public class ConfigurationFilter implements Filter {
 	
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER =
 			Logger.getLogger(ConfigurationFilter.class.getName());
 

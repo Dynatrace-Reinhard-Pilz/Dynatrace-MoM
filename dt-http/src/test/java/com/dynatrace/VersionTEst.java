@@ -1,5 +1,7 @@
 package com.dynatrace;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyManagementException;
@@ -17,7 +19,6 @@ import javax.net.ssl.X509TrustManager;
 
 import org.junit.Test;
 
-import com.dynatrace.http.HttpClient;
 import com.dynatrace.http.config.Credentials;
 
 public class VersionTEst implements HostnameVerifier, X509TrustManager {
@@ -48,19 +49,23 @@ public class VersionTEst implements HostnameVerifier, X509TrustManager {
 		Credentials credentials = new Credentials("admin", "admin");
 		setCredentials(con, credentials);
 		con.connect();
-		final int contentLength = con.getContentLength();
-		int responseCode = con.getResponseCode();
+		con.getContentLength();
+		con.getResponseCode();
 	}
 	
-	private void setCredentials(HttpURLConnection conn, Credentials cred) {
+	private void setCredentials(HttpURLConnection conn, Credentials cred) throws IOException {
 		Objects.requireNonNull(conn);
 		if (cred == null) {
 			return;
 		}
-		conn.setRequestProperty(
-				HEADER_AUTHORIZATION,
-				BASIC + cred.encode()
-		);
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			baos.write("Basic ".getBytes());
+			cred.encode(conn.getURL(), baos);
+			conn.setRequestProperty(
+					HEADER_AUTHORIZATION,
+					new String(baos.toByteArray())
+					);
+		}
 	}
 	
 	private void handleSecurity(HttpURLConnection conn) {

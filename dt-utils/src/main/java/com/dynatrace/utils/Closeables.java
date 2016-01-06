@@ -410,6 +410,11 @@ public class Closeables {
 		return Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
 	}
 	
+	/**
+	 * TODO: move this method
+	 * @param url
+	 * @return
+	 */
 	public static String getFilename(URL url) {
 		if (url == null) {
 			return null;

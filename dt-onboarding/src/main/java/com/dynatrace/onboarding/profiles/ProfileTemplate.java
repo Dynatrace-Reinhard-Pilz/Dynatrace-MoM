@@ -8,14 +8,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -33,61 +31,22 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.dynatrace.onboarding.variables.UnresolvedVariableException;
-import com.dynatrace.onboarding.variables.Variables;
+import com.dynatrace.onboarding.variables.DefaultVariables;
 import com.dynatrace.utils.DomUtil;
 import com.dynatrace.utils.Iterables;
+import com.dynatrace.utils.TempFiles;
 import com.dynatrace.utils.Version;
+import com.dynatrace.variables.UnresolvedVariableException;
 
 public class ProfileTemplate {
 	
-	@SuppressWarnings("unused")
-	private static final Logger LOGGER =
-			Logger.getLogger(ProfileTemplate.class.getSimpleName());
-
-	private final String id = UUID.randomUUID().toString();
 	private final File tempFolder = createTempFolder();
 	private final File source;
-	private Variables variables = new Variables();
+	private DefaultVariables variables = new DefaultVariables();
 	private final Version version;
 	
 	private synchronized File createTempFolder() {
-		try {
-			File globalTempFile = Files.createTempDirectory(
-				ProfileTemplate.class.getSimpleName()
-			).toFile();
-			if (!globalTempFile.exists()) {
-				if (!globalTempFile.mkdirs()) {
-					throw new RuntimeException(
-						"Unable to create directory " +
-						"'" + globalTempFile.getAbsolutePath() + "'"
-					);
-				}
-			} else if (!globalTempFile.isDirectory()) {
-				throw new RuntimeException(
-					"'" + globalTempFile.getAbsolutePath() + "'" +
-					" is not a directory"
-				);
-			}
-			File tempFolder = new File(globalTempFile, id);
-			if (tempFolder.exists()) {
-				if (!tempFolder.isDirectory()) {
-					throw new RuntimeException(
-						"'" + tempFolder.getAbsolutePath() + "'" +
-						" is not a directory"
-					);
-				}
-			} else if (!tempFolder.mkdirs()) {
-				throw new RuntimeException(
-					"Unable to create directory " +
-					"'" + tempFolder.getAbsolutePath() + "'"
-				);
-			}
-			tempFolder.deleteOnExit();
-			return tempFolder;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return TempFiles.getTempFolder(ProfileTemplate.class.getSimpleName());
 	}
 	
 	public ProfileTemplate(File source) throws IOException {
@@ -116,7 +75,7 @@ public class ProfileTemplate {
 			Document document = dBuilder.parse(in);
 			Iterables.addAll(variables, getVariables(document));
 		}
-		Iterables.addAll(variables, Variables.getVariables(getFilename()));
+		Iterables.addAll(variables, DefaultVariables.getVariables(getFilename()));
 		return variables;
 	}
 	
@@ -134,7 +93,7 @@ public class ProfileTemplate {
 				String attributeValue = attribute.getNodeValue();
 				Iterables.addAll(
 					variables,
-					Variables.getVariables(attributeValue)
+					DefaultVariables.getVariables(attributeValue)
 				);
 			}
 		}
@@ -152,7 +111,7 @@ public class ProfileTemplate {
 		return variables;
 	}
 	
-	private Document resolve(Document document, Variables variables) throws UnresolvedVariableException {
+	private Document resolve(Document document, DefaultVariables variables) throws UnresolvedVariableException {
 		Objects.requireNonNull(document);
 		Objects.requireNonNull(variables);
 		Document clone = (Document) document.cloneNode(true);
@@ -160,16 +119,45 @@ public class ProfileTemplate {
 		return clone;
 	}
 	
+	private static final char[] ALLOWED_CHARS = {
+		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',	
+		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+		'-', '_', '.'
+	};
+	
+	private static char correctChar(char c) {
+		for (char allowedChar : ALLOWED_CHARS) {
+			if (allowedChar == c) {
+				return c;
+			}
+		}
+		return '_';
+	}
+	
+	private static String correct(String s) {
+		if (s == null) {
+			return null;
+		}
+		char[] charArray = s.toCharArray();
+		for (int i = 0; i < charArray.length; i++) {
+			charArray[i] = correctChar(charArray[i]);
+		}
+		return new String(charArray);
+	}
+	
 	private String tokenize(Element element, Node attribute) {
 		if (element.getTagName().equals("agentmapping")) {
 			if (attribute.getNodeName().equals("namepattern")) {
-				return tokenize(element, element.getAttributeNode("id"));
+				return correct(
+					tokenize(element, element.getAttributeNode("id"))
+				);
 			}
 		}
 		return attribute.getNodeValue();
 	}
 	
-	private void resolve(Element element, Variables variables) throws UnresolvedVariableException {
+	private void resolve(Element element, DefaultVariables variables) throws UnresolvedVariableException {
 		NamedNodeMap attributes = element.getAttributes();
 		int attributeCount = attributes.getLength();
 		if (attributeCount > 0) {
@@ -198,11 +186,11 @@ public class ProfileTemplate {
 		return filename.substring(0, filename.length() - ".profile.xml".length());
 	}
 	
-	public String getResolvedProfileName(Variables variables) throws UnresolvedVariableException {
+	public String getResolvedProfileName(DefaultVariables variables) throws UnresolvedVariableException {
 		return variables.resolve(getTemplateName());
 	}
 	
-	public Profile resolve(Variables variables) throws IOException, UnresolvedVariableException {
+	public Profile resolve(DefaultVariables variables) throws IOException, UnresolvedVariableException {
 		return resolve(variables, null);
 	}
 	
@@ -452,7 +440,7 @@ public class ProfileTemplate {
 		configurationsElement.appendChild(configurationElement);
 	}
 	
-	public Profile resolve(Variables variables, Profile profile) throws IOException, UnresolvedVariableException {
+	public Profile resolve(DefaultVariables variables, Profile profile) throws IOException, UnresolvedVariableException {
 		this.variables = variables;
 		Document document = null;
 		
@@ -598,6 +586,13 @@ public class ProfileTemplate {
 		
 		taskElement.appendChild(taskDetailElement);		
 		tasksElement.appendChild(taskElement);
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		if (source != null) {
+			source.delete();
+		}
 	}
 
 }

@@ -3,6 +3,7 @@ package com.dynatrace.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,6 +35,16 @@ public class Iterables {
 		return (c == null) || c.isEmpty();
 	}
 	
+	/**
+	 * Checks if the given {@link SizedIterable} is either {@code null} or does
+	 * not contain any entries.
+	 * 
+	 * @param i the {@link SizedIterable} to check whether it actually contains
+	 * 		any entries
+	 * 
+	 * @return {@code true} if the given {@link SizedIterable} is either
+	 * 		{@code null} or does not have any entries, {@code false} otherwise
+	 */
 	public static boolean isNullOrEmpty(SizedIterable<?> i) {
 		return (i == null) || (i.size() == 0);
 	}
@@ -292,6 +303,17 @@ public class Iterables {
 		return list;
 	}
 	
+	/**
+	 * Adds all the entries available within the given {@link Iterable} to the
+	 * given {@link Collection}.<br />
+	 * <br />
+	 * If either the {@link Collection} to add the entries to or the
+	 * {@link Iterable} holding the entries are {@code null} this call will
+	 * simply get ignored.
+	 * 
+	 * @param c the {@link Collection} to add the entries to
+	 * @param a the {@link Iterable} holding the entries to add
+	 */
 	public static <T> void addAll(Collection<T> c, Iterable<? extends T> a) {
 		if (c == null) {
 			return;
@@ -303,5 +325,54 @@ public class Iterables {
 			c.add(t);
 		}
 	}
-
+	
+	/**
+	 * Adds all the entries contained within the given array to the given
+	 * {@link Collection}.<br />
+	 * <br />
+	 * If either the {@link Collection} to add the entries to or the array
+	 * holding the entries are {@code null} this call is simply getting ignored.
+	 * 
+	 * @param c the {@link Collection} to add entries to
+	 * @param t the array holding the entries to add
+	 */
+	public static <T, E extends T> void addAll(Collection<T> c, E[] t) {
+		if ((c == null) || (t == null)) {
+			return;
+		}
+		for (T element : t) {
+			c.add(element);
+		}
+	}
+	
+	/**
+	 * Checks if the given array is either {@code null} or does not contain
+	 * any entries.
+	 * 
+	 * @param t the array to check whether it actually holds entries
+	 * 
+	 * @return {@code true} if the given array is either {@code null} or does
+	 * 		not have any entries, {@code false} otherwise
+	 */
+	public static <T> boolean isNullOrEmpty(T[] t) {
+		if (t == null) {
+			return true;
+		}
+		if (t.length == 0) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static <T, E extends T> void addAll(Collection<T> c, Enumeration<E> e) {
+		if (c == null) {
+			return;
+		}
+		if (e == null) {
+			return;
+		}
+		while (e.hasMoreElements()) {
+			c.add(e.nextElement());
+		}
+	}
 }

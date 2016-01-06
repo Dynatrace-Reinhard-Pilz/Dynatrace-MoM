@@ -25,9 +25,9 @@ import com.dynatrace.onboarding.profiles.Profile;
 import com.dynatrace.onboarding.profiles.ProfileTemplate;
 import com.dynatrace.onboarding.serverconfig.ServerProperties;
 import com.dynatrace.onboarding.usergroups.XmlOnboarding;
-import com.dynatrace.onboarding.variables.UnresolvedVariableException;
-import com.dynatrace.onboarding.variables.Variables;
+import com.dynatrace.onboarding.variables.DefaultVariables;
 import com.dynatrace.utils.DefaultExecutionContext;
+import com.dynatrace.variables.UnresolvedVariableException;
 import com.dynatrace.xml.XMLUtil;
 
 /**
@@ -118,7 +118,7 @@ public class FastPackHelper {
 	 * 		occurred or not all variables have been defined
 	 */
 	public static Dashboard[] appendDashboards(FastpackBuilder fpb, Profile profile) {
-		Variables variables = new Variables(profile.getName());
+		DefaultVariables variables = new DefaultVariables(profile.getName());
 		Collection<Dashboard> dashboards = new ArrayList<>();
 		
 		String[] dashboardKeys = Config.dashboardKeys();
@@ -197,7 +197,7 @@ public class FastPackHelper {
 			LOGGER.log(Level.SEVERE, "Invalid System Profile Template " + profileTemplateFile.getSource().getName(), e);
 			return null;
 		}
-		Variables variables = new Variables();
+		DefaultVariables variables = new DefaultVariables();
 		
 		Profile profile = null;
 		try {
@@ -256,7 +256,5 @@ public class FastPackHelper {
 		}
 		return NextStep.Proceed;
 	}
-	
-	
 	
 }

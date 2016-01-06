@@ -27,6 +27,7 @@ import com.dynatrace.web.base.ServletExecutionContext;
 @WebListener
 public class MomWebAppInit implements ServletContextListener {
 	
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER =
 			Logger.getLogger(MomWebAppInit.class.getName());
 	

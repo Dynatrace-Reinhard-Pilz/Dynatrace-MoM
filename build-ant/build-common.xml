@@ -15,10 +15,12 @@
 	<property name="dir-src" value="src" />
 	<property name="dir-java-src" value="${dir-src}/main/java" />
 	<property name="dir-resources-src" value="${dir-src}/main/resources" />
+	<property name="dir-lib-src" value="lib" />
 	
 	<property name="dir-build" value="build" />
 	<property name="dir-build-classes" value="${dir-build}/classes" />
 	<property name="dir-build-resources" value="${dir-build}/resources" />
+	<property name="dir-build-lib" value="${dir-build}/lib" />
 	
 	<property
 		name="lastbuild.properties"
@@ -64,6 +66,7 @@
 		<mkdir dir="${dir-build}" />
 		<mkdir dir="${dir-build-classes}" />
 		<mkdir dir="${dir-build-resources}" />
+		<mkdir dir="${dir-build-lib}" />
 		<copy file="pom.xml" tofile="${dir-build}/pom.xml" verbose="true" />
 		<replace
 			file="${dir-build}/pom.xml"
@@ -73,6 +76,16 @@
 		<copy todir="${dir-build-resources}/META-INF">
 			<fileset dir="META-INF">
 				<include name="MANIFEST.MF"/>
+			</fileset>
+		</copy>
+		<copy todir="${dir-build-resources}">
+			<fileset dir=".">
+				<include name="plugin.xml"/>
+			</fileset>
+		</copy>
+		<copy todir="${dir-build}">
+			<fileset dir=".">
+				<include name="lib/**" />
 			</fileset>
 		</copy>
 		<echoproperties destfile="${lastbuild.properties}">
@@ -87,16 +100,35 @@
          ================================= -->
 	<target name="compile" depends="init" unless="built">
 		<ant-dependencies projects="${dependencies}" target="install" />
-		<dependencies pathId="dependency.classpath">
+		<dependencies pathId="dependency.classpath" scopes="compile,provided,runtime">
 			<pom file="${dir-build}/pom.xml" />
 		</dependencies>
+		<path id="library.classpath">
+			<fileset dir="${dir-build-lib}">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
+		<condition property="osgi.classpath.defined" value="true">
+		    <isreference refid="osgi.classpath"/>
+		</condition>
+		<if>
+			<equals arg1="${osgi.classpath.defined}" arg2="true"/>
+			<then>
+			</then>
+			<else>
+				<path id="osgi.classpath" />
+			</else>
+		</if>
 		<javac
 			includeantruntime="false"
 			sourcepath=""
 			destdir="${dir-build-classes}"
+			debug="true"
 			target="1.7">
 			<src location="${dir-java-src}" />
 			<classpath refid="dependency.classpath" />			
+			<classpath refid="library.classpath" />			
+			<classpath refid="osgi.classpath" />			
 		</javac>
 	</target>
 	
@@ -119,13 +151,18 @@
 					<include name="**" />
 				</fileset>
 			</copy>
+			<copy todir="${dir-lib-src}">
+				<fileset dir="${dir-build-lib}">
+					<include name="**" />
+				</fileset>
+			</copy>
 			<manifest
 				file="${dir-build-resources}/META-INF/MANIFEST.MF"
 					mode="update">
 				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Bundle-Version" value="${version}" />
 				<attribute name="Bundle-Name" value="@{bundle-name}" />
-				<attribute name="Bundle-SymbolicName" value="@{bundle-name}" />
+				<attribute name="Bundle-SymbolicName" value="@{bundle-name};singleton:=true" />
 				<attribute
 					name="Specification-Version"
 					value="${spec-version}" />
@@ -148,6 +185,9 @@
 				<fileset dir="${dir-build-resources}">
 					<include name="**" />
 				</fileset>
+				<fileset dir="${dir-build}">
+					<include name="lib/**" />
+				</fileset>
 			</jar>
 		</sequential>
 	</macrodef>
@@ -163,7 +203,7 @@
           target: link-bundled              
          ================================= -->
 	<target name="link-bundle" depends="compile" unless="built" description="">
-		<dependencies pathId="dependency.classpath" scopes="compile">
+		<dependencies pathId="dependency.classpath" scopes="compile,runtime">
 			<pom file="${dir-build}/pom.xml" />
 		</dependencies>
 		<pathconvert
@@ -186,6 +226,8 @@
 					overwrite="false">
 					<patternset>
 						<exclude name="**/*.class" />
+						<exclude name="**/MANIFEST.MF" />
+						<exclude name="**/plugin.xml" />
 					</patternset>
 				</unjar>
 			</sequential>
@@ -210,5 +252,19 @@
 			<pom file="${dir-build}/pom.xml" />
 		</install>
 	</target>
+	
+	<!-- ================================= 
+          target: assemble              
+         ================================= -->
+	<target name="assemble" description="">
+		<ant target="link-bundle">
+			<property
+				name="build.timestamp"
+				value="${build.timestamp}"
+			/>
+		</ant>
+		<copy file="${dir-build}/${ant.project.name}-bundle_${version}.jar" tofile="${ant.project.name}.jar" />
+	</target>
+	
 	
 </project>

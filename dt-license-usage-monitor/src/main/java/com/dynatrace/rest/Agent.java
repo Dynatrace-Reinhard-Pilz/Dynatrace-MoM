@@ -60,6 +60,21 @@ public class Agent {
 		return value.trim().toLowerCase().equals("true");
 	}
 	
+	public String getInstanceName() {
+		return getElementValue("agentInstanceName");
+	}
+	
+	public boolean isMasterAgent() {
+		if (!"Web Server".equals(getTechnologyType())) {
+			return false;
+		}
+		String instanceName = getInstanceName();
+		if (instanceName == null) {
+			return false;
+		}
+		return !instanceName.contains("[");
+	}
+	
 	public String getAgentGroup() {
 		return getElementValue("agentGroup");
 	}

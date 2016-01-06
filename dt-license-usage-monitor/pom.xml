@@ -17,4 +17,31 @@
     		</plugin>
   	</plugins>
   </build>
-  </project>
+  <dependencies>
+  	<dependency>
+  		<groupId>com.dynatrace</groupId>
+  		<artifactId>dt-authentication-api</artifactId>
+  		<version>1.0.0.qualifier</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.dynatrace</groupId>
+  		<artifactId>dt-utils</artifactId>
+  		<version>1.0.0.qualifier</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.dynatrace</groupId>
+  		<artifactId>dt-profiles</artifactId>
+  		<version>1.0.0.qualifier</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.dynatrace</groupId>
+  		<artifactId>dt-sysinfo</artifactId>
+  		<version>1.0.0.qualifier</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.dynatrace</groupId>
+  		<artifactId>dt-http</artifactId>
+  		<version>1.0.0.qualifier</version>
+  	</dependency>
+  </dependencies>
+</project>

@@ -12,7 +12,9 @@ import com.dynatrace.onboarding.fastpacks.FastPackHelper;
 import com.dynatrace.onboarding.fastpacks.FastPackHelper.NextStep;
 import com.dynatrace.onboarding.profiles.Profile;
 import com.dynatrace.onboarding.serverconfig.ServerProperties;
+import com.dynatrace.security.Persister;
 import com.dynatrace.utils.Logging;
+import com.dynatrace.utils.TempFiles;
 
 /**
  * 
@@ -24,20 +26,23 @@ public class OnBoardingMain {
 	private static final Logger LOGGER =
 			Logger.getLogger(OnBoardingMain.class.getName());
 	
-/*
-
-	public static final String PROP_DB_PERMISSION = "config.user.group.dashboard.permission";
-
-
-
- */
 	/**
 	 * main method
 	 * @param args no arguments are expected - everything configured via
 	 * 		system properties
 	 */
 	public static void main(String[] args) {
+		System.setProperty(TempFiles.PROPERTY_TMP_DIR_NAME, ".dt-onboarding");
+		Logging.init();
+
 		if ((args != null) && (args.length > 0)) {
+			if ("encrypt".equals(args[0])) {
+				if (true) {
+					Persister persister = new Persister();
+					persister.persist();
+					return;
+				}
+			}
 			if ("usage".equals(args[0]) || "help".equals(args[0])) {
 				System.out.println("java [-D<option>=<value> *] -jar dt-onboarding.jar [usage|help]");
 				System.out.println();
@@ -157,8 +162,8 @@ public class OnBoardingMain {
 				System.out.println("          This option is only required in case different User Groups");
 				System.out.println("           need to get a different Role for the System Profile to be");
 				System.out.println("           created or modified");
-				System.out.println("      -Dconfig.user.group.dashboard.permission=<Read|Read_Write>");
-				System.out.println("      -Dconfig.user.groups.default.dashboard.permission=<Read|Read_Write>");
+				System.out.println("      -Dconfig.user.group.dashboard.permission=<Read|Read_Write|None>");
+				System.out.println("      -Dconfig.user.groups.default.dashboard.permission=<Read|Read_Write|None>");
 				System.out.println("          (optional, default = Read)");
 				System.out.println("          The Dashboard Permissions to assign to the new User Group");
 				System.out.println("           specified by -Dconfig.user.group unless explicitely defined");
@@ -167,13 +172,30 @@ public class OnBoardingMain {
 				System.out.println("          The Dashboard Permissions Role to assign to any new User Group");
 				System.out.println("           specified by -Dconfig.user.groups.<groupkey>.name unless explicitely");
 				System.out.println("           defined by -Dconfig.user.groups.<groupkey>.dashboard.permission");
-				System.out.println("      -Dconfig.user.groups.<groupkey>.dashboards.<dashboardkey>.permission=<Read|Read_Write>");
+				System.out.println("      -Dconfig.user.groups.<groupkey>.dashboards.<dashboardkey>.permission=<Read|Read_Write|None>");
 				System.out.println("          (optional, default = Read)");
 				System.out.println("          The Dashboard Permissions for a Dashboard specified by");
 				System.out.println("           -Dconfig.dashboards.<dashboardkey>.name to assign to a specific");
 				System.out.println("           User Group specified by -Dconfig.user.groups.<groupkey>.name");
 				System.out.println("          This option is only necessary if different User Groups");
 				System.out.println("           need to have different Permissions to various Dashboards");
+				System.out.println("      -Dconfig.user.group.dashboard.autoopen=<true|false>");
+				System.out.println("      -Dconfig.user.groups.default.dashboard.autoopen=<true|false>");
+				System.out.println("          (optional, default = true)");
+				System.out.println("          Allows to automatically open Dashboards for the the new User Group");
+				System.out.println("           specified by -Dconfig.user.group unless explicitely defined");
+				System.out.println("           by -Dconfig.user.group.dashboards.<dashboardkey>.autoopen");
+				System.out.println("           or -Dconfig.user.groups.<groupkey>.dashboards.<dashboardkey>.autoopen");
+				System.out.println("          Allows to automatically open Dashboards for any new User Group");
+				System.out.println("           specified by -Dconfig.user.groups.<groupkey>.name unless explicitely");
+				System.out.println("           defined by -Dconfig.user.groups.<groupkey>.dashboard.autoopen");
+				System.out.println("      -Dconfig.user.groups.<groupkey>.dashboards.<dashboardkey>.autoopen=<true|false>");
+				System.out.println("          (optional, default = true)");
+				System.out.println("          The Auto Open setting for a Dashboard specified by");
+				System.out.println("           -Dconfig.dashboards.<dashboardkey>.name to assign to a specific");
+				System.out.println("           User Group specified by -Dconfig.user.groups.<groupkey>.name");
+				System.out.println("          This option is only necessary if different User Groups");
+				System.out.println("           need to have different settings for various Dashboards");
 				System.out.println();
 				System.out.println("  Variables within System Profile Templates and Dashboard Templates:");
 				System.out.println("      Both, the .profile.xml and .dashboard.xml files used as templates");
@@ -197,7 +219,6 @@ public class OnBoardingMain {
 				return;
 			}
 		}
-		Logging.init();
 		OnBoardingMain main = new OnBoardingMain();
 		try {
 			if (!main.execute()) {

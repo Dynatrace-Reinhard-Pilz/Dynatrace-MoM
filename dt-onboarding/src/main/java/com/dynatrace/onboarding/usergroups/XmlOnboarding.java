@@ -56,11 +56,14 @@ public final class XmlOnboarding {
 			if (dashboards != null) {
 				for (Dashboard dashboard : dashboards) {
 					XmlDashboardPermission dashboardPermission = new XmlDashboardPermission();
-					dashboardPermission.setAutoopen(true);
+					Config.dashboardAutoOpen(userGroupKey, dashboard.getKey());
+					dashboardPermission.setAutoopen(Config.dashboardAutoOpen(userGroupKey, dashboard.getKey()));
 					dashboardPermission.setDashboard(dashboard.getName());
 					Config.dashboardPermission(userGroupKey, dashboard.getKey());
 					dashboardPermission.setPermission(Config.dashboardPermission(userGroupKey, dashboard.getKey()));
-					dashboardPermissions.add(dashboardPermission);
+					if (dashboardPermission.getPermission() != DashboardPermission.None) {
+						dashboardPermissions.add(dashboardPermission);
+					}
 				}
 			}
 			xmlUserGroup.setDashboardPermissions(dashboardPermissions);

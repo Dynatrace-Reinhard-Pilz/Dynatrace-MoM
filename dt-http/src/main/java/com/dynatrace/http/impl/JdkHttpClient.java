@@ -8,11 +8,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.net.CacheRequest;
 import java.net.HttpURLConnection;
 import java.net.NoRouteToHostException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -33,16 +36,20 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import com.dynatrace.authentication.Authenticator;
 import com.dynatrace.http.HttpClient;
 import com.dynatrace.http.HttpResponse;
 import com.dynatrace.http.Method;
 import com.dynatrace.http.UploadResult;
-import com.dynatrace.http.config.Credentials;
 import com.dynatrace.http.permissions.PermissionDeniedException;
 import com.dynatrace.http.permissions.Unauthorized;
 import com.dynatrace.utils.Closeables;
 import com.dynatrace.utils.Iterables;
 import com.dynatrace.xml.XMLUtil;
+
+import sun.net.ProgressSource;
+import sun.net.www.MessageHeader;
+import sun.net.www.http.PosterOutputStream;
 
 /**
  * A minimalistic HTTP Client
@@ -56,10 +63,14 @@ public final class JdkHttpClient
 	private static final Logger LOGGER =
 			Logger.getLogger(JdkHttpClient.class.getName());
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public synchronized <T> HttpResponse<T> request(
 		URL url,
 		Method method,
-		Credentials credentials,
+		Authenticator credentials,
 		Class<T> responseClass
 	) throws IOException {
 		ByteArrayOutputStream out = null;
@@ -91,31 +102,15 @@ public final class JdkHttpClient
 			Closeables.closeQuietly(out);
 		}
 	}
-	
+
 	/**
-	 * Executes a request to the given {@link URL} using the given
-	 * {@link Method} an optionally performs Basic Authentication with the
-	 * given {@link Credentials}.
-	 * 
-	 * @param url the {@link URL} to send the request to
-	 * @param method the {@link Method} to use for the request
-	 * @param credentials the user credentials to be used for
-	 * 		Basic Authentication or {@code null} if no authentication is
-	 * 		expected to be required
-	 * @param out the {@link OutputStream} where the response delivered by the
-	 * 		HTTP Server should be streamed into.
-	 * 
-	 * @return the HTTP Response code delivered by the Server
-	 * 
-	 * @throws IOException if opening the connection to the HTTP Server fails
-	 * @throws NullPointerException if the given {@link URL} or the given
-	 * 		{@link Method} are {@code null}.
+	 * {@inheritDoc}
 	 */
 	@Override
 	public synchronized int request(
 		URL url,
 		Method method,
-		Credentials credentials,
+		Authenticator authenticator,
 		OutputStream out
 	)
 			throws IOException
@@ -127,11 +122,12 @@ public final class JdkHttpClient
 		try {
 			HttpURLConnection con =
 					(HttpURLConnection) url.openConnection();
+			
 			con.setConnectTimeout(5000);
 			con.setReadTimeout(10000);
 			handleSecurity(con);
 			con.setRequestMethod(method.name());
-			setCredentials(con, credentials);
+			setCredentials(con, authenticator);
 			con.connect();
 			final int contentLength = con.getContentLength();
 			responseCode = con.getResponseCode();
@@ -161,27 +157,34 @@ public final class JdkHttpClient
 	
 	/**
 	 * Prepares the given {@link HttpURLConnection} to authenticate via
-	 * Basic Authentication using the given {@link Credentials}.
+	 * Basic Authentication using the given {@link Authenticator}.
 	 * 
 	 * @param conn the {@link HttpURLConnection} to prepare for
 	 * 		Basic Authentication
-	 * @param cred the {@link Credentials} providing user name and
+	 * @param authenticator the {@link Authenticator} providing user name and
 	 * 		password for Basic Authentication
 	 * 
 	 * @throws NullPointerException if the given {@link HttpURLConnection} is
 	 * 		{@code null}.
-	 * @throws IllegalArgumentException if the given {@link Credentials} either
-	 * 		don't contain a user name or password
+	 * @throws IllegalArgumentException if the given {@link Authenticator}
+	 * 		either don't contain a user name or password
 	 */
-	private void setCredentials(HttpURLConnection conn, Credentials cred) {
+	private void setCredentials(
+		HttpURLConnection conn,
+		Authenticator authenticator
+	) throws IOException {
 		Objects.requireNonNull(conn);
-		if (cred == null) {
+		if (authenticator == null) {
 			return;
 		}
-		conn.setRequestProperty(
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			baos.write(BASIC.getBytes());
+			authenticator.encode(conn.getURL(), baos);
+			conn.setRequestProperty(
 				HEADER_AUTHORIZATION,
-				BASIC + cred.encode()
-		);
+				new String(baos.toByteArray())
+			);
+		}
 	}
 	
 	private void handleSecurity(HttpURLConnection conn) {
@@ -203,10 +206,13 @@ public final class JdkHttpClient
 		}		
 	}	
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public UploadResult upload(
 		URL url,
-		Credentials credentials,
+		Authenticator authenticator,
 		String fileName,
 		InputStream inputStream
 	) throws IOException {
@@ -219,9 +225,11 @@ public final class JdkHttpClient
 
 		con = (HttpURLConnection) url.openConnection();
 		handleSecurity(con);
-		
-		String encoding = credentials.encode();
-		con.setRequestProperty("Authorization", "Basic " + encoding);		
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			baos.write("Basic ".getBytes());
+			authenticator.encode(url, baos);
+			con.setRequestProperty("Authorization", new String(baos.toByteArray()));		
+		}
 		con.setUseCaches(false);
 		con.setDoOutput(true); // indicates POST method
 		con.setDoInput(true);
@@ -306,24 +314,33 @@ public final class JdkHttpClient
 		return new UploadResult(status, response, headers);		
 	}	
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean verify(String hostName, SSLSession sslSession) {
 		return true;
 	}
 
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void checkClientTrusted(X509Certificate[] certs, String authType)
 			throws CertificateException {
 	}
 
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void checkServerTrusted(X509Certificate[] certs, String authType)
 			throws CertificateException {
 	}
 
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public final X509Certificate[] getAcceptedIssuers() {
 		return null;

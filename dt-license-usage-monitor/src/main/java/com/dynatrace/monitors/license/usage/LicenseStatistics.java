@@ -15,11 +15,14 @@ public final class LicenseStatistics {
 
 	private final Map<String,Integer> usageMap = new HashMap<>();
 	
-	@SuppressWarnings("unused")
 	private final String id;
 	
 	public LicenseStatistics(String id) {
 		this.id = id;
+	}
+	
+	public String getId() {
+		return id;
 	}
 	
 	public int getCount() {

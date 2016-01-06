@@ -236,6 +236,21 @@ public final class Strings {
 		return result.toString();
 	}
 	
+	/**
+	 * Checks if the given {@link CharSequence} is contained within the given
+	 * {@link String} and offering the comfort not to check for {@code null} for
+	 * either of them.
+	 * 
+	 * @param s the {@link String} to check whether the given
+	 * 		{@link CharSequence} is contained within it
+	 * @param c the {@link CharSequence} to check whether it is contained within
+	 * 		the given {@link String}
+	 * 
+	 * @return {@code true} if the given {@link CharSequence} is contained
+	 * 		within the given {@link String}, {@code false} if either one of them
+	 * 		is {@code null} or the {@link CharSequence} is not contained within
+	 * 		the given {@link String}
+	 */
 	public static boolean contains(String s, CharSequence c) {
 		if (s == null) {
 			return false;
@@ -251,7 +266,8 @@ public final class Strings {
 			return null;
 		}
 		try {
-			return URLDecoder.decode(s, System.getProperty("file.encoding")).replace("%20", " ");
+			String fileEncoding = System.getProperty("file.encoding");
+			return URLDecoder.decode(s, fileEncoding).replace("%20", " ");
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}

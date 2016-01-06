@@ -3,7 +3,6 @@ package com.dynatrace.monitors.license.usage;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collection;
@@ -28,9 +27,12 @@ import com.dynatrace.http.Protocol;
 import com.dynatrace.http.config.ConnectionConfig;
 import com.dynatrace.http.config.Credentials;
 import com.dynatrace.http.config.ServerConfig;
+import com.dynatrace.profiles.SystemProfile;
+import com.dynatrace.profiles.metainfo.MetaInfo;
 import com.dynatrace.rest.Agent;
 import com.dynatrace.rest.Agents;
 import com.dynatrace.utils.DomUtil;
+import com.dynatrace.utils.Strings;
 
 public class UsageMonitor implements Monitor {
 	
@@ -50,21 +52,9 @@ public class UsageMonitor implements Monitor {
 	private static final String CONFIGID_MAX_AGE =
 			"com.dynatrace.monitors.usagemonitor.config.maxProfileCacheAge";
 	
-	
 	private final String METRIC_GROUPID_LICENSEUSAGE = "License Usage";
 	private final String METRICID_USED_LICENSES = "Consumed Licenses";
-
 	
-	private final String KEY_APPLICATION_ID = "-appid";
-	private final String META_INFO_KEY_APPLICATION = "app";
-	private final String DYN_KEY_APPLICATION = "-application-";
-	private final String META_INFO_KEY_BUSINESS_UNIT = "businessunit";
-	private final String DYN_KEY_BUSINESS_UNIT = "-businessunit-";
-	private final String META_INFO_KEY_PROJECT = "project";
-	private final String DYN_KEY_PROJECT = "-project-";
-	private final String META_INFO_KEY_ENVIRONMENT = "environment";
-	private final String DYN_KEY_ENVIRONMENT = "-environment-";
-	private final String DYN_KEY_TYPE = "-techtype-";
 	private final String OTHER = "Other";
 	
 	final static ProfileCache PROFILE_CACHE = new ProfileCache();
@@ -133,90 +123,60 @@ public class UsageMonitor implements Monitor {
 			Document document = DomUtil.build(xml);
 			Agents agents = new Agents(document);
 			
-			LicenseStatistics applications = new LicenseStatistics("applications");
-			LicenseStatistics projects = new LicenseStatistics("projects");
-			LicenseStatistics environments = new LicenseStatistics("environments");
-			LicenseStatistics bunits = new LicenseStatistics("bunits");
-			LicenseStatistics agentTypes = new LicenseStatistics("type");
+			StatisticsMap statisticsMap = new StatisticsMap();
 			
 			for (Agent agent : agents) {
 				if (agent == null) {
 					continue;
 				}
+				if (agent.isMasterAgent()) {
+					continue;
+				}
 				String agentGroupId = agent.getAgentGroup();
 				String systemProfileId = agent.getSystemProfile();
+				
 				if ("dynaTrace Self-Monitoring".equals(systemProfileId)) {
 					continue;
 				}
-				String application = PROFILE_CACHE.getMetaInfo(
-					systemProfileId,
-					agentGroupId,
-					META_INFO_KEY_APPLICATION,
-					OTHER
-				);
-				if ((application == null) || OTHER.equals(application)) {
-					application = PROFILE_CACHE.getMetaInfo(
+//				LOGGER.log(Level.INFO, "agentGroupId: " + agentGroupId);
+//				LOGGER.log(Level.INFO, "systemProfileId: " + systemProfileId);
+				SystemProfile systemProfile = PROFILE_CACHE.get(systemProfileId);
+				MetaInfo metaInfo = systemProfile.getMetaInfo();
+				Iterable<String> metaInfoKeys = metaInfo.keys();
+				for (String metaInfoKey : metaInfoKeys) {
+					if (Strings.isNullOrEmpty(metaInfoKey)) {
+						continue;
+					}
+//					LOGGER.log(Level.INFO, "    metaInfoKey: " + metaInfoKey);
+					LicenseStatistics statistics =
+						statisticsMap.get(metaInfoKey);
+					String metaInfoValue = PROFILE_CACHE.getMetaInfo(
 						systemProfileId,
 						agentGroupId,
-						KEY_APPLICATION_ID,
+						metaInfoKey,
 						OTHER
 					);
+					if (Strings.isNullOrEmpty(metaInfoValue)) {
+						metaInfoValue = OTHER;
+					}
+					statistics.inc(metaInfoValue);
 				}
-				applications.inc(application);
-				
-				agentTypes.inc(agent.getTechnologyType());
-				
-				environments.inc(PROFILE_CACHE.getMetaInfo(
-					systemProfileId,
-					agentGroupId,
-					META_INFO_KEY_ENVIRONMENT,
-					OTHER
-				));
-				projects.inc(PROFILE_CACHE.getMetaInfo(
-					systemProfileId,
-					agentGroupId,
-					META_INFO_KEY_PROJECT,
-					OTHER
-				));
-				bunits.inc(PROFILE_CACHE.getMetaInfo(
-					systemProfileId,
-					agentGroupId,
-					META_INFO_KEY_BUSINESS_UNIT,
-					OTHER
-				));
+				LicenseStatistics techTypeStatistics =
+						statisticsMap.get("techType");
+				String techType = agent.getTechnologyType();
+				if (Strings.isNullOrEmpty(techType)) {
+					techType = OTHER;
+				}
+				techTypeStatistics.inc(techType);
 			}
 			
-			bookMeasures(
-				env,
-				applications,
-				DYN_KEY_APPLICATION
-			);
-
-			bookMeasures(
-				env,
-				projects,
-				DYN_KEY_PROJECT
-			);
-
-			bookMeasures(
-				env,
-				bunits,
-				DYN_KEY_BUSINESS_UNIT
-			);
-
-			bookMeasures(
-				env,
-				environments,
-				DYN_KEY_ENVIRONMENT
-			);
-			
-			bookMeasures(
-				env,
-				agentTypes,
-				DYN_KEY_TYPE
-			);
-						
-	        
+			Iterable<LicenseStatistics> statisticsList = statisticsMap.getStatistics();
+			for (LicenseStatistics statistics : statisticsList) {
+				if (statistics == null) {
+					continue;
+				}
+				bookMeasures(env, statistics, statistics.getId());
+			}
 			return new Status(StatusCode.Success);
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Execution failed", e);
@@ -273,46 +233,19 @@ public class UsageMonitor implements Monitor {
 			return;
 		}
 		for (MonitorMeasure measure : measures) {
-			String measureName = measure.getMeasureName();
-			String metricName = measure.getMetricName();
-			LOGGER.log(Level.INFO, "MEASURE[name='" + measureName + "', metric='" + metricName + "'");
-			resetMeasurement(measure);
+//			String measureName = measure.getMeasureName();
+//			String metricName = measure.getMetricName();
+//			LOGGER.log(Level.INFO, "MEASURE[name='" + measureName + "', metric='" + metricName + "'");
 			Iterable<String> keys = statistics.getKeys();
 			for (String key : keys) {
+//				LOGGER.log(Level.INFO, "env.createDynamicMeasure(" + measure + ", \"" + dynKey + "\", \"" + key + "\")");
 				MonitorMeasure dynamicMeasure =	env.createDynamicMeasure(
 					measure,
 					dynKey,
 					key
 				);
+//				LOGGER.log(Level.INFO, "dynamicMeasure.setValue(" + statistics.get(key) + ")");
 				dynamicMeasure.setValue(statistics.get(key));
-			}
-			MonitorMeasure global = env.createDynamicMeasure(measure, dynKey, dynKey);
-			global.setValue(Double.NaN);
-		}
-	}
-	
-	private static void resetMeasurement(MonitorMeasure measure) {
-		if (measure == null) {
-			return;
-		}
-		Class<? extends MonitorMeasure> clazz = measure.getClass();
-		Field[] fields = clazz.getDeclaredFields();
-		if (fields == null) {
-			return;
-		}
-		for (Field field : fields) {
-			if (field == null) {
-				continue;
-			}
-			Class<?> fieldType = field.getType();
-			if (fieldType.equals(Number.class)) {
-				field.setAccessible(true);
-				try {
-					field.set(measure, null);
-				} catch (Throwable t) {
-					LOGGER.log(Level.SEVERE, "Failed miserably", t);
-					LOGGER.log(Level.SEVERE, stackTraceToString(t));
-				}
 			}
 		}
 	}

@@ -3,11 +3,13 @@ package com.dynatrace.onboarding.config;
 import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.net.URLConnection;
-import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -25,10 +27,11 @@ import com.dynatrace.onboarding.dashboards.Dashboard;
 import com.dynatrace.onboarding.dashboards.DashboardTemplate;
 import com.dynatrace.onboarding.profiles.Profile;
 import com.dynatrace.onboarding.profiles.ProfileTemplate;
-import com.dynatrace.onboarding.variables.UnresolvedVariableException;
-import com.dynatrace.onboarding.variables.Variables;
+import com.dynatrace.onboarding.variables.DefaultVariables;
 import com.dynatrace.utils.Closeables;
 import com.dynatrace.utils.Iterables;
+import com.dynatrace.utils.TempFiles;
+import com.dynatrace.variables.UnresolvedVariableException;
 
 public class Resources {
 	
@@ -36,34 +39,49 @@ public class Resources {
 			Logger.getLogger(Resources.class.getName());
 	
 	private static final String FLD_META_INF = "META-INF";
+
+	public final File temp = createTempFolder(); 
 	
 	public final Map<String, File> plugins = getPlugins();
 	public final Map<String, DashboardTemplate> dashboards = getDashboards();
 	public final Map<String, ProfileTemplate> profiles = getProfiles();
-	
-	public final File temp = createTempFolder(); 
+	public final Iterable<URLClassLoader> classLoaders = classLoaders();
 	
 	private static File createTempFolder() {
-		if (Debug.DEBUG) {
-			File tempFolder = new File(Resources.class.getSimpleName());
-			if (tempFolder.exists()) {
-				Closeables.purge(tempFolder);
-			}
-			LOGGER.log(Level.FINE, "Resource Folder: " + tempFolder.getAbsolutePath());
-			tempFolder.mkdirs();
-			return tempFolder;
-		}
-		File tempFolder = null;
-		try {
-			tempFolder = Files.createTempDirectory(Resources.class.getSimpleName()).toFile();
-		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Unable to create temp folder", e);
-		}
-		LOGGER.log(Level.FINE, "Temp Folder: " + tempFolder.getAbsolutePath());
-		tempFolder.deleteOnExit();
-		return tempFolder;
+		return TempFiles.getTempFolder(Resources.class.getSimpleName());
 	}
 	
+	private Iterable<URLClassLoader> classLoaders() {
+		Map<String, File> files = getResources(new NameFilter() {
+			@Override
+			public boolean accept(String name) {
+				if (!super.accept(name)) {
+					return false;
+				}
+				String subFolder = subFolder();
+				if ((subFolder != null) && !name.contains(subFolder)) {
+					return false;
+				}
+				return name.endsWith(".jar");
+			}
+			
+			@Override
+			public String subFolder() {
+				return "variables";
+			}
+		});
+		Collection<URLClassLoader> classLoaders = new ArrayList<>();
+		for (File file : files.values()) {
+			try {
+				classLoaders.add(
+						new URLClassLoader(new URL[] { file.toURI().toURL() })
+					);
+			} catch (MalformedURLException e) {
+				LOGGER.log(Level.FINE, "Unable to create class loader", e);
+			}
+		}
+		return classLoaders;
+	}
 	
 	private Map<String, File> getPlugins() {
 		return getResources(new NameFilter() {
@@ -285,10 +303,8 @@ public class Resources {
                 			folder,
                 			Closeables.getFilename(url)
                 		);
-                		if (!Debug.DEBUG) {
-                			resourceFile.deleteOnExit();
-                		}
             			Closeables.copy(url, resourceFile);
+            			resourceFile.deleteOnExit();
                     	resources.put(filter.hashName(name), resourceFile);
                 	}
                 }
@@ -349,7 +365,7 @@ public class Resources {
 		if (Iterables.isNullOrEmpty(profiles)) {
 			return;
 		}
-		Variables variables = new Variables(new Properties());
+		DefaultVariables variables = new DefaultVariables(new Properties());
 		for (Dashboard dashboard : dashboards) {
 			String name = dashboard.getName();
 			try {
@@ -375,7 +391,7 @@ public class Resources {
 		if (Iterables.isNullOrEmpty(profiles)) {
 			return;
 		}
-		Variables variables = new Variables(new Properties());
+		DefaultVariables variables = new DefaultVariables(new Properties());
 		for (Profile profile : profiles) {
 			String name = profile.getName();
 			try {

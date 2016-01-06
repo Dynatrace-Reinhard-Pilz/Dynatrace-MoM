@@ -6,12 +6,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,61 +27,22 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.dynatrace.onboarding.variables.UnresolvedVariableException;
-import com.dynatrace.onboarding.variables.Variables;
+import com.dynatrace.onboarding.variables.DefaultVariables;
 import com.dynatrace.utils.DomUtil;
 import com.dynatrace.utils.Iterables;
+import com.dynatrace.utils.TempFiles;
 import com.dynatrace.utils.Version;
+import com.dynatrace.variables.UnresolvedVariableException;
 
 public class DashboardTemplate {
-	
-	@SuppressWarnings("unused")
-	private static final Logger LOGGER =
-			Logger.getLogger(DashboardTemplate.class.getSimpleName());
 
-	private final String id = UUID.randomUUID().toString();
 	private final File tempFolder = createTempFolder();
 	private final File source;
 	private final String key;
 	private final Version version;
 	
 	private synchronized File createTempFolder() {
-		try {
-			File globalTempFile = Files.createTempDirectory(
-				DashboardTemplate.class.getSimpleName()
-			).toFile();
-			if (!globalTempFile.exists()) {
-				if (!globalTempFile.mkdirs()) {
-					throw new RuntimeException(
-						"Unable to create directory " +
-						"'" + globalTempFile.getAbsolutePath() + "'"
-					);
-				}
-			} else if (!globalTempFile.isDirectory()) {
-				throw new RuntimeException(
-					"'" + globalTempFile.getAbsolutePath() + "'" +
-					" is not a directory"
-				);
-			}
-			File tempFolder = new File(globalTempFile, id);
-			if (tempFolder.exists()) {
-				if (!tempFolder.isDirectory()) {
-					throw new RuntimeException(
-						"'" + tempFolder.getAbsolutePath() + "'" +
-						" is not a directory"
-					);
-				}
-			} else if (!tempFolder.mkdirs()) {
-				throw new RuntimeException(
-					"Unable to create directory " +
-					"'" + tempFolder.getAbsolutePath() + "'"
-				);
-			}
-			tempFolder.deleteOnExit();
-			return tempFolder;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return TempFiles.getTempFolder(DashboardTemplate.class.getSimpleName());
 	}
 	
 	public DashboardTemplate(File source, String key) throws IOException {
@@ -114,7 +73,7 @@ public class DashboardTemplate {
 			Document document = dBuilder.parse(in);
 			Iterables.addAll(variables, getVariables(document));
 		}
-		Iterables.addAll(variables, Variables.getVariables(getFilename()));
+		Iterables.addAll(variables, DefaultVariables.getVariables(getFilename()));
 		return variables;
 	}
 	
@@ -132,7 +91,7 @@ public class DashboardTemplate {
 				String attributeValue = attribute.getNodeValue();
 				Iterables.addAll(
 					variables,
-					Variables.getVariables(attributeValue)
+					DefaultVariables.getVariables(attributeValue)
 				);
 			}
 		}
@@ -150,7 +109,7 @@ public class DashboardTemplate {
 		return variables;
 	}
 	
-	private Document resolve(Document document, Variables variables) throws UnresolvedVariableException {
+	private Document resolve(Document document, DefaultVariables variables) throws UnresolvedVariableException {
 		Objects.requireNonNull(document);
 		Objects.requireNonNull(variables);
 		Document clone = (Document) document.cloneNode(true);
@@ -182,7 +141,7 @@ public class DashboardTemplate {
 		}
 	}
 	
-	private void resolve(Element element, Variables variables) throws UnresolvedVariableException {
+	private void resolve(Element element, DefaultVariables variables) throws UnresolvedVariableException {
 		NamedNodeMap attributes = element.getAttributes();
 		int attributeCount = attributes.getLength();
 		if (attributeCount > 0) {
@@ -215,11 +174,11 @@ public class DashboardTemplate {
 		return filename.substring(0, filename.length() - ".dashboard.xml".length());
 	}
 	
-	public String getResolvedDashboardName(Variables variables) throws UnresolvedVariableException {
+	public String getResolvedDashboardName(DefaultVariables variables) throws UnresolvedVariableException {
 		return variables.resolve(getTemplateName());
 	}
 	
-	public Dashboard resolve(Variables variables) throws IOException, UnresolvedVariableException {
+	public Dashboard resolve(DefaultVariables variables) throws IOException, UnresolvedVariableException {
 		Document document = null;
 		try (InputStream in = openStream()) {
 			document = DomUtil.build(in);
@@ -240,6 +199,13 @@ public class DashboardTemplate {
 			throw new IOException(e);
 		}
 		return new Dashboard(dashboardFile, key);
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		if (source != null) {
+			source.delete();
+		}
 	}
 	
 }

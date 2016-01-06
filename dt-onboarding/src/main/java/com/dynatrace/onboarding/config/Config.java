@@ -64,6 +64,7 @@ public class Config {
 	public static final String PROP_MGMT_ROLE = "config.user.group.management.role";
 	public static final String PROP_PROFILE_ROLE = "config.user.group.profile.role";
 	public static final String PROP_DB_PERMISSION = "config.user.group.dashboard.permission";
+	public static final String PROP_DB_AUTOOPEN = "config.user.group.dashboard.autoopen";
 
 	public static final String DEFAULT = "default";
 
@@ -71,6 +72,8 @@ public class Config {
 	private static final String DEFAULT_PROFILE_ROLE = "Administrator";
 	private static final DashboardPermission DEFAULT_DASHBOARD_PERMISSION =
 			DashboardPermission.Read;
+	
+	private static final Boolean DEFAULT_DASHBOARD_AUTO_OPEN = Boolean.TRUE;
 	
 	private static String get(Properties properties, String key) {
 		Objects.requireNonNull(properties);
@@ -208,8 +211,8 @@ public class Config {
 	
 	public static void setDefaultValues(Properties properties) {
 		set(properties, PROP_HOST, "localhost:8021");
-		set(properties, PROP_USER, "onboarding");
-		set(properties, PROP_PASS, "onboarding");
+		set(properties, PROP_USER, "admin");
+		set(properties, PROP_PASS, "admin");
 		
 		String value = get(properties, PROP_DASHBOARD_TPL);
 		if (value != null) {
@@ -240,6 +243,12 @@ public class Config {
 			set(properties, dbPermProp(DEFAULT, DEFAULT), value);
 		}
 		
+		value = get(properties, PROP_DB_AUTOOPEN);
+		if (value != null) {
+			properties.remove(PROP_DB_AUTOOPEN);
+			set(properties, dbAutoOpenProp(DEFAULT, DEFAULT), value);
+		}
+		
 		// config.user.groups.default.management.role=Guest
 		set(properties, mgmtRoleProp(DEFAULT), DEFAULT_MANAGEMENT_ROLE);
 		
@@ -249,18 +258,22 @@ public class Config {
 		// config.user.groups.default.dashboards.default.permission=Guest
 		set(properties, dbPermProp(DEFAULT, DEFAULT), DEFAULT_DASHBOARD_PERMISSION.name());
 		
+		// config.user.groups.default.dashboards.default.autoopen=true
+		set(properties, dbAutoOpenProp(DEFAULT, DEFAULT), DEFAULT_DASHBOARD_AUTO_OPEN.toString());
 		
 		String[] groupKeys = discoverGroupKeys(properties);
 		for (String groupKey : groupKeys) {
 			set(properties, mgmtRoleProp(groupKey), get(properties, mgmtRoleProp(DEFAULT)));
 			set(properties, profileRoleProp(groupKey), get(properties, profileRoleProp(DEFAULT)));
 			set(properties, dbPermProp(groupKey, DEFAULT), get(properties, dbPermProp(DEFAULT, DEFAULT)));
+			set(properties, dbAutoOpenProp(groupKey, DEFAULT), get(properties, dbAutoOpenProp(DEFAULT, DEFAULT)));
 		}
 		
 		String[] dashboardKeys = discoverDashboardKeys(properties);
 		for (String dashboardKey : dashboardKeys) {
 			for (String groupKey : groupKeys) {
 				set(properties, dbPermProp(groupKey, dashboardKey), get(properties, dbPermProp(DEFAULT, DEFAULT)));
+				set(properties, dbAutoOpenProp(groupKey, dashboardKey), get(properties, dbAutoOpenProp(DEFAULT, DEFAULT)));
 			}
 		}
 	}
@@ -277,6 +290,10 @@ public class Config {
 		return "config.user.groups." + userGroupKey + ".dashboards." + dashboardKey + ".permission";
 	}
 	
+	private static String dbAutoOpenProp(String userGroupKey, String dashboardKey) {
+		return "config.user.groups." + userGroupKey + ".dashboards." + dashboardKey + ".autoopen";
+	}
+	
 	private static String profileRoleProp(String userGroupKey) {
 		return "config.user.groups." + userGroupKey + ".profile.role";
 	}
@@ -285,12 +302,39 @@ public class Config {
 		return "config.user.groups." + userGroupKey + ".management.role";
 	}
 	
+	public static Boolean dashboardAutoOpen(String userGroupKey, String dashboardKey) {
+		Objects.requireNonNull(userGroupKey);
+		Objects.requireNonNull(dashboardKey);
+		return Boolean.valueOf(
+			getDashboardAutoOpen(INSTANCE.properties, userGroupKey, dashboardKey)
+		);
+	}
+	
 	public static DashboardPermission dashboardPermission(String userGroupKey, String dashboardKey) {
 		Objects.requireNonNull(userGroupKey);
 		Objects.requireNonNull(dashboardKey);
 		return DashboardPermission.valueOf(
 			getDashboardPermission(INSTANCE.properties, userGroupKey, dashboardKey)
 		);
+	}
+	
+	private static String getDashboardAutoOpen(Properties properties, String userGroupKey, String dashboardKey) {
+		Objects.requireNonNull(properties);
+		Objects.requireNonNull(userGroupKey);
+		Objects.requireNonNull(dashboardKey);
+		String value = get(properties, dbAutoOpenProp(userGroupKey, dashboardKey));
+		if (value != null) {
+			return value;
+		}
+		value = get(properties, dbAutoOpenProp(userGroupKey, DEFAULT));
+		if (value != null) {
+			return value;
+		}
+		value = get(properties, dbAutoOpenProp(DEFAULT, dashboardKey));
+		if (value != null) {
+			return value;
+		}
+		return get(properties, dbAutoOpenProp(DEFAULT, DEFAULT));
 	}
 	
 	private static String getDashboardPermission(Properties properties, String userGroupKey, String dashboardKey) {

@@ -5,6 +5,5 @@ Bundle-SymbolicName: dt-license-usage-monitor;singleton:=true
 Bundle-Version: 1.0.0.201511301800
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Dynatrace
-Require-Bundle: com.dynatrace.diagnostics.sdk,
- dt-utils;resolution:=optional;visibility:=reexport
+Require-Bundle: com.dynatrace.diagnostics.sdk
 Export-Package: com.dynatrace.monitors.license.usage

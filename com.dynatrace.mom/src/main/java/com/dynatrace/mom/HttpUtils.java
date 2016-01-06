@@ -27,6 +27,7 @@ public class HttpUtils {
 		);
 	}
 	
+	@SuppressWarnings("unused")
 	private static String adjustLocation(HttpServletRequest request, String location) {
 		Objects.requireNonNull(request);
 		Objects.requireNonNull(location);

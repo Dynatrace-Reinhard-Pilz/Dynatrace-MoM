@@ -1,6 +1,13 @@
 package com.dynatrace.http.config;
 
-import javax.xml.bind.DatatypeConverter;
+import static com.dynatrace.utils.Strings.isNullOrEmpty;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -8,8 +15,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import com.dynatrace.authentication.Authenticator;
+import com.dynatrace.utils.Base64;
+import com.dynatrace.utils.Base64Output;
 import com.dynatrace.utils.Strings;
-import static com.dynatrace.utils.Strings.isNullOrEmpty;
 
 /**
  * A configuration object holding user credentials
@@ -25,7 +34,7 @@ import static com.dynatrace.utils.Strings.isNullOrEmpty;
 				Credentials.ATTRIBUTE_PASS
 		}
 )
-public final class Credentials {
+public final class Credentials implements Authenticator {
 	
 	private static final String ERR_MSG_NO_USERNAME =
 			"credentials do not contain a username".intern();
@@ -125,15 +134,10 @@ public final class Credentials {
 	}
 	
 	/**
-	 * Encodes the configured user name and password to using a BASE64 Encoder
-	 * to be used for Basic Authentication (HTTP).
-	 * 
-	 * @return the encoded user credentials
-	 * 
-	 * @throws IllegalArgumentException if either the user name or the password
-	 * 		are {@code null} or empty
+	 * {@inheritDoc}
 	 */
-	public String encode() {
+	@Override
+	public boolean encode(URL url, OutputStream out) throws IOException {
 		if (isNullOrEmpty(user)) {
 			throw new IllegalArgumentException(ERR_MSG_NO_USERNAME);
 		}
@@ -141,7 +145,15 @@ public final class Credentials {
 			throw new IllegalArgumentException(ERR_MSG_NO_PASSWORD);
 		}
 		final String userPassword =	user + Strings.COLON + pass;
-		return DatatypeConverter.printBase64Binary(userPassword.getBytes());
+		try (
+			Base64Output base64Out = new Base64Output(out);
+			InputStream in = new ByteArrayInputStream(
+				userPassword.getBytes(Base64.UTF8)
+			);
+		) {
+			base64Out.write(in, in.available());
+		}
+		return true;
 	}
 	
 }

@@ -1,0 +1,14 @@
+<project name="dt-license-usage-monitor" default="link">
+
+	<path id="osgi.classpath">
+		<fileset dir="C:/Program Files/dynaTrace/dynaTrace 6.2/server/plugins">
+			<include name="com.dynatrace.diagnostics.util.jar" />
+			<include name="com.dynatrace.diagnostics.sdk.jar" />
+		</fileset>
+	</path>
+	
+	<import file="../build-ant/build-common.xml" />
+	
+	<property name="dependencies" value="dt-authentication-api dt-http dt-utils dt-sysinfo dt-profiles" />
+	
+</project>

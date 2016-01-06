@@ -1,5 +1,7 @@
 package com.dynatrace.http;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.UUID;
 
 import javax.xml.bind.DatatypeConverter;
@@ -101,26 +103,30 @@ public class CredentialsTest {
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
-	public void testEncodeInvalidUserAndPass() {
-		new Credentials(null, null).encode();
+	public void testEncodeInvalidUserAndPass() throws IOException {
+		new Credentials(null, null).encode(null, null);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void testEncodeInvalidUser() {
-		new Credentials(null, UUID.randomUUID().toString()).encode();
+	public void testEncodeInvalidUser() throws IOException {
+		new Credentials(null, UUID.randomUUID().toString()).encode(null, null);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void testEncodeInvalidPass() {
-		new Credentials(UUID.randomUUID().toString(), null).encode();
+	public void testEncodeInvalidPass() throws IOException {
+		new Credentials(UUID.randomUUID().toString(), null).encode(null, null);
 	}
 	
 	@Test
-	public void testEncode() {
+	public void testEncode() throws IOException {
 		String user = UUID.randomUUID().toString();
 		String pass = UUID.randomUUID().toString();
 		Credentials credentials = new Credentials(user, pass);
-		String encoded = credentials.encode();
+		String encoded = null;
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			credentials.encode(null, baos);
+			encoded = new String(baos.toByteArray());
+		}
 		String userPass = user + Strings.COLON + pass;
 		String expected = DatatypeConverter.printBase64Binary(
 			userPass.getBytes()

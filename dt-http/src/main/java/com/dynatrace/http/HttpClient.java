@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 
+import com.dynatrace.authentication.Authenticator;
 import com.dynatrace.http.config.Credentials;
 
 /**
@@ -50,7 +51,7 @@ public interface HttpClient {
 	 * 		{@link Method} are {@code null}.
 	 */
 	int request(
-		URL url, Method method,	Credentials credentials, OutputStream out
+		URL url, Method method,	Authenticator credentials, OutputStream out
 	) throws IOException;
 	
 	/**
@@ -75,9 +76,9 @@ public interface HttpClient {
 	 * @throws IOException in case sending the HTTP request fails
 	 */
 	<T> HttpResponse<T> request(URL url,
-			Method method,
-			Credentials credentials,
-			Class<T> responseClass
+		Method method,
+		Authenticator credentials,
+		Class<T> responseClass
 	) throws IOException;
 	
 	/**
@@ -95,10 +96,10 @@ public interface HttpClient {
 	 * @throws IOException in case sending the HTTP request fails
 	 */
 	UploadResult upload(
-			URL url,
-			Credentials credentials,
-			String fileName,
-			InputStream inputStream
-		) throws IOException;
+		URL url,
+		Authenticator credentials,
+		String fileName,
+		InputStream inputStream
+	) throws IOException;
 
 }
