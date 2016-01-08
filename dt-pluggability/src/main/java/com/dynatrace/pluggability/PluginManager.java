@@ -145,6 +145,8 @@ public class PluginManager extends ClassLoader {
 					jarName = entryName.substring("lib/".length());
 				} else if (entryName.startsWith("variables/")) {
 					jarName = entryName.substring("variables/".length());
+				} else if (entryName.startsWith("authentication/")) {
+					jarName = entryName.substring("authentication/".length());
 				}
 				if (jarName == null) {
 					continue;

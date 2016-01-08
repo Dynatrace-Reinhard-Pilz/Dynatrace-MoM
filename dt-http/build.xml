@@ -2,6 +2,6 @@
 
 	<import file="../build-ant/build-common.xml" />
 	
-	<property name="dependencies" value="dt-utils dt-cmd dt-authentication-api" />
+	<property name="dependencies" value="dt-utils dt-cmd dt-authentication-api dt-pluggability" />
 	
 </project>

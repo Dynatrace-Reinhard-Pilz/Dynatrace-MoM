@@ -407,6 +407,7 @@ public class Closeables {
 	}
 	
 	public static InputStream getResourceAsStream(String name) {
+		Objects.requireNonNull(name);
 		return Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
 	}
 	

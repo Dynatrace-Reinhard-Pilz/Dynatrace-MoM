@@ -8,14 +8,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.net.CacheRequest;
 import java.net.HttpURLConnection;
 import java.net.NoRouteToHostException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -46,10 +43,6 @@ import com.dynatrace.http.permissions.Unauthorized;
 import com.dynatrace.utils.Closeables;
 import com.dynatrace.utils.Iterables;
 import com.dynatrace.xml.XMLUtil;
-
-import sun.net.ProgressSource;
-import sun.net.www.MessageHeader;
-import sun.net.www.http.PosterOutputStream;
 
 /**
  * A minimalistic HTTP Client

@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -487,6 +489,48 @@ public class CloseablesTest extends Coverage<Closeables> {
 		} finally {
 			Closeables.delete(tmpFolder);
 		}
+	}
+	
+	@Test
+	public void testGetResourceAsStream() throws IOException {
+		File tempFile = File.createTempFile(
+			UUID.randomUUID().toString(),
+			UUID.randomUUID().toString()
+		);
+		try {
+			Closeables.getResourceAsStream(tempFile.getName());
+		} finally {
+			Closeables.delete(tempFile);
+		}
+	}
+	
+	@Test(expected = NullPointerException.class)
+	public void testGetResourceAsStreamNPE() {
+		Closeables.getResourceAsStream(null);
+	}
+	
+	@Test
+	public void testGetAbsCanonPath() throws IOException {
+		Assert.assertNull(Closeables.getAbsCanonPath(null));
+		File tempFile = File.createTempFile(
+			UUID.randomUUID().toString(),
+			UUID.randomUUID().toString()
+		);
+		try {
+			Assert.assertEquals(
+				tempFile.getAbsolutePath(),
+				Closeables.getAbsCanonPath(tempFile)
+			);
+		} finally {
+			Closeables.delete(tempFile);
+		}
+	}
+	
+	@Test
+	public void testGetFilename() throws MalformedURLException {
+		Assert.assertNull(Closeables.getFilename(null));
+		Assert.assertEquals("foo", Closeables.getFilename(new URL("http://localhost/foo")));
+		Assert.assertEquals("localhost", Closeables.getFilename(new URL("http://localhost")));
 	}
 	
 	@Override

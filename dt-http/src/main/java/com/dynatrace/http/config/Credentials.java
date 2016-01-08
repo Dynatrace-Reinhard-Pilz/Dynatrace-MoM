@@ -6,7 +6,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -16,6 +22,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import com.dynatrace.authentication.Authenticator;
+import com.dynatrace.pluggability.PluginManager;
 import com.dynatrace.utils.Base64;
 import com.dynatrace.utils.Base64Output;
 import com.dynatrace.utils.Strings;
@@ -36,6 +43,9 @@ import com.dynatrace.utils.Strings;
 )
 public final class Credentials implements Authenticator {
 	
+	private static final Logger LOGGER =
+			Logger.getLogger(Credentials.class.getName());
+	
 	private static final String ERR_MSG_NO_USERNAME =
 			"credentials do not contain a username".intern();
 	private static final String ERR_MSG_NO_PASSWORD =
@@ -47,6 +57,57 @@ public final class Credentials implements Authenticator {
 
 	private String user = null;
 	private String pass = null;
+	
+	private final static PluginManager PLUGINMGR = PluginManager.get(
+		Credentials.class
+	);
+	
+	private final static Iterable<Authenticator> AUTHS = findAuths();
+	
+	private static Iterable<Authenticator> findAuths() {
+		Class<? extends Authenticator>[] classes =
+				PLUGINMGR.getImplementors(Authenticator.class);
+		Collection<Authenticator> auths = new ArrayList<>();
+		for (Class<? extends Authenticator> clazz : classes) {
+			Authenticator auth = createAuth(clazz);
+			if (auth != null) {
+				LOGGER.log(
+					Level.INFO,
+					"Registering " + auth.getClass().getName()
+				);
+				auths.add(auth);
+			}
+		}
+		return auths;
+	}
+	
+	private static Authenticator createAuth(
+		Class<? extends Authenticator> clazz
+	) {
+		if (clazz == null) {
+			return null;
+		}
+		int modifiers = clazz.getModifiers();
+		if (Modifier.isAbstract(modifiers)) {
+			return null;
+		}
+		if (Modifier.isInterface(modifiers)) {
+			return null;
+		}
+		try {
+			Constructor<? extends Authenticator> ctor =
+				clazz.getDeclaredConstructor(new Class<?>[0]);
+			ctor.setAccessible(true);
+			return ctor.newInstance();
+		} catch (Throwable t) {
+			LOGGER.log(
+				Level.WARNING,
+				"Unable to create instance of " + clazz.getName()
+			);
+			return null;
+		}
+	}
+	
 	
 	/**
 	 * c'tor
@@ -138,6 +199,18 @@ public final class Credentials implements Authenticator {
 	 */
 	@Override
 	public boolean encode(URL url, OutputStream out) throws IOException {
+		for (Authenticator auth : AUTHS) {
+			if (auth.encode(url, out)) {
+				LOGGER.log(Level.FINEST, "Successfully authenticated via " + auth);
+				return true;
+			}
+		}
+		encode0(out);
+		LOGGER.log(Level.FINEST, "Fallback authenticated via " + user + "/" + pass);
+		return true;
+	}
+	
+	private void encode0(OutputStream out) throws IOException {
 		if (isNullOrEmpty(user)) {
 			throw new IllegalArgumentException(ERR_MSG_NO_USERNAME);
 		}
@@ -153,7 +226,6 @@ public final class Credentials implements Authenticator {
 		) {
 			base64Out.write(in, in.available());
 		}
-		return true;
 	}
 	
 }
