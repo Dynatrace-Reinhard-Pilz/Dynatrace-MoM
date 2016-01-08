@@ -155,6 +155,52 @@ will deploy a System Profile and two Dashboards using the given Templates on the
 * If the User Group does not exist yet, it will create a new LDAP group
   - The new User Group will have the `Administrator` Role as Management Role on the dynaTrace Server
 
+## Secure Authentication
+By default `dt-onboarding` expects user name and password to be specified via configuration properties.
+In cases where it is required to not specify user credentials via command line, the authentication mechanism can get extended via plugins.
+Authentication Plugins are allowed to be embedded into `dt-onboarding.jar` as embedded JAR file. They must reside within the folder `authentication` within `dt-onboarding.jar`.
+In order to get recognized as an Authentication Plugin, this JAR file is required to contain at least one Java Class implementing the interface `com.dynatrace.authentication.Authenticator`. This interface is contained within the [dt-authentication-api.jar](https://github.com/Dynatrace-Reinhard-Pilz/Dynatrace-MoM/blob/master/dt-authentication-api/dt-authentication-api.jar?raw=true).
+
+
+
+```
+package com.dynatrace.authentication;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
+
+/**
+ * 
+ * @author reinhard.pilz@dynatrace.com
+ *
+ */
+public interface Authenticator {
+	
+	/**
+	 * Encodes the configured user name and password to using a BASE64 Encoder
+	 * to be used for Basic Authentication (HTTP).<br />
+	 * <br />
+	 * More specifically an {@link Authenticator} is required to Base64-encode
+	 * a character sequence matching {@code username:password} and write the
+	 * bytes of this string into the given {@link OutputStream}.
+	 * 
+	 * @param url the {@link URL} a connection is about to be opened for, and
+	 * 		for which authentication is required
+	 * @param out the {@link OutputStream} to add the credentials to
+	 * 
+	 * @return {@code true} if this {@link Authenticator} was able to provide
+	 * 		authentication for the given {@link URL}, {@code false} otherwise
+	 * 
+	 * @throws IllegalArgumentException if either the user name or the password
+	 * 		are {@code null} or empty
+	 */
+	boolean encode(URL url, OutputStream out) throws IOException;
+	
+}
+```
+
+
 ## Full documentation of capabilities and options
 ```
 java [-D<option>=<value> *] -jar dt-onboarding.jar [usage|help]
