@@ -13,7 +13,11 @@ public interface Authenticator {
 	
 	/**
 	 * Encodes the configured user name and password to using a BASE64 Encoder
-	 * to be used for Basic Authentication (HTTP).
+	 * to be used for Basic Authentication (HTTP).<br />
+	 * <br />
+	 * More specifically an {@link Authenticator} is required to Base64-encode
+	 * a character sequence matching {@code username:password} and write the
+	 * bytes of this string into the given {@link OutputStream}.
 	 * 
 	 * @param url the {@link URL} a connection is about to be opened for, and
 	 * 		for which authentication is required
