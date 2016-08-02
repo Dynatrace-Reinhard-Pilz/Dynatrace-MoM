@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Dashboards implements Iterable<Dashboard> {
 
-	private final Collection<Dashboard> dashboards = new ArrayList<Dashboard>();
+	private Collection<Dashboard> dashboards = new ArrayList<Dashboard>();
 	private String href = null;
 	
 	public void setHref(String href) {
@@ -35,14 +35,11 @@ public class Dashboards implements Iterable<Dashboard> {
 	
 	@XmlElementRef(type = Dashboard.class, name = "dashboard")
 	public Collection<Dashboard> getDashboards() {
-		return new ArrayList<Dashboard>(dashboards);
+		return dashboards;
 	}
 	
 	public void setDashboards(Collection<Dashboard> dashboards) {
-		this.dashboards.clear();
-		if (dashboards != null) {
-			this.dashboards.addAll(dashboards);
-		}
+		this.dashboards = dashboards;
 	}
 
 	@Override

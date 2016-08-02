@@ -9,5 +9,7 @@ public interface BaseServerRepository {
 	
 	void setServerRecords(Collection<ServerRecord> serverRecords);
 	Collection<ServerRecord> getServerRecords();
+	void encrypt();
+	void decrypt();
 	
 }

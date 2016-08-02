@@ -3,11 +3,13 @@ package com.dynatrace.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Vector;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -304,6 +306,116 @@ public class IterablesTest extends Coverage<Iterables> {
 			UUID.randomUUID(),
 			null
 		}, false);
+	}
+	
+	@Test
+	public void testIsNullOrEmpty() {
+		Assert.assertTrue(Iterables.isNullOrEmpty(new SizedIterable<Object>() {
+
+			@Override
+			public Iterator<Object> iterator() {
+				return null;
+			}
+
+			@Override
+			public int size() {
+				return 0;
+			}
+			
+		}));
+		Assert.assertTrue(Iterables.isNullOrEmpty((Iterable<Object>) new SizedIterable<Object>() {
+
+			@Override
+			public Iterator<Object> iterator() {
+				return null;
+			}
+
+			@Override
+			public int size() {
+				return 0;
+			}
+			
+		}));
+		Assert.assertFalse(Iterables.isNullOrEmpty(new SizedIterable<Object>() {
+
+			@Override
+			public Iterator<Object> iterator() {
+				return Collections.emptyIterator();
+			}
+
+			@Override
+			public int size() {
+				return 1;
+			}
+			
+		}));
+		Assert.assertFalse(Iterables.isNullOrEmpty((Iterable<Object>)new SizedIterable<Object>() {
+
+			@Override
+			public Iterator<Object> iterator() {
+				return Collections.emptyIterator();
+			}
+
+			@Override
+			public int size() {
+				return 1;
+			}
+			
+		}));
+		Assert.assertTrue(
+			Iterables.isNullOrEmpty((SizedIterable<Object>) null)
+		);
+	}
+	
+	@Test
+	public void testAddAllIterable() {
+		Iterables.addAll(null, (Iterable<?>) null);
+		Iterables.addAll(Collections.emptyList(), (Iterable<?>) null);
+		Iterables.addAll(null, Collections.emptyList());
+		Iterables.addAll(Collections.emptyList(), Collections.emptyList());
+		ArrayList<Object> c = new ArrayList<>();
+		ArrayList<Object> i = new ArrayList<>();
+		Object o = new Object();
+		i.add(o);
+		Iterables.addAll(c, i);
+		Assert.assertEquals(1, c.size());
+		Assert.assertEquals(o, c.get(0));
+	}
+	
+	@Test
+	public void testAddAllEnumeration() {
+		Iterables.addAll(null, (Enumeration<?>) null);
+		Iterables.addAll(Collections.emptyList(), (Enumeration<?>) null);
+		Iterables.addAll(null, Collections.emptyEnumeration());
+		Iterables.addAll(Collections.emptyList(), Collections.emptyEnumeration());
+		ArrayList<Object> c = new ArrayList<>();
+		Vector<Object> i = new Vector<>();
+		Object o = new Object();
+		i.add(o);
+		Iterables.addAll(c, i.elements());
+		Assert.assertEquals(1, c.size());
+		Assert.assertEquals(o, c.get(0));
+	}
+	
+	@Test
+	public void testAddAllArray() {
+		Iterables.addAll(null, (Object[]) null);
+		Iterables.addAll(Collections.emptyList(), (Object[]) null);
+		Iterables.addAll(null, new Object[0]);
+		Iterables.addAll(Collections.emptyList(), new Object[0]);
+		ArrayList<Object> c = new ArrayList<>();
+		Object o = new Object();
+		Object[] i = new Object[] { o };
+		Iterables.addAll(c, i);
+		Assert.assertEquals(1, c.size());
+		Assert.assertEquals(o, c.get(0));
+	}
+	
+	@Test
+	public void testIsNullOrEmptyArray() {
+		Assert.assertTrue(Iterables.isNullOrEmpty((Object[]) null));
+		Assert.assertTrue(Iterables.isNullOrEmpty(new Object[0]));
+		Assert.assertFalse(Iterables.isNullOrEmpty(new Object[] { this }));
 	}
 	
 	@Override

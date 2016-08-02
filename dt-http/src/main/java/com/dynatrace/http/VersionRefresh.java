@@ -17,6 +17,11 @@ public class VersionRefresh extends ServerOperation<Version> {
 		super(ctx, scfg);
 	}
 	
+	@Override
+	protected ResultLoggingLevel getResultLoggingLevel() {
+		return ResultLoggingLevel.None;
+	}
+	
 	protected boolean prepare() {
 		ConnectionStatus status =
 		getAttribute(ConnectionAware.class).getConnectionStatus();

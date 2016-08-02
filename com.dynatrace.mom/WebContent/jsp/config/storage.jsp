@@ -8,11 +8,17 @@ com.dynatrace.http.ConnectionStatus,
 com.dynatrace.reporting.Availability,
 java.io.File,
 com.dynatrace.mom.MomConfig"
+%><%
+MomConfig momConfig = null;
+momConfig = (MomConfig) pageContext.findAttribute(MomConfig.ATTRIBUTE);
+	File storage = momConfig.getStorage();
 %><!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Storage - dynaTrace MoM</title>
-
+		<title>Storage - dynaTrace MoM</title><%
+		if (storage != null) { %>
+			<meta http-equiv="refresh" content="0; url=${pageContext.request.contextPath}" /><%
+		} %>
 		<link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" type="image/x-icon" />
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/debug.css" />
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/icomoon.css" />
@@ -27,8 +33,6 @@ com.dynatrace.mom.MomConfig"
 		<script src="${pageContext.request.contextPath}/scripts/utils.js"></script>
 		<script src="${pageContext.request.contextPath}/scripts/commands.js"></script>
 	</head><%
-	MomConfig momConfig = null;
-	momConfig = (MomConfig) pageContext.findAttribute(MomConfig.ATTRIBUTE);
 %>
 	<body>
 <jsp:include page="/jsp/header.jspf" />	
@@ -41,7 +45,6 @@ com.dynatrace.mom.MomConfig"
 					<div class="instance_content">
 					<div id="tab_license" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
 						<div class="tab_content tab_license"><%
-							File storage = momConfig.getStorage();
 							if (storage == null) { %>
 							<div>You need to specify a folder to store settings and temporary data</div>
 							<div>The Application Server hosting MoM requires r/w access to this folder</div>

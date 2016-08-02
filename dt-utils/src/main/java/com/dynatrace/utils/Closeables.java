@@ -96,6 +96,7 @@ public class Closeables {
 				out.write(buffer, 0, read);
 				read = in.read(buffer);
 			}
+			out.flush();
 			return len;
 		}
 	

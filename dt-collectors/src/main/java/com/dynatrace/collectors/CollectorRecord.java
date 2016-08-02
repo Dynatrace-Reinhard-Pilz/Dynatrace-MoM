@@ -80,7 +80,7 @@ public class CollectorRecord implements Labelled, Unique<CollectorInfo>, Version
 	public void setRestartStatus(RestartStatus restartStatus) {
 		synchronized (this) {
 			if (this.restartStatus != restartStatus) {
-				LOGGER.log(Level.INFO, "Restart " + restartStatus + " for " + this);
+				LOGGER.log(Level.INFO, "Restart " + restartStatus + " for " + this + " (version: " + this.getVersion() + ")");
 			}
 			this.restartStatus = restartStatus;
 		}

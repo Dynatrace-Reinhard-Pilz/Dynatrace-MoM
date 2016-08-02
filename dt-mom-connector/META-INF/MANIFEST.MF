@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: dt-mom-connector
+Bundle-SymbolicName: dt-mom-connector;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: com.dynatrace.diagnostics.sdk,
+ com.dynatrace.diagnostics.server,
+ javax.servlet,
+ com.dynatrace.diagnostics.webservices
+Bundle-Vendor: Dynatrace LLC
+Bundle-Activator: com.dynatrace.mom.connector.MoMConnector
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: com.dynatrace.mom.connector
+Bundle-ClassPath: .

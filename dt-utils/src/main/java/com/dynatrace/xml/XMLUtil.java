@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import com.dynatrace.utils.Closeables;
+import com.dynatrace.utils.Iterables;
 import com.dynatrace.utils.Throwables;
 import com.dynatrace.utils.Unchecked;
 
@@ -180,7 +181,7 @@ public class XMLUtil {
 	public static JAXBContext createContext(Class<?>... classes)
 		throws IOException
 	{
-		if ((classes == null) || (classes.length == 0)) {
+		if (Iterables.isNullOrEmpty(classes)) {
 			throw new IllegalArgumentException();
 		}
 		try {

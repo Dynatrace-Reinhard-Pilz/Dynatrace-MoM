@@ -2,6 +2,7 @@ package com.dynatrace.license;
 
 import java.util.logging.Logger;
 
+import com.dynatrace.http.ResultLoggingLevel;
 import com.dynatrace.http.ServerOperation;
 import com.dynatrace.http.config.ServerConfig;
 import com.dynatrace.http.request.Request;
@@ -14,6 +15,11 @@ public class LicenseRefresh extends ServerOperation<LicenseInfo> {
 	
 	public LicenseRefresh(ExecutionContext ctx, ServerConfig scfg) {
 		super(ctx, scfg);
+	}
+	
+	@Override
+	protected ResultLoggingLevel getResultLoggingLevel() {
+		return ResultLoggingLevel.None;
 	}
 
 	@Override

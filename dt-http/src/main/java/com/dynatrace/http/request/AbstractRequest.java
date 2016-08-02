@@ -41,7 +41,9 @@ public abstract class AbstractRequest<T> implements Request<T> {
 	
 	protected static final HttpClient HTTPCLIENT = Http.client();
 	
-	
+	protected Level level() {
+		return Level.FINE;
+	}
 	
 	protected Logger getLogger() {
 		return LOGGER;
@@ -64,7 +66,7 @@ public abstract class AbstractRequest<T> implements Request<T> {
 	 */
 	public HttpResponse<T> execute(ServerConfig serverConfig) {
 		long start = System.currentTimeMillis();
-		getLogger().log(Level.FINEST, MessageFormat.format(
+		getLogger().log(level(), MessageFormat.format(
 				"Executing {0} {1}...",
 				getClass().getSimpleName(),
 				serverConfig
@@ -109,7 +111,7 @@ public abstract class AbstractRequest<T> implements Request<T> {
 			}
 			return new HttpResponse<T>(
 				code,
-				new UnexpectedResponseCodeException(expected, code, new String(out.toByteArray())));
+				new UnexpectedResponseCodeException(expected, code, new String(out.toByteArray()), this.getPath()));
 		}
 		try {
 			out.close();
@@ -137,7 +139,7 @@ public abstract class AbstractRequest<T> implements Request<T> {
 			return new HttpResponse<T>(code, null, e);
 		} finally {
 			long end = System.currentTimeMillis();
-			getLogger().log(Level.FINEST, MessageFormat.format(
+			getLogger().log(level(), MessageFormat.format(
 					"    {0} {1} lasted {2} ms",
 					getClass().getSimpleName(),
 					serverConfig,

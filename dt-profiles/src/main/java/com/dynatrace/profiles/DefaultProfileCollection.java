@@ -3,8 +3,12 @@ package com.dynatrace.profiles;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 public class DefaultProfileCollection implements ProfileCollection {
+	
+	private static final Logger LOGGER =
+			Logger.getLogger(DefaultProfileCollection.class.getName());
 
 	private final HashMap<String, SystemProfile> profiles =
 			new HashMap<String, SystemProfile>();

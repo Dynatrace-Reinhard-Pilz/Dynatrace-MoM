@@ -1,9 +1,9 @@
 package com.dynatrace.collectors;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -15,6 +15,9 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class CollectorInfos implements Collection<CollectorInfo> {
 	
+	@SuppressWarnings("unused")
+	private static final Logger LOGGER = Logger.getLogger(CollectorInfos.class.getName());
+	
 	private Collection<CollectorInfo> collectors =
 			new HashSet<CollectorInfo>();
 	
@@ -23,14 +26,11 @@ public class CollectorInfos implements Collection<CollectorInfo> {
 		name = "collectorinformation"
 	)
 	public Collection<CollectorInfo> getCollectors() {
-		return new ArrayList<CollectorInfo>(collectors);
+		return collectors;
 	}
 	
 	public void setCollectors(Collection<CollectorInfo> collectors) {
-		this.collectors.clear();
-		if (collectors != null) {
-			this.collectors.addAll(collectors);
-		}
+		this.collectors = collectors;
 	}
 
 	@Override

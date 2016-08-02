@@ -1,5 +1,6 @@
 package com.dynatrace.incidents;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.dynatrace.http.Method;
@@ -20,6 +21,11 @@ public class GetIncidentReferences extends AbstractRequest<XmlIncidentRule> {
 	}
 	
 	@Override
+	protected Level level() {
+		return Level.FINE;
+	}
+	
+	@Override
 	protected Logger getLogger() {
 		return LOGGER;
 	}
@@ -34,12 +40,14 @@ public class GetIncidentReferences extends AbstractRequest<XmlIncidentRule> {
 
 	@Override
 	public String getPath() {
-		return new StringBuilder("/rest/management/profiles/")
+		String string = new StringBuilder("/rest/management/profiles/")
 			.append(Strings.encode(SELF_MONITORING_PROFILE))
 			.append("/incidentrules/")
 			.append(Strings.encode(incidentRule.getName()))
 			.append("/incidents")
 			.toString();
+		// getLogger().log(Level.INFO, string);
+		return string;
 	}
 
 	@Override

@@ -37,8 +37,8 @@ public interface HttpClient {
 	 * given {@link Credentials}.
 	 * 
 	 * @param url the {@link URL} to send the request to
-	 * @param method the {@link Method} to use for the request
-	 * @param credentials the user credentials to be used for
+	 * @param m the {@link Method} to use for the request
+	 * @param auth the user credentials to be used for
 	 * 		Basic Authentication or {@code null} if no authentication is
 	 * 		expected to be required
 	 * @param out the {@link OutputStream} where the response delivered by the
@@ -50,9 +50,8 @@ public interface HttpClient {
 	 * @throws NullPointerException if the given {@link URL} or the given
 	 * 		{@link Method} are {@code null}.
 	 */
-	int request(
-		URL url, Method method,	Authenticator credentials, OutputStream out
-	) throws IOException;
+	int request(URL url, Method m, Authenticator auth, OutputStream out)
+		throws IOException;
 	
 	/**
 	 * Sends out an HTTP request to the given {@link URL} using the given
@@ -63,8 +62,8 @@ public interface HttpClient {
 	 * annotation in order to deserialize that XML code into an object.
 	 * 
 	 * @param url the {@link URL} to send the request to
-	 * @param method the HTTP method to use for the request
-	 * @param credentials the credentials to use for authentication or
+	 * @param m the HTTP method to use for the request
+	 * @param auth the {@link Authenticator} for authentication or
 	 * 		{@code null} if there is no authentication necessary
 	 * @param responseClass the {@link Class} implementing the required JAXB
 	 * 		annotation for umarshalling the HTTP response in form of XML code
@@ -75,10 +74,8 @@ public interface HttpClient {
 	 * 
 	 * @throws IOException in case sending the HTTP request fails
 	 */
-	<T> HttpResponse<T> request(URL url,
-		Method method,
-		Authenticator credentials,
-		Class<T> responseClass
+	<T> HttpResponse<T> request(
+		URL url, Method m, Authenticator auth, Class<T> responseClass
 	) throws IOException;
 	
 	/**
@@ -86,10 +83,10 @@ public interface HttpClient {
 	 * for transferring the bytes.
 	 *  
 	 * @param url the {@link URL} to upload the data to
-	 * @param credentials the {@link Credentials} for authentication or
+	 * @param auth the {@link Authenticator} for authentication or
 	 * 		{@code null} if no authentication is required
 	 * @param fileName the file name to publish to the HTTP server
-	 * @param inputStream the {@link InputStream} offering the data to upload
+	 * @param is the {@link InputStream} offering the data to upload
 	 * 
 	 * @return the results of the upload procedure
 	 * 
@@ -97,9 +94,11 @@ public interface HttpClient {
 	 */
 	UploadResult upload(
 		URL url,
-		Authenticator credentials,
+		Authenticator auth,
 		String fileName,
-		InputStream inputStream
+		InputStream is
 	) throws IOException;
+	
+	public void setResponseVerifier(ResponseVerifier verifier);
 
 }

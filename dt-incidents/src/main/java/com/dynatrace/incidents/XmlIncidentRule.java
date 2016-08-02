@@ -95,5 +95,10 @@ public class XmlIncidentRule {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return new StringBuilder(XmlIncidentRule.class.getSimpleName()).append("[").append(name).append("](").append(incidents.size()).append(")").toString();
+	}
 
 }

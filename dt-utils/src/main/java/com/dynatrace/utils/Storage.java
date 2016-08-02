@@ -18,10 +18,14 @@ public final class Storage {
 	
 	private static final String FOLDER_NAME_DYNATRACE = ".dynatrace";
 
-	private static final File STANDARD = resolveStorage();
+	private static File STANDARD = resolveStorage();
 	
 	public final static File standard() {
 		return STANDARD;
+	}
+	
+	public static void refresh() {
+		STANDARD = resolveStorage();
 	}
 	
 	private final static File resolveStorage() {

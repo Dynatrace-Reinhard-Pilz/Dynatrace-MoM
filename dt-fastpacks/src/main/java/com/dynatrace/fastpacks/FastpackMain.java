@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import com.dynatrace.cmd.CommandLineException;
 import com.dynatrace.utils.Closeables;
+import com.dynatrace.utils.FileSource;
 import com.dynatrace.utils.Iterables;
 
 public class FastpackMain {
@@ -41,7 +42,7 @@ public class FastpackMain {
 			for (String profile : profiles) {
 				isEmpty = false;
 				System.out.println("... adding System Profile '" + profile + "'");
-				builder.addProfile(new File(profile));
+				builder.addProfile(new FileSource(profile));
 			}
 		}
 		Collection<String> dashboards = config.getDashboards();
@@ -49,7 +50,7 @@ public class FastpackMain {
 			for (String dashboard : dashboards) {
 				isEmpty = false;
 				System.out.println("... adding Dashboard '" + dashboard + "'");
-				builder.addDashboard(new File(dashboard));
+				builder.addDashboard(new FileSource(dashboard));
 			}
 		}
 		if (isEmpty) {

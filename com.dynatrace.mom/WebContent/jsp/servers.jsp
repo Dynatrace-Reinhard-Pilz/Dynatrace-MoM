@@ -21,7 +21,7 @@ com.dynatrace.reporting.Availability"
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/stack_details.css" />
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/components/popup.css" />
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles/lib/jquery-ui-1.9.0.custom.min.css" />
-		<script src="${pageContext.request.contextPath}/scripts/jquery.min.js"></script>
+		<script src="${pageContext.request.contextPath}/scripts/jquery.min.js"></script> 
 		<script src="${pageContext.request.contextPath}/scripts/utils.js"></script>
 		<script src="${pageContext.request.contextPath}/scripts/commands.js"></script>
 	</head><%
@@ -45,7 +45,7 @@ com.dynatrace.reporting.Availability"
 -->
 					<div id="tab_license" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
 						<div class="tab_content tab_license">
-								<table id="reload-server-list" class="overview-list servers" style="font-family: raleway"><%--
+								<table id="reload-server-list" class="overview-list servers" style="font-family: Arial"><%--
 									<thead>
 										<tr>
 											<th>name</th>

@@ -47,6 +47,9 @@
         <dependent-module archiveName="dt-sysinfo-1.0.0.qualifier.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/dt-sysinfo/dt-sysinfo">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="dt-pluggability-1.0.0.qualifier.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/dt-pluggability/dt-pluggability">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <dependent-module archiveName="dt-web-base-1.0.0.qualifier.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/dt-web-base/dt-web-base">
             <dependency-type>uses</dependency-type>
         </dependent-module>

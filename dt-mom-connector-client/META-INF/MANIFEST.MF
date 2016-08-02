@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: dt-mom-connector-client
+Bundle-SymbolicName: dt-mom-connector-client
+Bundle-Version: 1.0.0.qualifier
+Main-Class: com.dynatrace.mom.connector.client.ConnectorClientMain
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: dt-utils

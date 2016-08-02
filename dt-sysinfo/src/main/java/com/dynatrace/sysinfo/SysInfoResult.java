@@ -32,5 +32,10 @@ public class SysInfoResult {
 	public void addProfile(SystemProfile systemProfile) {
 		profiles.add(systemProfile);
 	}
+	
+	@Override
+	public String toString() {
+		return SysInfoResult.class.getSimpleName() + "[" + file.getName() + "]";
+	}
 
 }

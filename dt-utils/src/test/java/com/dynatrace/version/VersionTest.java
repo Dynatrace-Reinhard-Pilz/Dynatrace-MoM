@@ -110,6 +110,7 @@ public class VersionTest {
 	@Test
 	public void testEquals() {
 		Version version = new Version(1, 2, 3, 4);
+		Assert.assertFalse(version.equals((Object) null));
 		Assert.assertFalse(version.equals(null));
 		Assert.assertFalse(version.equals(this));
 		Assert.assertFalse(version.equals(new Version(0, 2, 3, 4)));
@@ -117,6 +118,7 @@ public class VersionTest {
 		Assert.assertFalse(version.equals(new Version(1, 2, 0, 4)));
 		Assert.assertFalse(version.equals(new Version(1, 2, 3, 0)));
 		Assert.assertTrue(version.equals(Version.parse(version.toString())));
+		Assert.assertTrue(version.equals((Object) version));
 	}
 	
 	@Test
@@ -332,6 +334,28 @@ public class VersionTest {
 				return false;
 			}
 		}) == 1);
+	}
+	
+	@Test(expected = UnsupportedOperationException.class)
+	public void testUpdateVersion() throws Exception {
+		Version.UNDEFINED.updateVersion(Version.UNDEFINED);
+	}
+	
+	@Test
+	public void testEqualsVersionable() throws Exception {
+		Version version = new Version(1, 0, 0, 0);
+		Assert.assertFalse(version.equals((Versionable) null));
+		Assert.assertFalse(version.equals((Versionable) (new Version(1, 0, 0, 1))));
+		Assert.assertTrue(version.equals((Versionable) (new Version(1, 0, 0, 0))));
+	}
+	
+	@Test
+	public void testStaticEqualsVersionable() throws Exception {
+		Assert.assertTrue(Version.equals(null, null));
+		Assert.assertFalse(Version.equals(new Version(1, 0, 0, 0), null));
+		Assert.assertFalse(null, Version.equals(null, new Version(1, 0, 0, 0)));
+		Assert.assertFalse(null, Version.equals(new Version(1, 0, 0, 1), new Version(1, 0, 0, 0)));
+		Assert.assertTrue(null, Version.equals(new Version(1, 0, 0, 0), new Version(1, 0, 0, 0)));
 	}
 	
 //	@Test

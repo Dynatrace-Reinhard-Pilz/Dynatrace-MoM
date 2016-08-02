@@ -26,6 +26,7 @@ import com.dynatrace.pluggability.PluginManager;
 import com.dynatrace.utils.Base64;
 import com.dynatrace.utils.Base64Output;
 import com.dynatrace.utils.Strings;
+import com.dynatrace.utils.encryption.Encryptable;
 
 /**
  * A configuration object holding user credentials
@@ -38,10 +39,13 @@ import com.dynatrace.utils.Strings;
 @XmlType(
 		propOrder = {
 				Credentials.ATTRIBUTE_USER,
-				Credentials.ATTRIBUTE_PASS
+				Credentials.ATTRIBUTE_PASS,
+				Credentials.ATTRIBUTE_ENCRYPTED
 		}
 )
-public final class Credentials implements Authenticator {
+public final class Credentials implements Authenticator, Cloneable, Encryptable {
+	
+	
 	
 	private static final Logger LOGGER =
 			Logger.getLogger(Credentials.class.getName());
@@ -54,9 +58,50 @@ public final class Credentials implements Authenticator {
 	public static final String TAG = "credentials";
 	static final String ATTRIBUTE_USER = "user";
 	static final String ATTRIBUTE_PASS = "pass";
+	static final String ATTRIBUTE_ENCRYPTED = "encrypted";
 
-	private String user = null;
-	private String pass = null;
+	private String user = "username";
+	private String pass = "password";
+
+	private volatile boolean isEncrypted = false;
+	
+	private static final DesEncrypter USER_DESCRYPTER = new DesEncrypter("USER_DESCRYPTER", "useruseruseruseruseruseruseruseruseruseruser");
+	private static final DesEncrypter PASS_DESCRYPTER = new DesEncrypter("PASS_DESCRYPTER", "passpasspasspasspasspasspasspasspasspasspass");
+	
+	public void setEncrypted(boolean isEncrypted) {
+		this.isEncrypted = isEncrypted;
+	}
+	
+	@XmlAttribute(name = Credentials.ATTRIBUTE_ENCRYPTED, required = false)
+	public boolean isEncrypted() {
+		return isEncrypted;
+	}
+	
+	@Override
+	public void encrypt() {
+		synchronized (this) {
+			if (isEncrypted) {
+				return;
+			}
+			this.user = USER_DESCRYPTER.encrypt(this.user);
+			this.pass = PASS_DESCRYPTER.encrypt(this.pass);
+			isEncrypted = true;
+		}
+	}
+	
+	@Override
+	public void decrypt() {
+		synchronized (this) {
+			if (!isEncrypted) {
+				return;
+			}
+			this.user = USER_DESCRYPTER.decrypt(this.user);
+			this.pass = PASS_DESCRYPTER.decrypt(this.pass);
+			isEncrypted = false;
+		}
+	}
+	
+	
 	
 	private final static PluginManager PLUGINMGR = PluginManager.get(
 		Credentials.class
@@ -217,6 +262,8 @@ public final class Credentials implements Authenticator {
 		if (isNullOrEmpty(pass)) {
 			throw new IllegalArgumentException(ERR_MSG_NO_PASSWORD);
 		}
+//		LOGGER.log(Level.INFO, "user: " + user);
+//		LOGGER.log(Level.INFO, "pass: " + pass);
 		final String userPassword =	user + Strings.COLON + pass;
 		try (
 			Base64Output base64Out = new Base64Output(out);
@@ -225,6 +272,15 @@ public final class Credentials implements Authenticator {
 			);
 		) {
 			base64Out.write(in, in.available());
+		}
+	}
+	
+	@Override
+	public Credentials clone() {
+		try {
+			return (Credentials) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new InternalError(e.getMessage());
 		}
 	}
 	

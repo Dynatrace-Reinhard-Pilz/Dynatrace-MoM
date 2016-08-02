@@ -1,6 +1,5 @@
 package com.dynatrace.fastpacks;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,6 +14,7 @@ import com.dynatrace.fastpacks.metadata.manifest.ManifestBuilder;
 import com.dynatrace.fastpacks.metadata.resources.Resource;
 import com.dynatrace.fastpacks.metadata.resources.ResourceType;
 import com.dynatrace.utils.Closeables;
+import com.dynatrace.utils.Source;
 import com.dynatrace.utils.Version;
 import com.dynatrace.xml.XMLUtil;
 
@@ -28,23 +28,23 @@ public class FastpackBuilder {
 		this.plugin = new Plugin(fastPackName, fastPackId);
 	}
 	
-	public FastpackBuilder addResource(File file, String targetDir) {
-		this.plugin = this.plugin.addResource(file, targetDir);
+	public FastpackBuilder addResource(Source<?> source, String targetDir) {
+		this.plugin = this.plugin.addResource(source, targetDir);
 		return this;
 	}
 	
-	public FastpackBuilder addDashboard(File file) {
-		this.plugin = this.plugin.addDashboard(file);
+	public FastpackBuilder addDashboard(Source<?> source) {
+		this.plugin = this.plugin.addDashboard(source);
 		return this;
 	}
 	
-	public FastpackBuilder addProfile(File file) {
-		this.plugin = this.plugin.addProfile(file);
+	public FastpackBuilder addProfile(Source<?> source) {
+		this.plugin = this.plugin.addProfile(source);
 		return this;
 	}
 	
-	public FastpackBuilder addUserPlugin(File file) {
-		this.plugin = this.plugin.addUserPlugin(file);
+	public FastpackBuilder addUserPlugin(Source<?> source) {
+		this.plugin = this.plugin.addUserPlugin(source);
 		return this;
 	}
 	
@@ -101,9 +101,9 @@ public class FastpackBuilder {
 		final JarEntry entry = new JarEntry(resource.getType().getStorage() + "/" + resource.getName());
 		entry.setTime(System.currentTimeMillis());
 		out.putNextEntry(entry);
-		InputStream in = resource.getInputStream();
-		Closeables.copy(in, out);
-		in.close();
+		try (InputStream in = resource.openStream()) {
+			Closeables.copy(in, out);
+		}
 		out.flush();
 		out.closeEntry();
 	}

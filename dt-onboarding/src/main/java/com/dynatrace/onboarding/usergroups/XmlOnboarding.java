@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.dynatrace.onboarding.config.Config;
-import com.dynatrace.onboarding.dashboards.Dashboard;
+import com.dynatrace.onboarding.dashboards.LocalDashboard;
 
 @XmlRootElement(name = "onboarding")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -36,7 +36,7 @@ public final class XmlOnboarding {
 		this.usergroups = usergroups;
 	}
 	
-	public static XmlOnboarding create(Dashboard[] dashboards, String profileName) {
+	public static XmlOnboarding create(LocalDashboard[] dashboards, String profileName) {
 		if (!Config.areUserGroupsConfigured()) {
 			return null;
 		}
@@ -54,11 +54,11 @@ public final class XmlOnboarding {
 			
 			Collection<XmlDashboardPermission> dashboardPermissions = new ArrayList<>();
 			if (dashboards != null) {
-				for (Dashboard dashboard : dashboards) {
+				for (LocalDashboard dashboard : dashboards) {
 					XmlDashboardPermission dashboardPermission = new XmlDashboardPermission();
 					Config.dashboardAutoOpen(userGroupKey, dashboard.getKey());
 					dashboardPermission.setAutoopen(Config.dashboardAutoOpen(userGroupKey, dashboard.getKey()));
-					dashboardPermission.setDashboard(dashboard.getName());
+					dashboardPermission.setDashboard(dashboard.getId());
 					Config.dashboardPermission(userGroupKey, dashboard.getKey());
 					dashboardPermission.setPermission(Config.dashboardPermission(userGroupKey, dashboard.getKey()));
 					if (dashboardPermission.getPermission() != DashboardPermission.None) {

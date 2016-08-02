@@ -21,12 +21,15 @@ import com.dynatrace.onboarding.config.Config;
 import com.dynatrace.onboarding.config.Debug;
 import com.dynatrace.onboarding.dashboards.Dashboard;
 import com.dynatrace.onboarding.dashboards.DashboardTemplate;
+import com.dynatrace.onboarding.dashboards.LocalDashboard;
+import com.dynatrace.onboarding.profiles.InvalidProfileNameException;
 import com.dynatrace.onboarding.profiles.Profile;
 import com.dynatrace.onboarding.profiles.ProfileTemplate;
 import com.dynatrace.onboarding.serverconfig.ServerProperties;
 import com.dynatrace.onboarding.usergroups.XmlOnboarding;
 import com.dynatrace.onboarding.variables.DefaultVariables;
 import com.dynatrace.utils.DefaultExecutionContext;
+import com.dynatrace.utils.FileSource;
 import com.dynatrace.variables.UnresolvedVariableException;
 import com.dynatrace.xml.XMLUtil;
 
@@ -53,15 +56,18 @@ public class FastPackHelper {
 	 */
 	public static boolean createAndUploadFastPack(
 		FastpackBuilder builder,
-		ServerConfig serverConfig
+		ServerConfig serverConfig,
+		InstallationVerifier verifier
 	) {
-		LOGGER.log(Level.INFO, "Creating and uploading Fast Pack");
+		LOGGER.log(Level.FINE, "Creating and uploading Fast Pack");
 		final File dtpFile = new File(
 			Config.temp(),
 			UUID.randomUUID() + ".dtp"
 		);
 		if (!Debug.DEBUG) {
 			dtpFile.deleteOnExit();
+		} else {
+			LOGGER.log(Level.INFO, "DTP File: " + dtpFile.getAbsolutePath());
 		}
 		
 		try (OutputStream out = new FileOutputStream(dtpFile)) {
@@ -74,7 +80,11 @@ public class FastPackHelper {
 			);
 			return false;
 		}
-		
+		return uploadFastPack(serverConfig, dtpFile, verifier);
+
+	}
+	
+	public static boolean uploadFastPack(ServerConfig serverConfig, final File dtpFile, final InstallationVerifier verifier) {
 		DefaultExecutionContext ctx = new DefaultExecutionContext();
 		FastPackUpload upload = new FastPackUpload(ctx, serverConfig) {
 			@Override
@@ -104,11 +114,8 @@ public class FastPackHelper {
 				if (!"Administrative Permission".equals(permission)) {
 					return super.handlePermissionDeniedException(e);
 				}
-				ServerProperties serverProps = ServerProperties.load(
-					Config.serverConfig(),
-					false
-				);
-				if (serverProps.isPermissionTaskInstalled) {
+				
+				if (verifier.isInstalled()) {
 					return new FastPackInstallStatus();
 				}
 				return null;
@@ -118,7 +125,7 @@ public class FastPackHelper {
 			LOGGER.log(Level.SEVERE, "Unable to deploy Fast Pack");
 			return false;
 		}
-		return true;
+		return true;		
 	}
 	
 	/**
@@ -131,15 +138,15 @@ public class FastPackHelper {
 	 * @param profile the System Profile the Dashboard to create should be
 	 * 		contain as its source
 	 * 
-	 * @return the {@link Dashboard} that has been created and appended to the
+	 * @return the {@link LocalDashboard} that has been created and appended to the
 	 * 		given {@link FastpackBuilder} or {@code null} if an error
 	 * 		occurred or not all variables have been defined
 	 */
-	public static Dashboard[] appendDashboards(
+	public static LocalDashboard[] appendDashboards(
 		FastpackBuilder fpb,
 		Profile profile
 	) {
-		DefaultVariables variables = new DefaultVariables(profile.getName());
+		DefaultVariables variables = new DefaultVariables(profile.getId());
 		Collection<Dashboard> dashboards = new ArrayList<>();
 		
 		String[] dbKeys = Config.dashboardKeys();
@@ -158,17 +165,9 @@ public class FastPackHelper {
 			}
 			DashboardTemplate dbTpl = null;
 			try {
-				dbTpl = new DashboardTemplate(
-					dbTplFile.getSource(),
-					dbKey
-				);
-			} catch (IOException e) {
-				LOGGER.log(
-					Level.SEVERE,
-					"Invalid Dashboard Template " +
-						dbTplFile.getSource().getName(),
-					e
-				);
+				dbTpl = dbTplFile.localize();
+			} catch (IOException ioe) {
+				LOGGER.log(Level.SEVERE, "Unable to make dashboard available offline", ioe);
 				return null;
 			}
 			Dashboard dashboard = null;
@@ -178,7 +177,7 @@ public class FastPackHelper {
 				LOGGER.log(
 					Level.SEVERE,
 					"Unable to resolve dashboard xml file " +
-						dbTpl.getSource().getPath(),
+						dbTpl.getName(),
 					e
 				);
 				return null;
@@ -190,20 +189,20 @@ public class FastPackHelper {
 						e.getVariable() +
 						"=<value>) needs to be defined in order to deploy " +
 						"dashboard '" +						
-						dbTpl.getSource().getName() + "'"
+						dbTpl.getName() + "'"
 				);
 				return null;
 			}
 			
-			fpb.addDashboard(dashboard.getFile());
+			fpb.addDashboard(dashboard);
 			LOGGER.log(
 				Level.INFO,
 				"'" + dashboard.getName() +
-				".dashboard.xml' has been appended to Fast Pack"
+				"' has been appended to Fast Pack"
 			);
 			dashboards.add(dashboard);
 		}
-		return dashboards.toArray(new Dashboard[dashboards.size()]);
+		return dashboards.toArray(new LocalDashboard[dashboards.size()]);
 	}
 	
 	/**
@@ -213,7 +212,7 @@ public class FastPackHelper {
 	 * @param fpb the {@link FastpackBuilder} to be configured to contain the
 	 * 		System Profile to create from the template
 	 * 
-	 * @return the {@link Profile} that has been created and appended to the
+	 * @return the {@link ProfileFile} that has been created and appended to the
 	 * 		given {@link FastpackBuilder} or {@code null} if an error
 	 * 		occurred or not all variables have been defined
 	 */
@@ -251,12 +250,12 @@ public class FastPackHelper {
 		
 		ProfileTemplate profTpl = null;
 		try {
-			profTpl = new ProfileTemplate(profTplFile.getSource());
+			profTpl = profTplFile.localize();
 		} catch (IOException e) {
 			LOGGER.log(
 				Level.SEVERE,
 				"Invalid System Profile Template " +
-					profTplFile.getSource().getName(),
+					profTplFile.getName(),
 				e
 			);
 			return null;
@@ -266,21 +265,24 @@ public class FastPackHelper {
 		Profile profile = null;
 		try {
 			profile = profTpl.resolve(variables, tgtProf);
-			tgtProf = serverProps.profiles(profile.getName());
+			tgtProf = serverProps.profiles(profile.getId());
 			if (tgtProf != null) {
 				LOGGER.log(
 					Level.INFO,
-					"The System Profile '" + tgtProf.getName() +
+					"The System Profile '" + tgtProf.getId() +
 						"' already exists on the dynaTrace Server - adding an" +
 						" additional tier instead of replacing it"
 				);
 				profile = profTpl.resolve(variables, tgtProf);
 			}
+		} catch (InvalidProfileNameException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage());
+			return null;
 		} catch (IOException e) {
 			LOGGER.log(
 				Level.SEVERE,
 				"Unable to resolve profile template xml file " +
-					profTpl.getSource().getName(),
+					profTpl.getId(),
 				e
 			);
 			return null;
@@ -290,15 +292,15 @@ public class FastPackHelper {
 				"The variable '" + e.getVariable() + "' (-Dvariable." +
 					e.getVariable() + "=<value>) needs to be defined in order" +
 					" to resolve the profile template '" +
-					profTpl.getSource().getName() + "'"
+					profTpl.getId() + "'"
 			);
 			return null;
 		}
 		
-		fpb.addProfile(profile.getFile());
+		fpb.addProfile(profile);
 		LOGGER.log(
 			Level.INFO,
-			"'" + profile.getName() +
+			"'" + profile.getId() +
 				".profile.xml' has been appended to Fast Pack"
 		);
 		return profile;
@@ -312,7 +314,7 @@ public class FastPackHelper {
 	
 	public static NextStep appendOnboardingConfig(
 		FastpackBuilder fpb,
-		Dashboard[] dashboards,
+		LocalDashboard[] dashboards,
 		Profile profile
 	) {
 		Objects.requireNonNull(fpb);
@@ -325,9 +327,10 @@ public class FastPackHelper {
 //			return NextStep.Nochange;
 //		}
 		XmlOnboarding xmlOnboarding = XmlOnboarding.create(
-			dashboards, profile.getName()
+			dashboards, profile.getId()
 		);
 		if (xmlOnboarding == null) {
+			System.out.println("xmlOnboarding == null");
 			return NextStep.Nochange;
 		}
 		if (xmlOnboarding != null) {
@@ -349,7 +352,7 @@ public class FastPackHelper {
 			}
 			
 			fpb.addResource(
-				resource,
+				new FileSource(resource),
 				"conf/com.dynatrace.tasks.ensure.user.groups"
 			);
 			LOGGER.log(

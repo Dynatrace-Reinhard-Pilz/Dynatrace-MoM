@@ -16,6 +16,8 @@ import com.dynatrace.reporting.Availability;
 
 public final class ServerUpdater extends TimerTask {
 	
+	private static final boolean DISABLED = false;
+	
 	private static final Logger LOGGER = Logger.getLogger(ServerUpdater.class.getName());
 	
 	private static final long PERIOD_MS = 40 * 1000;
@@ -31,6 +33,7 @@ public final class ServerUpdater extends TimerTask {
 	
 	public ServerUpdater(final ServerRepository repository) {
 		this.serverRepository = repository;
+		if (DISABLED) return;
 		this.run();
 		timer.schedule(this, 0, PERIOD_MS);
 		this.run();
@@ -73,6 +76,7 @@ public final class ServerUpdater extends TimerTask {
 	
 	@Override
 	public final void run() {
+		if (DISABLED) return;
 		final Collection<ServerContext> serverContexts = serverRepository.getServerContexts();
 		for (ServerContext serverContext : serverContexts) {
 			if (serverContext == null) {
@@ -89,6 +93,24 @@ public final class ServerUpdater extends TimerTask {
 						);
 						serverContext.uploadHealthDashboard();
 					}
+					
+					switch (serverContext.getMoMConnectorAvailability()) {
+					case Available:
+						serverContext.refreshSelfMonitoringProfile();
+						break;
+					case Determining:
+					case NotYetAvailable:
+						break;
+					case Unavailable:
+						serverContext.setMoMConnectorAvailability(Availability.NotYetAvailable);
+						serverContext.uploadMomConnector();
+						break;
+					case unknown:
+						serverContext.setMoMConnectorAvailability(Availability.Determining);
+						serverContext.refreshMoMConnectorVersion();
+						break;
+					}
+					
 					serverContext.refreshCollectors();
 					serverContext.refreshLicense();
 					serverContext.refreshProfiles();

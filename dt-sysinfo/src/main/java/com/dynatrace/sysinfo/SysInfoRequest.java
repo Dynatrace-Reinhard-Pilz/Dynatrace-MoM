@@ -102,7 +102,7 @@ public class SysInfoRequest implements Request<SysInfoResult> {
 			}
 			return new HttpResponse<SysInfoResult>(
 				code,
-				new UnexpectedResponseCodeException(ResponseCode.OK, code, serverResponse)
+				new UnexpectedResponseCodeException(ResponseCode.OK, code, serverResponse, getPath())
 			);
 		}
 		try {

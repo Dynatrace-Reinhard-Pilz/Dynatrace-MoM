@@ -83,7 +83,7 @@ public class HttpUtils {
 		HttpServletResponse response,
 		String location
 	) throws IOException {
-		LOGGER.log(Level.INFO, "redirecting to " + location);
+		LOGGER.log(Level.FINER, "redirecting to " + location);
 		response.sendRedirect(location);
 	}
 }

@@ -265,11 +265,36 @@ public final class Strings {
 		if (s == null) {
 			return null;
 		}
+		return urlDecode(s, StandardCharsets.UTF_8.name())
+				.replace("%20", " ");
+	}
+	
+	private static String urlDecode(String s, String charSetName) {
+		if (s == null) {
+			return s;
+		}
 		try {
-			String fileEncoding = System.getProperty("file.encoding");
-			return URLDecoder.decode(s, fileEncoding).replace("%20", " ");
+			return URLDecoder.decode(s, charSetName);
 		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
+			throw new InternalError(e.getMessage());
 		}
 	}
+	
+	public static boolean startsWith(String s, String prefix) {
+		if ((s == null) || (prefix == null)) {
+			return false;
+		}
+		return s.startsWith(prefix);
+	}
+	
+	public static String removePrefix(String s, char c) {
+		if (isNullOrEmpty(s)) {
+			return s;
+		}
+		while (s.charAt(0) == c) {
+			s = s.substring(1);
+		}
+		return s;
+	}
+	
 }

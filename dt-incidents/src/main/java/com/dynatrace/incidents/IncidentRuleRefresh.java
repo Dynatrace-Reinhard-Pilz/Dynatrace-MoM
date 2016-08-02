@@ -35,14 +35,14 @@ public class IncidentRuleRefresh extends MulitServerOperation<IncidentRule, XmlI
 		IncidentRule stored = ia.getIncidentRule(input.getId());
 		if (stored == null) {
 			logger().log(Level.WARNING, "No incident Rule " + input.getId() + " stored - cannot update it");
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			try {
-				XMLUtil.serialize(incidentRule, baos);
-				logger().log(Level.WARNING, new String(baos.toByteArray()));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//			try {
+//				XMLUtil.serialize(incidentRule, baos);
+//				logger().log(Level.WARNING, new String(baos.toByteArray()));
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 			return;
 		}
 		
@@ -53,6 +53,7 @@ public class IncidentRuleRefresh extends MulitServerOperation<IncidentRule, XmlI
 			if (incidentRef == null) {
 				continue;
 			}
+//			logger().log(Level.INFO, incidentRef.getId());
 			Incident incident = incidentRef.getIncident();
 			if (Incident.isConfirmed(incident)) {
 				continue;

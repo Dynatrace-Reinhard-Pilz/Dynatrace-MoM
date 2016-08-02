@@ -22,12 +22,12 @@ import com.dynatrace.diagnostics.server.shared.security.BaseRole;
 import com.dynatrace.diagnostics.server.shared.security.UserGroup;
 import com.dynatrace.diagnostics.server.shared.security.UserPermissionConfig;
 import com.dynatrace.diagnostics.server.shared.security.UserRoleSystemMapping;
-import com.dynatrace.tasks.utils.XMLUtil;
 import com.dynatrace.tasks.xml.XmlDashboardAssignment;
 import com.dynatrace.tasks.xml.XmlDashboardPermission;
 import com.dynatrace.tasks.xml.XmlOnboarding;
 import com.dynatrace.tasks.xml.XmlSystemRole;
 import com.dynatrace.tasks.xml.XmlUserGroup;
+import com.dynatrace.xml.XMLUtil;
 
 
 public class EnsureUserGroupsTask implements Task {

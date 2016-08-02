@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+  <extension id="com.dynatrace.mom.connector.serverstartup" name="com.dynatrace.mom.connector.serverstartup" point="com.dynatrace.diagnostics.server.startup">
+    <handler class="com.dynatrace.mom.connector.MoMConnector" />
+  </extension>
+</plugin>

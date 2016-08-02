@@ -2,9 +2,16 @@ package com.dynatrace.mom;
 
 import java.io.File;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import javax.servlet.ServletContextEvent;
+
 public class MomConfig {
+	
+	private static final Logger LOGGER =
+			Logger.getLogger(MomConfig.class.getName());
 	
 	private static Preferences PREFERENCES = Preferences.userNodeForPackage(
 		MomConfig.class
@@ -18,17 +25,10 @@ public class MomConfig {
 	private File storage = null;
 	
 	public MomConfig() {
-		PREFERENCES.remove(KEY_STORAGE);
+//		PREFERENCES.remove(KEY_STORAGE);
 		String storageLocation = PREFERENCES.get(KEY_STORAGE, null);
 		if (storageLocation != null) {
-			File storage = new File(storageLocation);
-			if (!storage.exists()) {
-				if (storage.mkdirs()) {
-					this.storage = storage;
-				}
-			} else {
-				this.storage = storage;
-			}
+			setStorage(new File(storageLocation));
 		}
 	}
 	
@@ -42,6 +42,7 @@ public class MomConfig {
 			}
 		}
 		this.storage = storage;
+		LOGGER.log(Level.INFO, "Storage location: " + storage.getAbsolutePath());
 		PREFERENCES.put(KEY_STORAGE, storage.getAbsolutePath());
 	}
 	

@@ -1,7 +1,13 @@
-<project name="dt-reporting" default="link">
+<project name="dt-ensure-user-group-task" default="link">
 
 	<import file="../build-ant/build-common.xml" />
 	
 	<property name="dependencies" value="dt-utils dt-cmd dt-http" />
+	<property name="dir-osgi-plugins" value="C:/Program Files/dynaTrace/dynaTrace 6.3/server/plugins" />
+	<path id="osgi.classpath">
+		<fileset dir="${dir-osgi-plugins}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
 	
 </project>

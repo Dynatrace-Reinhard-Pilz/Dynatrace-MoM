@@ -18,6 +18,24 @@ public abstract class ServerOperation<T> extends AbstractServerOperation {
 	}
 	
 	public abstract Request<T> createRequest();
+	
+	protected ResultLoggingLevel getResultLoggingLevel() {
+		return ResultLoggingLevel.None;
+	}
+	
+	protected void handleResult0(T data) {
+		switch (getResultLoggingLevel()) {
+		case Full:
+			logger().log(Level.INFO, "handleResult(" + data + ")");
+			break;
+		case Partial:
+			logger().log(Level.INFO, "handleResult( ... )");
+			break;
+		case None:
+			break;
+		}
+		handleResult(data);
+	}
 	protected abstract void handleResult(T data);
 	protected abstract Logger logger();
 	
@@ -61,7 +79,7 @@ public abstract class ServerOperation<T> extends AbstractServerOperation {
 			T data = httpResponse.getData();
 			if (data != null) {
 				setStatus(getDefaultConnectionStatus());
-				handleResult(data);
+				handleResult0(data);
 			}
 			return data;
 		} catch (Exception e) {

@@ -61,6 +61,7 @@ public class Config {
 	public static final String PROP_PROFILE_TPL = "config.templates.profile";
 	public static final String PROP_PROFILE = "config.profile";
 	public static final String PROP_PERMISSION_GROUP = "config.user.group";
+	public static final String PROP_PERMISSION_GROUP_NAME = "config.user.group.name";
 	public static final String PROP_MGMT_ROLE = "config.user.group.management.role";
 	public static final String PROP_PROFILE_ROLE = "config.user.group.profile.role";
 	public static final String PROP_DB_PERMISSION = "config.user.group.dashboard.permission";
@@ -224,6 +225,13 @@ public class Config {
 			properties.remove(PROP_PERMISSION_GROUP);
 			set(properties, groupProp(DEFAULT), value);
 		}
+		
+		value = get(properties, PROP_PERMISSION_GROUP_NAME);
+		if (Strings.isNotEmpty(value)) {
+			properties.remove(PROP_PERMISSION_GROUP_NAME);
+			set(properties, groupProp(DEFAULT), value);
+		}
+		
 		
 		value = get(properties, PROP_PROFILE_ROLE);
 		if (value != null) {
@@ -431,9 +439,9 @@ public class Config {
 		this.version = version;
 		
 		Collection<String> templateNames = new ArrayList<>();
-		templateNames.addAll(resources.profiles.keySet());
+		templateNames.addAll(resources.profileTemplates.keySet());
 		for (String templateName : templateNames) {
-			ProfileTemplate template = resources.profiles.get(templateName);
+			ProfileTemplate template = resources.profileTemplates.get(templateName);
 			if (template == null) {
 				continue;
 			}
@@ -450,7 +458,7 @@ public class Config {
 			}
 			if (!isCompatible) {
 				LOGGER.log(Level.WARNING, "The System Profile Template '" + templateName + "' (Version " + templateVersion + ") embedded within dt-onboarding.jar cannot be used on this dynaTrace Server (Version: " + version + ") - this Template will be ignored");
-				resources.profiles.remove(templateName);
+				resources.profileTemplates.remove(templateName);
 			}
 		}
 		
@@ -507,8 +515,8 @@ public class Config {
 		return INSTANCE.resources;
 	}
 	
-	public static Map<String, ProfileTemplate> profileTemplates() {
-		return resources().profiles;
+	public static Map<String,ProfileTemplate> profileTemplates() {
+		return resources().profileTemplates;
 	}
 	
 	public static ProfileTemplate profileTemplates(String name) {
@@ -703,7 +711,7 @@ public class Config {
 		if (profileTemplateName == null) {
 			LOGGER.severe("No Profile Template to deploy given (-D" + PROP_PROFILE_TPL + "=<profilename>)");
 			LOGGER.severe("  Possible values");
-			Set<String> keySet = resources.profiles.keySet();
+			Set<String> keySet = resources.profileTemplates.keySet();
 			for (String string : keySet) {
 				LOGGER.severe("    " + string);
 			}

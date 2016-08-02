@@ -4,8 +4,10 @@
     <server name="localhost" status="ONLINE">
         <config>
             <connection protocol="HTTPS" host="127.0.0.1" port="8021"/>
-            <credentials user="admin" pass="admin"/>
+            <credentials user="admin" pass="admin" encrypted="false" />
+            <pwh database="dynaTrace6" type="Postgres" host="localhost">
+                <credentials user="p6YUGdf9jwhK2vuahJKlJQ==" pass="TaAdSlwYb1A=" encrypted="true"/>
+            </pwh>
         </config>
-        <version major="6" minor="2" revision="0" build="1239"/>
     </server>
 </servers>

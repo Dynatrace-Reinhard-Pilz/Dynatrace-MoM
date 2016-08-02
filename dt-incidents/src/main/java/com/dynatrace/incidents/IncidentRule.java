@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -35,8 +34,8 @@ public class IncidentRule
 implements SizedIterable<IncidentReference>, Unique<String> {
 	
 	private String name = null;
-	private Map<String,IncidentReference> incidents =
-			new HashMap<String, IncidentReference>();
+	private Collection<IncidentReference> incidents =
+			new ArrayList<IncidentReference>();
 	
 	/**
 	 * c'tor
@@ -58,7 +57,13 @@ implements SizedIterable<IncidentReference>, Unique<String> {
 		if (incidents == null) {
 			return null;
 		}
-		for (IncidentReference incidentReference : incidents.values()) {
+		for (IncidentReference incidentReference : incidents) {
+			if (incidentReference == null) {
+				continue;
+			}
+			if (incidentReference.getId() == null) {
+				continue;
+			}
 			if (incidentReference != null) {
 				IncidentSeverity severity = incidentReference.getSeverity();
 				if (severity != null) {
@@ -136,25 +141,30 @@ implements SizedIterable<IncidentReference>, Unique<String> {
 	@XmlElement(type = IncidentReference.class)
 	public Collection<IncidentReference> getIncidents() {
 		synchronized (this) {
-			return new ArrayList<IncidentReference>(incidents.values());
+			return incidents;
 		}
 	}
 	
 	public void setIncidents(Collection<IncidentReference> incidents) {
 		synchronized (this) {
-			this.incidents = new HashMap<String, IncidentReference>();
-			if (!Iterables.isNullOrEmpty(incidents)) {
-				for (IncidentReference incidentReference : incidents) {
-					if (incidentReference == null) {
-						continue;
-					}
-					String id = incidentReference.getId();
-					if (id == null) {
-						continue;
-					}
-					this.incidents.put(id, incidentReference);
+			this.incidents = incidents;
+		}
+	}
+	
+	private boolean containsIncident(String id) {
+		if (id == null) {
+			return false;
+		}
+		synchronized (this) {
+			for (IncidentReference incidentReference : incidents) {
+				if (incidentReference == null) {
+					continue;
+				}
+				if (id.equals(incidentReference.getId())) {
+					return true;
 				}
 			}
+			return false;
 		}
 	}
 	
@@ -170,27 +180,33 @@ implements SizedIterable<IncidentReference>, Unique<String> {
 				if (id == null) {
 					continue;
 				}
-				if (!incidents.containsKey(id)) {
-					incidents.put(id, incidentReference);
+				if (!containsIncident(id)) {
+					incidents.add(incidentReference);
 				}
 			}
-			ArrayList<String> ids = new ArrayList<String>(incidents.keySet());
-			for (String id : ids) {
+			for (Iterator<IncidentReference> it = incidents.iterator(); it.hasNext(); ) {
+				IncidentReference incidentReference = it.next();
+				if (incidentReference == null) {
+					it.remove();
+					continue;
+				}
+				String id = incidentReference.getId();
 				if (id == null) {
+					it.remove();
 					continue;
 				}
 				boolean exists = false;
-				for (IncidentReference incidentReference : incidentReferences) {
+				for (IncidentReference iref : incidentReferences) {
 					if (incidentReference == null) {
 						continue;
 					}
-					if (Strings.equals(id, incidentReference.getId())) {
+					if (Strings.equals(id, iref.getId())) {
 						exists = true;
 						break;
 					}
 				}
 				if (!exists) {
-					incidents.remove(id);
+					it.remove();
 				}
 			}
 		}
@@ -212,7 +228,7 @@ implements SizedIterable<IncidentReference>, Unique<String> {
 				return Collections.emptyIterator();
 			}
 			return new ArrayList<IncidentReference>(
-				incidents.values()
+				incidents
 			).iterator();
 		}
 	}
@@ -246,7 +262,7 @@ implements SizedIterable<IncidentReference>, Unique<String> {
 	public int size() {
 		int count = 0;
 		synchronized (this) {
-			for (IncidentReference incidentReference : incidents.values()) {
+			for (IncidentReference incidentReference : incidents) {
 				if (incidentReference == null) {
 					continue;
 				}

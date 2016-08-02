@@ -67,6 +67,7 @@ public final class MomInit {
 			}
 		}
 		serverRepository = new DefaultServerRepository(xmlRepo, context);
+		serverRepository.decrypt();
 		init(context);
 		return this;
 	}

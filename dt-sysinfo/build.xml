@@ -2,6 +2,6 @@
 
 	<import file="../build-ant/build-common.xml" />
 	
-	<property name="dependencies" value="dt-utils dt-cmd dt-http dt-incidents dt-profiles" />
+	<property name="dependencies" value="dt-utils dt-authentication-api dt-cmd dt-http dt-incidents dt-profiles" />
 	
 </project>

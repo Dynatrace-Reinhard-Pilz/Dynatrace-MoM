@@ -46,6 +46,7 @@ public final class DefaultServerRepository implements ServerRepository {
 	
 	public DefaultServerRepository(BaseServerRepository repository, ExecutionContext ctx) {
 		this.ctx = ctx;
+		decrypt();
 		setServerRecords(repository.getServerRecords());
 	}
 	
@@ -241,6 +242,34 @@ public final class DefaultServerRepository implements ServerRepository {
 			serverContexts.put(name, serverContext);
 			LOGGER.log(Level.INFO, "dynaTrace Server '" + oldName + "' has been renamed to '" + name + "'");
 			return true;
+		}
+	}
+
+	@Override
+	public void encrypt() {
+		Collection<ServerRecord> serverRecords = getServerRecords();
+		if (serverRecords == null) {
+			return;
+		}
+		for (ServerRecord serverRecord : serverRecords) {
+			if (serverRecord == null) {
+				continue;
+			}
+			serverRecord.encrypt();
+		}
+	}
+
+	@Override
+	public void decrypt() {
+		Collection<ServerRecord> serverRecords = getServerRecords();
+		if (serverRecords == null) {
+			return;
+		}
+		for (ServerRecord serverRecord : serverRecords) {
+			if (serverRecord == null) {
+				continue;
+			}
+			serverRecord.decrypt();
 		}
 	}
 

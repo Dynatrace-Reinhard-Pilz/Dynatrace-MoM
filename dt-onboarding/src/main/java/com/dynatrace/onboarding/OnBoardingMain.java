@@ -1,5 +1,6 @@
 package com.dynatrace.onboarding;
 
+import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -7,9 +8,10 @@ import java.util.logging.Logger;
 import com.dynatrace.fastpacks.FastpackBuilder;
 import com.dynatrace.http.config.ServerConfig;
 import com.dynatrace.onboarding.config.Config;
-import com.dynatrace.onboarding.dashboards.Dashboard;
+import com.dynatrace.onboarding.dashboards.LocalDashboard;
 import com.dynatrace.onboarding.fastpacks.FastPackHelper;
 import com.dynatrace.onboarding.fastpacks.FastPackHelper.NextStep;
+import com.dynatrace.onboarding.fastpacks.InstallationVerifier;
 import com.dynatrace.onboarding.profiles.Profile;
 import com.dynatrace.onboarding.serverconfig.ServerProperties;
 import com.dynatrace.security.Persister;
@@ -243,11 +245,18 @@ public class OnBoardingMain {
 		// keeping connection information locally
 		ServerConfig serverConfig = Config.serverConfig();
 		
+		MoMConnector moMConnector = new MoMConnector(serverConfig);
+		if (!moMConnector.ensureInstalled()) {
+			return false;
+		}
+		
 		// querying for information from dynaTrace Server
 		// A: is the onboarding task plugin already installed?
 		// B: downloading System Profiles
 		// C: downloading Dashboards
-		ServerProperties serverProperties = ServerProperties.load(serverConfig);
+		ServerProperties serverProperties = ServerProperties.load(
+			serverConfig
+		);
 		if (serverProperties == null) {
 			return false;
 		}
@@ -256,7 +265,12 @@ public class OnBoardingMain {
 		// dynaTrace Server, they should be available for deployment
 		// Templates on the dynaTrace Server which are matching the name of
 		// and embedded Template will supersede the embedded ones.
-		Config.resources().publishProfiles(serverProperties.profiles());
+		try {
+			Config.resources().publishProfiles(serverProperties.profiles());
+		} catch (IOException ioe) {
+			ioe.printStackTrace(System.err);
+			return false;
+		}
 		// in case there are Dashboard Templates located on the
 		// dynaTrace Server, they should be available for deployment
 		// Templates on the dynaTrace Server which are matching the name of
@@ -282,7 +296,7 @@ public class OnBoardingMain {
 		}
 
 		// appending Dashboard to the Fast Pack
-		Dashboard[] dashboards = FastPackHelper.appendDashboards(fpb, profile);
+		LocalDashboard[] dashboards = FastPackHelper.appendDashboards(fpb, profile);
 		if (dashboards == null) {
 			return false;
 		}
@@ -293,7 +307,13 @@ public class OnBoardingMain {
 		nextStep = FastPackHelper.appendOnboardingConfig(fpb, dashboards, profile);
 		
 		// finally uploading Fast Pack
-		if (!FastPackHelper.createAndUploadFastPack(fpb, serverConfig)) {
+		if (!FastPackHelper.createAndUploadFastPack(fpb, serverConfig, new InstallationVerifier() {
+			
+			@Override
+			public boolean isInstalled() {
+				return true;
+			}
+		})) {
 			return false;
 		}
 		

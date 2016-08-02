@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.dynatrace.http.Protocol;
+import com.dynatrace.utils.encryption.Encryptable;
+import com.dynatrace.utils.encryption.Encryption;
 
 /**
  * A configuration object holding the necessary information to connect to and
@@ -20,11 +22,13 @@ import com.dynatrace.http.Protocol;
  */
 @XmlRootElement(name = "server")
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(propOrder = { "connectionConfig", Credentials.TAG })
-public class ServerConfig {
+@XmlType(propOrder = { "connectionConfig", Credentials.TAG, "pwhConfig" })
+public class ServerConfig implements Cloneable, Encryptable {
+	
 	
 	private Credentials credentials = null;
 	private ConnectionConfig connectionConfig = null;
+	private PWHConfig pwhConfig = new PWHConfig();
 	
 	public ServerConfig() {
 	}
@@ -35,6 +39,32 @@ public class ServerConfig {
 	) {
 		this.credentials = credentials;
 		this.connectionConfig = connectionConfig;
+	}
+	
+	@XmlElement(name = "pwh")
+	public PWHConfig getPwhConfig() {
+		return pwhConfig;
+	}
+	
+	public void setPwhConfig(PWHConfig pwhConfig) {
+		this.pwhConfig = pwhConfig;
+	}
+	
+	@Override
+	public void encrypt() {
+		Encryption.encrypt(credentials);
+		Encryption.encrypt(pwhConfig);
+	}
+
+	@Override
+	public void decrypt() {
+		Encryption.decrypt(credentials);
+		Encryption.decrypt(pwhConfig);
+	}
+	
+	@Override
+	public boolean isEncrypted() {
+		return Encryption.isEncrypted(credentials, pwhConfig);
 	}
 	
 	public String getHost() {
@@ -155,6 +185,19 @@ public class ServerConfig {
 		} else if (!connectionConfig.equals(other.connectionConfig))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public ServerConfig clone() {
+		ServerConfig clone = null;
+		try {
+			clone = (ServerConfig) super.clone();
+			clone.setConnectionConfig(connectionConfig.clone());
+			clone.setCredentials(credentials.clone());
+		} catch (CloneNotSupportedException e) {
+			throw new InternalError(e.getMessage());
+		}
+		return clone;
 	}
 	
 }

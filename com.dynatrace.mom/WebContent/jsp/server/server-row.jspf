@@ -11,9 +11,13 @@ com.dynatrace.reporting.Availability"
 
 	ServerRecord curServer = (ServerRecord)pageContext.getAttribute(ServerRecord.class.getName());
 	if (curServer != null) {
+		String srvLight = "green_light.png";
+		if (curServer.getConnectionStatus() == ConnectionStatus.OFFLINE) {
+			srvLight = "gray_light.png";
+		}
 %>									<tr>
 										<td rowspan="2" class="icon-column" style="width: 1px; white-space: nowrap; padding-right: 15px; line-height: 2em"><%
-											%><a href="${pageContext.request.contextPath}/servers/<%= curServer.getName() %>" style="text-decoration: none; line-height: 2em; vertical-align: middle; padding: 0px 0px 0px 18px; background-image: url(${pageContext.request.contextPath}/images/green_light.png); background-repeat: no-repeat; background-position: left middle; background-size: 16px"><%= curServer.getName() %></a><%
+											%><a href="${pageContext.request.contextPath}/servers/<%= curServer.getName() %>" style="text-decoration: none; line-height: 2em; vertical-align: middle; padding: 0px 0px 0px 18px; background-image: url(${pageContext.request.contextPath}/images/<%= srvLight %>); background-repeat: no-repeat; background-position: left middle; background-size: 16px"><%= curServer.getName() %></a><%
 											%><div style="font-size: 80%; color: #888888; font-style: italic; padding-left: 1em"><%= curServer.getHost() %>:<%= curServer.getPort() %></div><%
 										%></td><%
 											String vClass = "";
@@ -31,6 +35,8 @@ com.dynatrace.reporting.Availability"
 											} else {
 												%><%= curServer.getVersion().toString() %><%
 											}
+											} else {
+												%><span style="font-weight: normal; font-style: italic; font-size: 90%; color: #888888; line-height: 1em; text-align: center">unavailable</span><%
 											}
 										%></td><%
 											String lClass = "";
@@ -38,7 +44,8 @@ com.dynatrace.reporting.Availability"
 											if (lic != null) {
 												lClass = "class=\"license\"";
 											} else {
-												lic = "";
+												lClass = "class=\"license\"";
+												lic = "<span style=\"font-style: italic; font-size: 90%; color: #888888; line-height: 1em; text-align: center\">unavailable</span>";
 											}
 										%>
 										<td <%= lClass %> style="width: 1px; white-space: nowrap; padding-right: 15px"><%= lic %></td><%
@@ -82,19 +89,41 @@ com.dynatrace.reporting.Availability"
 											} else if (connectionStatus == ConnectionStatus.ONLINE) {						
 												%><button class="btn btn-blue btn-compact failover_button">Restart</button><%
 											} else if (connectionStatus == ConnectionStatus.OFFLINE) {
-												%><div style="white-space: nowrap; padding-right: 15px; font-style: italic; font-weight: bold; color: red">offline</div><%
+												%><div style="white-space: nowrap; padding-right: 15px; font-style: italic; font-weight: bold; color: red; display: inline">offline</div><%
 											}
-										%></form><img src="${pageContext.request.contextPath}/images/grey_action_delete.png" style="vertical-align: middle; padding: 0px 5px 0px 5px" /><%
-										%></td>
+										%>
+										</form><form style="display: inline" method="get" action="${pageContext.request.contextPath}/servers/<%= curServer.getName() %>/config"><%--
+										 --%><button class="btn btn-blue btn-compact failover_button"><div style="margin: 0px 0px 0px -2px; vertical-align: center"><img src="${pageContext.request.contextPath}/images/settings.png" style="margin: -3px 3px -2px 0px; padding: 0; display: inline; height: 15px; width: 15px; vertical-align: middle" valign="center" />Settings</div></button><%--
+										 --%></form><form style="display: inline" method="get" action="#"><%--
+										--%><button class="btn btn-blue btn-compact failover_button"><div style="margin: 0px 0px 0px -2px; vertical-align: center"><img src="${pageContext.request.contextPath}/images/grey_action_delete.png" style="margin: -3px 3px -2px 0px; padding: 0; display: inline; height: 15px; width: 15px; vertical-align: middle" valign="center" />Remove</div></button>
+										</form>
+										</td>
 									</tr>
 									<tr>
 										<td colspan="8" style="line-height: 20px; padding: 0; font-size: 80%"><%
+											String severityColor = "black";
+											com.dynatrace.mom.PWHChecker.DelaySeverity delaySeverity = curServer.getPWHSeverity();
+											switch (delaySeverity) {
+											case ok:
+												severityColor = "green";
+												break;
+											case critical:
+												severityColor = "orange";
+												break;
+											case severe:
+												severityColor = "red";
+												break;
+											}
 											String lightIcon = "red_light.png";
-											if (curServer.isPWHConnected()) {
+											if (connectionStatus == ConnectionStatus.OFFLINE) {
+												lightIcon = "gray_light.png";
+											} else if (curServer.isPWHConnected()) {
 												lightIcon = "green_light.png";
 											} %>
-											<div style="display: inline; vertical-align: middle; padding: 0px 0px 0px 12px; background-image: url(${pageContext.request.contextPath}/images/<%= lightIcon %>); background-repeat: no-repeat; background-position: left middle; background-size: 10px">Performance Warehouse</div>
-											<a href="#" style="margin-left: 1.5em; background-image: url(${pageContext.request.contextPath}/images/external-link-16.png); background-repeat: no-repeat; background-position: left center; padding-left: 10px; background-size: 8px">Launch dynaTrace Client</a>
+											<div style="display: inline; vertical-align: middle; padding: 0px 0px 0px 12px; background-image: url(${pageContext.request.contextPath}/images/<%= lightIcon %>); background-repeat: no-repeat; background-position: left middle; background-size: 10px">Performance Warehouse - <span style="color: <%= severityColor %>"> confirmed <%= curServer.getPWHDelayInSeconds() / 60 %> min ago</span></div><%
+											if (connectionStatus != ConnectionStatus.OFFLINE) {	%>
+												<a href="#" style="margin-left: 1.5em; background-image: url(${pageContext.request.contextPath}/images/external-link-16.png); background-repeat: no-repeat; background-position: left center; padding-left: 10px; background-size: 8px">Launch dynaTrace Client</a><%
+											} %>
 										</td>
 									</tr><%
 }

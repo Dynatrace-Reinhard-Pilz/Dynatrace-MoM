@@ -1,9 +1,11 @@
 package com.dynatrace.mom.runtime.components;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -41,6 +43,7 @@ import com.dynatrace.incidents.IncidentAware;
 import com.dynatrace.incidents.IncidentRule;
 import com.dynatrace.license.LicenseAware;
 import com.dynatrace.license.LicenseInfo;
+import com.dynatrace.mom.PWHChecker;
 import com.dynatrace.mom.web.FixPackState;
 import com.dynatrace.profiles.DefaultProfileCollection;
 import com.dynatrace.profiles.ProfileCollection;
@@ -59,7 +62,7 @@ import com.dynatrace.utils.Versionable;
 @XmlRootElement(name = ServerRecord.TAG)
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class ServerRecord
-implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, FixPackAware, AgentAware, IncidentAware, MeasureAware, Labelled {
+implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, FixPackAware, AgentAware, IncidentAware, MeasureAware, Labelled, Closeable, Cloneable {
 	
 	private static final Logger LOGGER =
 			Logger.getLogger(ServerRecord.class.getName());
@@ -73,6 +76,38 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 			new DefaultCollectorCollection(this);
 	private FixPackInstallStatus fixPackInstallStatus = null;
 	private boolean isVersionOutdated = false;
+	private final PWHInactiveIncident pwhCheckIncident = new PWHInactiveIncident();
+	private PWHChecker pwhChecker = PWHChecker.NULL;
+	
+	public void encrypt() {
+		if (config == null) {
+			return;
+		}
+		config.encrypt();
+	}
+
+	public void decrypt() {
+		if (config == null) {
+			return;
+		}
+		config.decrypt();
+	}
+	
+	public long getPWHDelayInSeconds() {
+		return pwhChecker.getDelayInSeconds();
+	}
+	
+	public PWHChecker.DelaySeverity getPWHSeverity() {
+		return pwhChecker.getSeverity();
+	}
+	
+	public String getLastFormattedPWHTimeStamp() {
+		return pwhChecker.getLastFormattedTimeStamp();
+	}
+	
+	public long getLastPWHTimeStamp() {
+		return pwhChecker.getLastTimeStamp();
+	}
 	
 	public void setVersionOutdated(boolean isVersionOutdated) {
 		synchronized (this) {
@@ -80,6 +115,7 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 		}
 	}
 	
+	@XmlTransient
 	public boolean isVersionOutdated() {
 		synchronized (this) {
 			return isVersionOutdated;
@@ -105,6 +141,7 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 		
 	};
 	private Availability healthDashboardAvailability = Availability.unknown;
+	private Availability momConnectorAvailablitiy = Availability.unknown;
 	private final HashMap<String,Collection<Measure>> dtServerHealthMeasures =
 			new HashMap<String,Collection<Measure>>();
 	private final DashboardCollection dashboards =
@@ -150,7 +187,7 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 			if ("MoM dynaTrace Server Health".equals(dashboardName)) {
 				synchronized (ServerRecord.this) {
 					healthDashboardAvailability = Availability.Unavailable;
-					LOGGER.log(Level.FINE, "Health Dashboard UNAVAILABLE");
+					LOGGER.log(Level.INFO, "Health Dashboard UNAVAILABLE (removed)");
 				}
 			}
 			LOGGER.log(Level.FINE, "Dashboard " + dashboardName + " removed");
@@ -188,6 +225,8 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 			new HashMap<FixPack, FixPackStatus>();
 	private String name = null;
 	private ConnectionStatus connectionStatus = ConnectionStatus.OFFLINE;
+
+	private Version momConnectorVersion = Version.UNDEFINED;
 	
 	public ServerRecord() {
 		this.config = null;
@@ -196,6 +235,21 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 	public ServerRecord(ServerConfig config) {
 		Objects.requireNonNull(version);
 		this.config = config;
+		if (this.pwhChecker != null) {
+			LOGGER.info("this.pwhChecker.close();");
+			this.pwhChecker.close();
+			LOGGER.info("/this.pwhChecker.close();");
+			try {
+				if (pwhChecker.isAlive()) {
+					LOGGER.info("pwhChecker.join();");
+					pwhChecker.join();
+					LOGGER.info("/pwhChecker.join();");
+				}
+			} catch (InterruptedException e) {
+				// ignore
+			}
+		}
+		this.pwhChecker = new PWHChecker(this, config.getPwhConfig());
 	}
 	
 	@XmlTransient
@@ -222,6 +276,19 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 	public Availability getHealthDashboardAvailability() {
 		synchronized (this) {
 			return healthDashboardAvailability;
+		}
+	}
+	
+	@XmlTransient
+	public Availability getMomConnectorAvailability() {
+		synchronized (this) {
+			return momConnectorAvailablitiy;
+		}
+	}
+	
+	public void setMomConnectorAvailability(Availability availability) {
+		synchronized (this) {
+			this.momConnectorAvailablitiy = availability;
 		}
 	}
 	
@@ -285,29 +352,36 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 			if (smp == null) {
 				return Collections.emptyList();
 			}
-			return IncidentRule.getOpenIncidents(smp.getIncidentRules());
+			Collection<Incident> openIncidents =
+					IncidentRule.getOpenIncidents(smp.getIncidentRules());
+			if (pwhCheckIncident.isOpen()) {
+				openIncidents.add(pwhCheckIncident);
+			}
+			return openIncidents;
 		}
 	}
 	
 	public boolean isPWHConnected() {
-		Collection<Incident> incidents = getOpenIncidents();
-		if (!Iterables.isNullOrEmpty(incidents)) {
-			for (Incident incident : incidents) {
-				if (incident == null) {
-					continue;
-				}
-				String incidentId = incident.getId();
-				if (incidentId == null) {
-					continue;
-				}
-				if (Strings.contains(incident.getMessage(), "Performance Warehouse is offline")) {
-					if (incident.isOpen()) {
-						return false;
+		synchronized (this) {
+			Collection<Incident> incidents = getOpenIncidents();
+			if (!Iterables.isNullOrEmpty(incidents)) {
+				for (Incident incident : incidents) {
+					if (incident == null) {
+						continue;
+					}
+					String incidentId = incident.getId();
+					if (incidentId == null) {
+						continue;
+					}
+					if (Strings.contains(incident.getMessage(), "Performance Warehouse is offline")) {
+						if (incident.isOpen()) {
+							return false;
+						}
 					}
 				}
 			}
+			return true;
 		}
-		return true;
 	}
 	
 	@XmlTransient
@@ -336,19 +410,24 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 		synchronized (this) {
 			SystemProfile smp = profiles.getSelfMonitoringProfile();
 			if (smp == null) {
+				LOGGER.log(Level.SEVERE, "smp is NULL!!!! ... " + profiles.size());
+				for (Iterator<SystemProfile> it = profiles.iterator(); it.hasNext(); ) {
+					LOGGER.log(Level.INFO, " .... " + it.next());
+				}
 				return null;
 			}
 			return smp.getIncidentRule(name);
 		}
 	}
 	
-	@XmlElement(name = "version")
+	@XmlTransient
 	@Override
 	public Version getVersion() {
 		synchronized (this) {
 			return version;
 		}
 	}
+	
 	
 	public void setVersion(Version version) {
 		if (version == null) {
@@ -385,8 +464,9 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 				LOGGER.log(Level.WARNING, "Collector Version " + collectorVersion + " is not valid");
 			}
 			
-			if (!thisVersion.equals(collectorVersion) && !Version.UNDEFINED.equals(collectorVersion)) {
+			if (!thisVersion.equals(collectorVersion) && !Version.UNDEFINED.equals(collectorVersion) && !Version.UNDEFINED.equals(thisVersion)) {
 				if (collector.getRestartStatus() == RestartStatus.NONE) {
+					LOGGER.log(Level.INFO, "Setting REQUIRED this.version = " + thisVersion + ", collectorVersion = " + collectorVersion);
 					collector.setRestartStatus(RestartStatus.REQUIRED);
 				}
 			} else if (collector.getRestartStatus() == RestartStatus.REQUIRED) {
@@ -429,6 +509,12 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 	public void setConfig(ServerConfig config) {
 		synchronized (this) {
 			this.config = config;
+			if (this.pwhChecker != null) {
+				this.pwhChecker.close();
+			}
+			if (PWHChecker.NONE != this.pwhChecker) {
+				this.pwhChecker = new PWHChecker(this, config.getPwhConfig(), pwhCheckIncident);
+			}
 		}
 	}
 	
@@ -542,6 +628,7 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 		return this.version.compareTo(version);
 	}
 
+	@XmlTransient
 	@Override
 	public ConnectionStatus getConnectionStatus() {
 		synchronized (this) {
@@ -654,15 +741,58 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 		}
 	}
 	
+	
 	public FixPackInstallStatus getFixPackInstallStatus() {
 		synchronized (this) {
 			return fixPackInstallStatus;
 		}
 	}
 	
+	
 	@Override
 	public boolean equals(Versionable versionable) {
 		return getVersion().equals(versionable);
+	}
+	
+	@Override
+	public void close() {
+		if (this.pwhChecker != null) {
+//			LOGGER.info("this.pwhChecker.close();");
+			this.pwhChecker.close();
+//			LOGGER.info("/this.pwhChecker.close();");
+			try {
+				if (pwhChecker.isAlive()) {
+//					LOGGER.info("pwhChecker.join();");
+					pwhChecker.join();
+//					LOGGER.info("/pwhChecker.join();");
+				}
+			} catch (InterruptedException e) {
+				// ignore
+			}
+		}
+	}
+	
+	@Override
+	protected ServerRecord clone() {
+		try {
+			ServerRecord clone = (ServerRecord) super.clone();
+			clone.pwhChecker = PWHChecker.NONE;
+			clone.setConfig(config.clone());
+			clone.setName(getName());
+			clone.setVersion(version);
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			throw new InternalError(e.getMessage());
+		}
+	}
+
+	public void setMoMConnectorVersion(Version version) {
+		this.momConnectorVersion = version;
+	}
+
+	@XmlTransient
+	public Version getMoMConnectorVersion() {
+		return momConnectorVersion;
 	}
 
 }

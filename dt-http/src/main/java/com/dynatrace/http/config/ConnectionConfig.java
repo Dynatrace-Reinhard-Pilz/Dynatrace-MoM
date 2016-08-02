@@ -30,7 +30,7 @@ import com.dynatrace.utils.Strings;
 				ConnectionConfig.ATTRIBUTE_PORT
 		}
 )
-public final class ConnectionConfig {
+public final class ConnectionConfig implements Cloneable {
 	
 	private static final int UNDEFINED_PORT = 0;
 
@@ -183,6 +183,15 @@ public final class ConnectionConfig {
 		String host = connectionConfig.getHost();
 		int port = connectionConfig.getPort();
 		return "[" + host + ":" + port + "]";
+	}
+	
+	@Override
+	public ConnectionConfig clone() {
+		try {
+			return (ConnectionConfig) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new InternalError(e.getMessage());
+		}
 	}
 	
 }

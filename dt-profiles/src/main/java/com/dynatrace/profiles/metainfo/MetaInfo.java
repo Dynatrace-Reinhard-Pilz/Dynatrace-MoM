@@ -3,8 +3,11 @@ package com.dynatrace.profiles.metainfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.logging.Logger;
+
+import com.dynatrace.utils.Iterables;
 
 public final class MetaInfo {
 	
@@ -19,6 +22,33 @@ public final class MetaInfo {
 		return metaInfos.containsKey(key);
 	}
 	
+	public static MetaInfo merge(MetaInfo... metaInfos) {
+		if (Iterables.isNullOrEmpty(metaInfos)) {
+			return new MetaInfo();
+		}
+		MetaInfo mergedMetaInfo = new MetaInfo();
+		for (MetaInfo metaInfo : metaInfos) {
+			mergedMetaInfo.add(metaInfo);
+		}
+		return mergedMetaInfo;
+	}
+	
+	private void add(MetaInfo metaInfo) {
+		if (metaInfo == null) {
+			return;
+		}
+		for (Entry<String, String> entry : metaInfo.metaInfos.entrySet()) {
+			String key = entry.getKey();
+			if (key == null) {
+				continue;
+			}
+			String value = entry.getValue();
+			if (value == null) {
+				continue;
+			}
+			metaInfos.put(key, value);
+		}
+	}
 	
 	public String get(String key) {
 		Objects.requireNonNull(key);
@@ -36,6 +66,9 @@ public final class MetaInfo {
 	
 	public boolean isEmpty() {
 		return metaInfos.isEmpty();
+	}
+	
+	private MetaInfo() {
 	}
 	
 	private MetaInfo(String s) {

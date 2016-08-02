@@ -26,16 +26,13 @@ public class SystemProfiles implements Iterable<SystemProfile> {
 	@XmlElementRef(type = SystemProfile.class)
 	public Collection<SystemProfile> getProfiles() {
 		synchronized (this.profiles) {
-			return new ArrayList<SystemProfile>(profiles);
+			return profiles;
 		}
 	}
 	
 	public void setProfiles(Collection<SystemProfile> profiles) {
 		synchronized (this.profiles) {
-			this.profiles.clear();
-			if (profiles != null) {
-				this.profiles.addAll(profiles);
-			}
+			this.profiles = profiles;
 		}
 	}
 

@@ -1,5 +1,7 @@
 package com.dynatrace.collectors;
 
+import java.util.logging.Level;
+
 import com.dynatrace.http.Method;
 import com.dynatrace.http.ResponseCode;
 import com.dynatrace.http.request.AbstractRequest;
@@ -8,6 +10,11 @@ public class CollectorsRequest extends AbstractRequest<CollectorInfos> {
 
 	private static final CollectorInfos RESPONSE_PROTOTYPE = new CollectorInfos();
 	public String COMMAND = "/rest/management/collectors".intern();
+	
+	@Override
+	protected Level level() {
+		return Level.FINE;
+	}
 	
 	@Override
 	protected String getPath() {

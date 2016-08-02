@@ -2,6 +2,7 @@ package com.dynatrace.dashboards;
 
 import java.util.logging.Logger;
 
+import com.dynatrace.http.ResultLoggingLevel;
 import com.dynatrace.http.ServerOperation;
 import com.dynatrace.http.config.ServerConfig;
 import com.dynatrace.http.request.Request;
@@ -14,6 +15,11 @@ public class DashboardRefresh extends ServerOperation<Dashboards> {
 	
 	public DashboardRefresh(ExecutionContext ctx, ServerConfig scfg) {
 		super(ctx, scfg);
+	}
+	
+	@Override
+	protected ResultLoggingLevel getResultLoggingLevel() {
+		return ResultLoggingLevel.None;
 	}
 
 	@Override

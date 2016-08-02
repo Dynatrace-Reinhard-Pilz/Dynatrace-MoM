@@ -27,8 +27,6 @@ public final class Base64 {
 	public static void encode(byte[] bytes, OutputStream out) throws IOException {
 		Objects.requireNonNull(out);
 		Objects.requireNonNull(bytes);
-		String string = new String(bytes, UTF8);
-		System.out.println("encode(" + string + ")");
         encodeBytes(bytes, new DataOutputStream(out));
     }
     

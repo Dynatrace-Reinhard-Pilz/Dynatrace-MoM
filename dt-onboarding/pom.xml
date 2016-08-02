@@ -17,17 +17,7 @@
   	</dependency>
   	<dependency>
   		<groupId>com.dynatrace</groupId>
-  		<artifactId>dt-cmd</artifactId>
-  		<version>1.0.0.qualifier</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-http</artifactId>
-  		<version>1.0.0.qualifier</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>com.dynatrace</groupId>
-  		<artifactId>dt-sysinfo</artifactId>
   		<version>1.0.0.qualifier</version>
   	</dependency>
   	<dependency>
@@ -44,6 +34,18 @@
   		<groupId>com.dynatrace</groupId>
   		<artifactId>dt-pluggability</artifactId>
   		<version>1.0.0.qualifier</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.dynatrace</groupId>
+  		<artifactId>dt-mom-connector-client</artifactId>
+  		<version>1.0.0.qualifier</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.dynatrace</groupId>
+  		<artifactId>dt-ensure-user-group-task</artifactId>
+  		<version>1.0.0.qualifier</version>
+  		<scope>runtime</scope>
+  		<classifier>bundle</classifier>
   	</dependency>
   </dependencies>
   <build>

@@ -102,8 +102,12 @@ public final class Logging extends Formatter {
     public static final void removeHandlers(final Logger logger) {
     	Objects.requireNonNull(logger);
 		for (Handler handler : logger.getHandlers()) {
-			logger.removeHandler(handler);
-			handler.close();
+			if (handler.getClass().getName().equals("org.apache.juli.FileHandler")) {
+				handler.setFormatter(INSTANCE);
+			} else {
+				logger.removeHandler(handler);
+				handler.close();
+			}
 		}
     }
 
@@ -135,7 +139,7 @@ public final class Logging extends Formatter {
 		}
 		return fileHandler;
     }
-
+    
     /**
      * Factored functionality from the initialization routine, in order to
      * increase code coverage.
@@ -145,19 +149,29 @@ public final class Logging extends Formatter {
      */
     protected static void configureRootLogger(
     		final Logger logger,
-    		final File logFolder
+    		final File logFolder,
+    		Handler handler
     ) {
-    	logger.setUseParentHandlers(false);
+//    	logger.setUseParentHandlers(false);
     	removeHandlers(logger);
 		logger.addHandler(CONSOLE_HANDLER);
 		if (!logFolder.exists()) {
 			logFolder.mkdirs();
+		}
+		if (handler != null) {
+			handler.setFormatter(INSTANCE);
+			logger.addHandler(handler);
 		}
 	}
     
     public static synchronized void init() {
     	init(null);
     }
+    
+	public static synchronized void init(Logger logger, String... welcome) {
+		init(logger, null, welcome);
+	}
+    
 
     /**
      * Initializes the root logger and prints out an optional welcome message
@@ -167,7 +181,7 @@ public final class Logging extends Formatter {
      * 		welcome message
      * @param welcome the lines of the welcome message to print out
      */
-	public static synchronized void init(Logger logger, String... welcome) {
+	public static synchronized void init(Logger logger, Handler handler, String... welcome) {
 		if (initialized) {
 			return;
 		}
@@ -176,7 +190,7 @@ public final class Logging extends Formatter {
 						PROPERTY_ROOT_LOGGER_NAME,
 						ROOT_LOGGER.getName()
 				)
-		), new File("log"));
+		), new File("log"), handler);
 		
 		Logger.getLogger("com.dynatrace.optional.mom").setLevel(Level.INFO);
 		

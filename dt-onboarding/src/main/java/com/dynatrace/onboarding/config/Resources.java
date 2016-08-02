@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 import com.dynatrace.onboarding.OnBoardingMain;
 import com.dynatrace.onboarding.dashboards.Dashboard;
 import com.dynatrace.onboarding.dashboards.DashboardTemplate;
+import com.dynatrace.onboarding.dashboards.LocalDashboardTemplate;
+import com.dynatrace.onboarding.profiles.LocalProfileTemplate;
 import com.dynatrace.onboarding.profiles.Profile;
 import com.dynatrace.onboarding.profiles.ProfileTemplate;
 import com.dynatrace.onboarding.variables.DefaultVariables;
@@ -43,8 +45,10 @@ public class Resources {
 	public final File temp = createTempFolder(); 
 	
 	public final Map<String, File> plugins = getPlugins();
-	public final Map<String, DashboardTemplate> dashboards = getDashboards();
-	public final Map<String, ProfileTemplate> profiles = getProfiles();
+	public final Map<String, DashboardTemplate> dashboards =
+			extractEmbeddedDashboardTemplates();
+	public final Map<String, ProfileTemplate> profileTemplates =
+			extractEmbeddedProfileTemplates();
 	public final Iterable<URLClassLoader> classLoaders = classLoaders();
 	
 	private static File createTempFolder() {
@@ -104,7 +108,7 @@ public class Resources {
 		});
 	}
 	
-	private Map<String, DashboardTemplate> getDashboards() {
+	private Map<String, DashboardTemplate> extractEmbeddedDashboardTemplates() {
 		Map<String, File> templateFiles = getResources(new NameFilter() {
 			@Override
 			public boolean accept(String name) {
@@ -147,7 +151,7 @@ public class Resources {
 				continue;
 			}
 			try {
-				DashboardTemplate template = new DashboardTemplate(
+				LocalDashboardTemplate template = new LocalDashboardTemplate(
 					templateFile,
 					UUID.randomUUID().toString()
 				);
@@ -159,7 +163,7 @@ public class Resources {
 		return templates;
 	}
 	
-	private Map<String, ProfileTemplate> getProfiles() {
+	private Map<String, ProfileTemplate> extractEmbeddedProfileTemplates() {
 		Map<String, File> templateFiles = getResources(new NameFilter() {
 			@Override
 			public boolean accept(String name) {
@@ -202,7 +206,7 @@ public class Resources {
 				continue;
 			}
 			try {
-				ProfileTemplate template = new ProfileTemplate(templateFile);
+				ProfileTemplate template = new LocalProfileTemplate(templateFile);
 				templates.put(templateName, template);
 			} catch (IOException e) {
 				LOGGER.log(Level.WARNING, "Template File '" + templateFile.getName() + "' does not contain a valid System Profile - ignoring this resource");
@@ -355,60 +359,74 @@ public class Resources {
 			if (!filter.accept(absolutePath)) {
 				continue;
 			}
-    		LOGGER.log(Level.FINER, "Embedded Resource " + filter.hashName(file.getName()) + " discovered.");
+    		LOGGER.log(
+    			Level.FINER,
+    			"Embedded Resource " + filter.hashName(file.getName()) + " discovered."
+    		);
 			resources.put(filter.hashName(file.getName()), file);
 		}
 		return resources;
 	}
 	
 	public void publishDashboards(Collection<Dashboard> dashboards) {
-		if (Iterables.isNullOrEmpty(profiles)) {
+		if (Iterables.isNullOrEmpty(profileTemplates)) {
 			return;
 		}
 		DefaultVariables variables = new DefaultVariables(new Properties());
 		for (Dashboard dashboard : dashboards) {
-			String name = dashboard.getName();
+			String name = dashboard.getId();
 			try {
 				variables.resolve(name);
 			} catch (UnresolvedVariableException e) {
-				File templateFile = dashboard.getFile();
+				DashboardTemplate dashboardTemplate = null;
 				try {
+					dashboardTemplate = dashboard.asTemplate();
 					DashboardTemplate embeddedTemplate = this.dashboards.get(name);
-					this.dashboards.put(name, new DashboardTemplate(templateFile, UUID.randomUUID().toString()));
+					this.dashboards.put(name, dashboardTemplate);
 					if (embeddedTemplate != null) {
-						LOGGER.log(Level.INFO, "The embedded Dashboard Template '" + name + "' also exists on the dynaTrace Server - using the Template located on the dynaTrace Server");
+						LOGGER.log(
+							Level.INFO,
+							"The embedded Dashboard Template '" + name + "' also exists on the dynaTrace Server - using the Template located on the dynaTrace Server"
+						);
 					} else {
-						LOGGER.log(Level.INFO, "Discovered Dashboard Template '" + name + "' located on the dynaTrace Server");
+						LOGGER.log(
+							Level.INFO,
+							"Discovered Dashboard Template '" + name + "' located on the dynaTrace Server"
+						);
 					}
 				} catch (IOException ioe) {
-					LOGGER.log(Level.WARNING, "Discovered a Dashboard Template '" + name + "' located on the dynaTrace Server, but unable to resolve it properly - ignoring this resource");
+					LOGGER.log(
+						Level.WARNING,
+						"Discovered a Dashboard Template '" + name + "' located on the dynaTrace Server, but unable to resolve it properly - ignoring this resource"
+					);
 				}
 			}
 		}
 	}
 	
-	public void publishProfiles(Collection<Profile> profiles) {
+	public void publishProfiles(Collection<Profile> profiles) throws IOException {
 		if (Iterables.isNullOrEmpty(profiles)) {
 			return;
 		}
 		DefaultVariables variables = new DefaultVariables(new Properties());
 		for (Profile profile : profiles) {
-			String name = profile.getName();
+			String name = profile.getId();
 			try {
 				variables.resolve(name);
 			} catch (UnresolvedVariableException e) {
-				File templateFile = profile.getFile();
-				try {
-					ProfileTemplate embeddedTemplate = this.profiles.get(name);
-					this.profiles.put(name, new ProfileTemplate(templateFile));
+//				File templateFile = metaProfile.getFile();
+//				try {
+					ProfileTemplate embeddedTemplate = this.profileTemplates.get(name);
+					this.profileTemplates.put(name, profile.asTemplate());
+//					this.profiles.put(name, new LocalMetaProfileTemplate(new ProfileTemplate(templateFile)));
 					if (embeddedTemplate != null) {
 						LOGGER.log(Level.INFO, "The embedded System Profile Template '" + name + "' also exists on the dynaTrace Server - using the Template located on the dynaTrace Server");
 					} else {
 						LOGGER.log(Level.INFO, "Discovered System Profile Template '" + name + "' located on the dynaTrace Server");
 					}
-				} catch (IOException ioe) {
-					LOGGER.log(Level.WARNING, "Discovered a System Profile Template '" + name + "' located on the dynaTrace Server, but unable to resolve it properly - ignoring this resource");
-				}
+//				} catch (IOException ioe) {
+//					LOGGER.log(Level.WARNING, "Discovered a System Profile Template '" + name + "' located on the dynaTrace Server, but unable to resolve it properly - ignoring this resource");
+//				}
 			}
 		}
 	}

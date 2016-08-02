@@ -13,6 +13,9 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractExecutionContext implements ExecutionContext, ThreadFactory {
 	
+	@SuppressWarnings("unused")
+	private static final Logger LOGGER = Logger.getLogger(AbstractExecutionContext.class.getName());
+	
 	protected abstract Logger logger();
 	
 	@Override
@@ -51,6 +54,7 @@ public abstract class AbstractExecutionContext implements ExecutionContext, Thre
 		File storageFolder =
 			getAttribute(ATTRIBUTE_STORAGE_FOLDER);
 		if (storageFolder != null) {
+//			LOGGER.info("AbstractExecutionContext.getStorageFolder() (1): " + storageFolder);
 			return storageFolder;
 		}
 		
@@ -63,16 +67,12 @@ public abstract class AbstractExecutionContext implements ExecutionContext, Thre
 			ATTRIBUTE_STORAGE_FOLDER,
 			webAppFolder
 		);
+//		LOGGER.info("AbstractExecutionContext.getStorageFolder() (2): " + storageFolder);
 	    return webAppFolder;
 	}
 	
 	@Override
 	public File getStorageSubFolder(String attribute, String folderName, boolean delete) {
-		return getStorageSubFolder(attribute, folderName, true);
-	}
-	
-	@Override
-	public synchronized File getStorageSubFolder(String attribute, String folderName) {
 		File folder = getAttribute(attribute);
 		if (folder != null) {
 			return folder;
@@ -82,6 +82,11 @@ public abstract class AbstractExecutionContext implements ExecutionContext, Thre
 		folder.mkdirs();
 		setAttribute(attribute, folder);
 		return folder;
+	}
+	
+	@Override
+	public synchronized File getStorageSubFolder(String attribute, String folderName) {
+		return getStorageSubFolder(attribute, folderName, true);
 	}
 	
 	@Override

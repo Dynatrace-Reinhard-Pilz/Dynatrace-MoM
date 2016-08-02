@@ -17,4 +17,11 @@
     		</plugin>
   	</plugins>
   </build>
+  <dependencies>
+  	<dependency>
+  		<groupId>com.dynatrace</groupId>
+  		<artifactId>dt-utils</artifactId>
+  		<version>1.0.0.qualifier</version>
+  	</dependency>
+  </dependencies>
 </project>

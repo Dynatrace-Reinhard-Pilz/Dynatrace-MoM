@@ -25,6 +25,26 @@ public class XMLServerRepository implements BaseServerRepository {
 	public XMLServerRepository() {
 	}
 	
+	@Override
+	public void encrypt() {
+		for (ServerRecord serverRecord : serverRecords) {
+			if (serverRecord == null) {
+				continue;
+			}
+			serverRecord.encrypt();
+		}
+	}
+
+	@Override
+	public void decrypt() {
+		for (ServerRecord serverRecord : serverRecords) {
+			if (serverRecord == null) {
+				continue;
+			}
+			serverRecord.decrypt();
+		}
+	}
+	
 	public XMLServerRepository(BaseServerRepository repository) {
 		this.serverRecords = repository.getServerRecords();
 	}
@@ -65,7 +85,7 @@ public class XMLServerRepository implements BaseServerRepository {
 				ConnectionConfig connConf = config.getConnectionConfig();
 				String host = connConf.getHost();
 				int port = connConf.getPort();
-				serverRecord.setName(host + ":" + port);
+//				serverRecord.setName(host + ":" + port);
 				serverRecord.setVersion(Version.UNDEFINED);
 //				this.serverRecords.add(serverRecord);
 			}

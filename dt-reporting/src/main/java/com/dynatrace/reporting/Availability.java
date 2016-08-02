@@ -5,5 +5,6 @@ public enum Availability {
 	Available,
 	Unavailable,
 	NotYetAvailable,
-	unknown
+	unknown,
+	Determining
 }

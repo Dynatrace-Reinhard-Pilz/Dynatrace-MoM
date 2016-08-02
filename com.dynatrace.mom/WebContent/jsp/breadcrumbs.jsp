@@ -43,7 +43,14 @@ ConnectionStatus serverStatus = ConnectionStatus.OFFLINE;
 		if (serverRecord != null) {
 			%><jsp:include page="/jsp/serveractions.jspf" /><%
 		}
-		%></div><%		
+		%><div style="float: right; padding-right: 40px; margin-top: 2px">
+			<form name="frm-add-server" id="frm-add-server" action="${pageContext.request.contextPath}/servers/+" method="post" style="display: inline; border: none"><div>
+				<input type="submit" id="btn-add-server" value="" title="Add new dynaTrace Server"></input>
+			</div></form>
+		</div>
+			
+			
+		</div><%		
 	}
 	if (modelBase != null) {
 		Iterable<Link> links = modelBase.getBreadCrumbsEx();

@@ -1,7 +1,5 @@
 package com.dynatrace.fastpacks.metadata.resources;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -18,6 +16,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import com.dynatrace.fastpacks.metadata.instances.Instance;
 import com.dynatrace.fastpacks.metadata.instances.InstanceType;
+import com.dynatrace.utils.Source;
 import com.dynatrace.utils.Strings;
 
 /**
@@ -30,7 +29,7 @@ import com.dynatrace.utils.Strings;
 public class Resource {
 
 	@XmlTransient
-	private File file = null;
+	private Source<?> source = null;
 	private String name = null;
 	private ResourceType type = null;
 	private boolean overwrite = true;
@@ -41,11 +40,11 @@ public class Resource {
 		// constructor for JAXB
 	}
 	
-	public Resource(File file, ResourceType type) {
-		Objects.requireNonNull(file);
+	public Resource(Source<?> source, ResourceType type) {
+		Objects.requireNonNull(source);
 		ResourceType.validate(type);
-		this.file = file;
-		this.name = file.getName();
+		this.source = source;
+		this.name = source.getName();
 		this.type = type;
 	}
 
@@ -146,13 +145,13 @@ public class Resource {
 		}
 	}
 	
-	public static Resource create(File file, ResourceType type) {
-		if (!file.exists() || !file.isFile()) {
-			throw new IllegalArgumentException(
-				file.getAbsolutePath() + " does not exist"
-			);
-		}
-		Resource resource = new Resource(file, type);
+	public static Resource create(Source<?> source, ResourceType type) {
+//		if (!file.exists() || !file.isFile()) {
+//			throw new IllegalArgumentException(
+//				file.getAbsolutePath() + " does not exist"
+//			);
+//		}
+		Resource resource = new Resource(source, type);
 		switch (type) {
 		case dashboard:
 			resource.setInstances(
@@ -230,12 +229,12 @@ public class Resource {
 		return resource;
 	}
 	
-	public InputStream getInputStream() throws IOException {
-		return new FileInputStream(file);
+	public InputStream openStream() throws IOException {
+		return source.openStream();
 	}
 	
-	public long getSize() {
-		return file.length();
+	public long length() {
+		return source.length();
 	}
 	
 }

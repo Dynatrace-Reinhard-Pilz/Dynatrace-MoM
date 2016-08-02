@@ -1,6 +1,5 @@
 package com.dynatrace.fastpacks.metadata;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -11,6 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.dynatrace.fastpacks.metadata.resources.Resource;
 import com.dynatrace.fastpacks.metadata.resources.ResourceType;
+import com.dynatrace.utils.Source;
 
 @XmlRootElement(name = "plugin")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -76,32 +76,32 @@ public final class Plugin {
 		return this;
 	}
 	
-	public Plugin add(File file, ResourceType resourceType) {
-		add(Resource.create(file, resourceType));
+	public Plugin add(Source<?> source, ResourceType resourceType) {
+		add(Resource.create(source, resourceType));
 		return this;
 	}
 
-	public Plugin add(File file, ResourceType resourceType, String targetDir) {
-		Resource resource = Resource.create(file, resourceType);
+	public Plugin add(Source<?> source, ResourceType resourceType, String targetDir) {
+		Resource resource = Resource.create(source, resourceType);
 		resource.setTargetDir(targetDir);
 		add(resource);
 		return this;
 	}
 	
-	public Plugin addUserPlugin(File file) {
-		return add(file, ResourceType.userPlugin);
+	public Plugin addUserPlugin(Source<?> source) {
+		return add(source, ResourceType.userPlugin);
 	}
 	
-	public Plugin addProfile(File file) {
-		return add(file, ResourceType.systemProfile);
+	public Plugin addProfile(Source<?> source) {
+		return add(source, ResourceType.systemProfile);
 	}
 	
-	public final Plugin addDashboard(File file) {
-		return add(file, ResourceType.dashboard);
+	public final Plugin addDashboard(Source<?> source) {
+		return add(source, ResourceType.dashboard);
 	}
 	
-	public final Plugin addResource(File file, String targetDir) {
-		return add(file, ResourceType.resource, targetDir);
+	public final Plugin addResource(Source<?> source, String targetDir) {
+		return add(source, ResourceType.resource, targetDir);
 	}
 	
 	public final void setName(String name) {

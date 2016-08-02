@@ -1,5 +1,7 @@
 package com.dynatrace.license;
 
+import java.util.logging.Level;
+
 import com.dynatrace.http.Method;
 import com.dynatrace.http.ResponseCode;
 import com.dynatrace.http.request.AbstractRequest;
@@ -16,6 +18,11 @@ public class LicenseRequest extends AbstractRequest<LicenseInfo> {
 	private static final LicenseInfo RESULT_PROTOTYPE = new LicenseInfo();
 	private String COMMAND = "/rest/management/server/license/information".intern();
 
+	@Override
+	protected Level level() {
+		return Level.FINEST;
+	}
+	
 	@Override
 	protected String getPath() {
 		return COMMAND;

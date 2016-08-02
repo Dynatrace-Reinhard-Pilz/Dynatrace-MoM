@@ -224,4 +224,50 @@ public class XMLUtilTest {
 		XMLUtil.serialize(o, out, charset, ctx, true, false);
 		XMLUtil.serialize(o, out, charset, ctx);
 	}
+	
+	@Test
+	public void testToString() {
+		Pojo o = new Pojo();
+		String s = XMLUtil.toString(o);
+		System.out.println(s);
+	}
+	
+	private static class Ref<T> {
+		private T value = null;
+		
+		public void set(T value) {
+			this.value = value;
+		}
+		
+		public T get() {
+			return value;
+		}
+	}
+	
+	@Test
+	public void testDeserializeInterrupted() throws IOException {
+		final ByteArrayInputStream in = new ByteArrayInputStream(new byte[0]);
+		final Ref<Object> result = new Ref<Object>();
+		Thread t = new Thread() {
+			
+			@Override
+			public void run() {
+				try {
+					Object o = XMLUtil.deserialize(in, XMLUtilTest.class);
+					result.set(o);
+				} catch (IOException e) {
+					result.set(e);
+				}
+			}
+		};
+		t.start();
+		t.interrupt();
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			Assert.fail(e.getMessage());
+		}
+		Assert.assertNull(result.get());
+		
+	}
 }

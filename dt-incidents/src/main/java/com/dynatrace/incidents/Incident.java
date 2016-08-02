@@ -68,7 +68,7 @@ public class Incident {
 	
 	@XmlTransient
 	public boolean isOpen() {
-		return isValid() && !isConfirmed() && (endTime <= 0);
+		return isValid() && !isConfirmed() && (getEndTime() < getStartTime());
 	}
 	
 	@XmlTransient
@@ -112,9 +112,9 @@ public class Incident {
 			return Strings.EMPTY;
 		}
 		StringBuilder sb = new StringBuilder();
-		sb.append(sdf.format(new Date(startTime))).append(" - ");
-		if (endTime > 0) {
-			sb.append(sdf.format(new Date(endTime)));
+		sb.append(sdf.format(new Date(getStartTime()))).append(" - ");
+		if (getEndTime() > 0) {
+			sb.append(sdf.format(new Date(getEndTime())));
 		}
 		return sb.toString();
 	}

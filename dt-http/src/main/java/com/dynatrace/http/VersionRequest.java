@@ -89,7 +89,7 @@ public class VersionRequest extends AbstractRequest<Version> {
 			}
 			return new HttpResponse<Version>(
 				code,
-				new UnexpectedResponseCodeException(expected, code, new String(out.toByteArray())));
+				new UnexpectedResponseCodeException(expected, code, new String(out.toByteArray()), this.getPath()));
 		}
 		try {
 			out.close();
@@ -128,7 +128,7 @@ public class VersionRequest extends AbstractRequest<Version> {
 	
 
 	@Override
-	protected final String getPath() {
+	protected String getPath() {
 		return COMMAND;
 	}
 

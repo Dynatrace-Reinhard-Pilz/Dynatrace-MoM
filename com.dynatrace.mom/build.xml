@@ -1,0 +1,10 @@
+<project name="dt-mom" default="publish">
+	<target name="publish">
+		<jar destfile="C:\devtools\apache-tomcat-7.0.55\dt-mom.war">
+			<fileset dir="C:\workspaces\data\Dynatrace-Mom\Dynatrace-MoM\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps\com.dynatrace.mom">
+				<include name="**/*" />
+			</fileset>
+		</jar>
+		<copy file="C:\devtools\apache-tomcat-7.0.55\dt-mom.war" tofile="C:\devtools\apache-tomcat-7.0.55\webapps\dt-mom.war" overwrite="true" />
+	</target>
+</project>

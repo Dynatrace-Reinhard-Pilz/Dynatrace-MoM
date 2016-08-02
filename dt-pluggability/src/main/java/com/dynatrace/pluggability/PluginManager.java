@@ -119,7 +119,9 @@ public class PluginManager extends ClassLoader {
 		try {
 			return resolveURLs(protectionDomain.getCodeSource().getLocation().toURI());
 		} catch (URISyntaxException e) {
-			throw new InternalError(e.getMessage());
+			return new URL[0];
+		} catch (InternalError e) {
+			return new URL[0];
 		}
 	}
 	

@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -155,10 +156,22 @@ public class SystemProfile implements Metaable {
 	}
 	
 	public IncidentRule getIncidentRule(String incidentRuleName) {
-		return incidentRules.get(incidentRuleName);
+		IncidentRule incidentRule = incidentRules.get(incidentRuleName);
+		if (incidentRule == null) {
+			LOGGER.info("AVAILABLE INCIDENT RULES");
+			dumpIncidentRules();
+		}
+		return incidentRule;
+	}
+	
+	private void dumpIncidentRules() {
+		for (String id : incidentRules.keySet()) {
+			LOGGER.info("   - " + incidentRules.get(id));
+		}
 	}
 	
 	public void evalIncidentRules() {
+//		LOGGER.info(" ... evaluating incident rules");
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		SAXParser saxParser = null;
 		try {
@@ -170,6 +183,7 @@ public class SystemProfile implements Metaable {
 			);
 			return;
 		}
+		final AtomicInteger numRulesAdded = new AtomicInteger(0);
 		DefaultHandler handler = new DefaultHandler() {
 			
 			private static final String ELEMENT_INCIDENTRULE = "incidentrule";
@@ -185,6 +199,8 @@ public class SystemProfile implements Metaable {
 				if (ELEMENT_INCIDENTRULE.equals(qName)) {
 					String id = attributes.getValue(ATTRIBUTE_ID);
 					if (isNotEmpty(id) && !incidentRules.containsKey(id)) {
+						numRulesAdded.incrementAndGet();
+						// LOGGER.info(" ... adding IncidentRule '" + id + "'");
 						incidentRules.put(id, new IncidentRule(id));
 					}
 				}
@@ -196,6 +212,7 @@ public class SystemProfile implements Metaable {
 		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, "Unable to parse System Profile", e);
 		}
+//		LOGGER.info("    ... " + numRulesAdded.get() + " added");
 	}
 	
 	public static String getProfileName(File localFile) {
@@ -311,6 +328,11 @@ public class SystemProfile implements Metaable {
 			agentGroups.add(new AgentGroup(agentGroupElement));
 		}
 		return agentGroups;
+	}
+	
+	@Override
+	public String toString() {
+		return getId();
 	}
 	
 }

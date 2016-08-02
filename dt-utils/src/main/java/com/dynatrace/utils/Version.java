@@ -266,6 +266,10 @@ public final class Version implements Versionable, Serializable {
 
 	@Override
 	public int compareTo(Versionable o) {
+		return compareTo(o, false);
+	}
+	
+	public int compareTo(Versionable o, boolean includeBuild) {
 		if (o == null) {
 			return 1;
 		}
@@ -273,6 +277,7 @@ public final class Version implements Versionable, Serializable {
 		if (version == null) {
 			return 1;
 		}
+		
 		if (this.major > version.getMajor()) {
 			return 1;
 		} else if (this.major < version.getMajor()) {
@@ -286,7 +291,15 @@ public final class Version implements Versionable, Serializable {
 		} else if (this.revision < version.getRevision()) {
 			return -1;
 		}
+		if (includeBuild) {
+			if (this.build > version.getBuild()) {
+				return 1;
+			} else if (this.build < version.getBuild()) {
+				return -1;
+			}
+		}
 		return 0;
+		
 	}
 
 	@Override
@@ -306,9 +319,8 @@ public final class Version implements Versionable, Serializable {
 	public static boolean equals(Versionable a, Versionable b) {
 		if (a == null) {
 			return b == null;
-		}
-		if (b == null) {
-			return b == null;
+		} else if (b == null) {
+			return false;
 		}
 		return a.equals(b);
 	}

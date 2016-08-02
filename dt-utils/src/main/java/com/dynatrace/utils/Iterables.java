@@ -314,16 +314,17 @@ public class Iterables {
 	 * @param c the {@link Collection} to add the entries to
 	 * @param a the {@link Iterable} holding the entries to add
 	 */
-	public static <T> void addAll(Collection<T> c, Iterable<? extends T> a) {
+	public static <T> Collection<T> addAll(Collection<T> c, Iterable<? extends T> a) {
 		if (c == null) {
-			return;
+			return c;
 		}
 		if (a == null) {
-			return;
+			return c;
 		}
 		for (T t : a) {
 			c.add(t);
 		}
+		return c;
 	}
 	
 	/**
@@ -338,6 +339,9 @@ public class Iterables {
 	 */
 	public static <T, E extends T> void addAll(Collection<T> c, E[] t) {
 		if ((c == null) || (t == null)) {
+			return;
+		}
+		if (t.length == 0) {
 			return;
 		}
 		for (T element : t) {
@@ -374,5 +378,15 @@ public class Iterables {
 		while (e.hasMoreElements()) {
 			c.add(e.nextElement());
 		}
+	}
+	
+	public static <T> Collection<T> asCollection(SizedIterable<T> iterable) {
+		if (iterable == null) {
+			return null;
+		}
+		if (iterable instanceof Collection) {
+			return Unchecked.cast(iterable);
+		}
+		return addAll(new ArrayList<T>(iterable.size()), iterable);
 	}
 }

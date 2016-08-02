@@ -1,6 +1,11 @@
 package com.dynatrace.mom.runtime.components;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
@@ -49,8 +54,12 @@ import com.dynatrace.incidents.IncidentState;
 import com.dynatrace.license.LicenseAware;
 import com.dynatrace.license.LicenseInfo;
 import com.dynatrace.license.LicenseRefresh;
+import com.dynatrace.mom.connector.MomConnectorAware;
+import com.dynatrace.mom.connector.RefreshMoMConnectorVersion;
+import com.dynatrace.mom.connector.RefreshSelfMonitoringProfile;
 import com.dynatrace.mom.rest.ContextConstants;
 import com.dynatrace.mom.runtime.ServerRepository;
+import com.dynatrace.mom.runtime.XMLServerRepository;
 import com.dynatrace.profiles.ProfileCollection;
 import com.dynatrace.profiles.ProfileRefresh;
 import com.dynatrace.profiles.SystemProfile;
@@ -60,17 +69,19 @@ import com.dynatrace.reporting.HealthRefresh;
 import com.dynatrace.reporting.Measure;
 import com.dynatrace.reporting.MeasureAware;
 import com.dynatrace.sysinfo.SysInfoRefresh;
+import com.dynatrace.utils.Closeables;
 import com.dynatrace.utils.DefaultExecutionContext;
 import com.dynatrace.utils.ExecutionContext;
 import com.dynatrace.utils.Unchecked;
 import com.dynatrace.utils.Version;
 import com.dynatrace.utils.Versionable;
+import com.dynatrace.xml.XMLUtil;
 
 @XmlRootElement(name = ServerRecord.TAG)
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class ServerContext
 	extends DefaultExecutionContext
-	implements ThreadFactory, ConnectionAware, Versionable, LicenseAware, HealthDashboardAware, Restartable, FixPackAware, IncidentAware, MeasureAware  {
+	implements ThreadFactory, ConnectionAware, Versionable, LicenseAware, HealthDashboardAware, Restartable, FixPackAware, IncidentAware, MeasureAware, MomConnectorAware  {
 
 	private static final Logger LOGGER =
 			Logger.getLogger(ServerContext.class.getName());
@@ -166,8 +177,34 @@ public class ServerContext
 		execute(new VersionRefresh(this, getServerConfig()));
 	}
 	
+	public void refreshMoMConnectorVersion() {
+		execute(new RefreshMoMConnectorVersion(this, getServerConfig()));
+	}
+	
+	public void refreshSelfMonitoringProfile() {
+		LOGGER.log(Level.FINER, "refreshing [" + getName() + "] dynaTrace Self-Monitoring.profile.xml");
+		execute(new RefreshSelfMonitoringProfile(this, getServerConfig()) {
+			@Override
+			public void onSystemProfile(SystemProfile systemProfile) {
+				if (systemProfile == null) {
+					return;
+				}
+				SystemProfile profile = serverRecord.getProfile(
+					systemProfile.getId()
+				);
+				LOGGER.log(Level.FINER, "[" + getName() + "] dynaTrace Self-Monitoring.profile.xml received");
+				if (profile == null) {
+					serverRecord.addProfile(systemProfile);
+				} else {
+					Closeables.delete(profile.getLocalFile());
+					profile.setLocalFile(systemProfile.getLocalFile());
+				}
+			}
+		});
+	}
+	
 	public void refreshCollectors() {
-		LOGGER.log(Level.FINEST, "refreshing collectors [" + getName() + "]");
+		LOGGER.log(Level.FINER, "refreshing collectors [" + getName() + "]");
 		execute(new CollectorRefresh(this, getServerConfig()));
 	}
 	
@@ -199,29 +236,74 @@ public class ServerContext
 		});
 	}
 	
+	public void uploadMomConnector() {
+		if (getMoMConnectorAvailability() != Availability.NotYetAvailable) {
+			return;
+		}
+		LOGGER.log(Level.INFO, "Uploading MoM Connector [" + getName() + "]");
+		execute(new FastPackUpload(this, getServerConfig()) {
+			
+			@Override
+			protected InputStream openStream() throws IOException {
+				return this.getClass().getClassLoader().getResourceAsStream("/com.dynatrace.mom.connector.fastpack.dtp");
+			}
+			
+			@Override
+			protected boolean prepare() {
+				if (!super.prepare()) {
+					return false;
+				}
+				switch (getMoMConnectorAvailability()) {
+				case Available:
+				case Determining:
+				case unknown:
+				case Unavailable:
+					return false;
+				case NotYetAvailable:
+					break;
+				}
+				return true;
+			}
+			
+			@Override
+			public void onSuccess() {
+				setMoMConnectorAvailability(Availability.Available);
+			}
+		});
+	}
+	
 	public void refreshDashboardStatus() {
-		LOGGER.log(Level.FINEST, "refreshing dashboard status [" + getName() + "]");
+		LOGGER.log(Level.FINER, "refreshing dashboard status [" + getName() + "]");
 		execute(new DashboardRefresh(this, getServerConfig()));
 	}
 	
 	public void refreshLicense() {
-		LOGGER.log(Level.FINEST, "refreshing licenses [" + getName() + "]");
+		LOGGER.log(Level.FINER, "refreshing licenses [" + getName() + "]");
 		execute(new LicenseRefresh(this, getServerConfig()));
 	}
 	
 	public void refreshProfiles() {
-		LOGGER.log(Level.FINEST, "refreshing profiles [" + getName() + "]");
+		LOGGER.log(Level.FINER, "refreshing profiles [" + getName() + "]");
 		execute(new ProfileRefresh(this, getServerConfig()));
 	}
 	
 	public void refreshDynatraceServerHealthMeasures() {
-		LOGGER.log(Level.FINEST, "refreshing health measures [" + getName() + "]");
+		LOGGER.log(Level.FINER, "refreshing health measures [" + getName() + "]");
 		execute(new HealthRefresh(this, getServerConfig()));
 	}
 	
 	public void refreshConfigs() {
-		LOGGER.log(Level.FINEST, "refreshing configs [" + getName() + "]");
+		LOGGER.log(Level.FINER, "refreshing configs [" + getName() + "]");
 		execute(new SysInfoRefresh(this, getServerConfig()) {
+			
+			protected String[] getSupportedFileTypes() {
+				return new String[] {
+						"configfiles",
+						"agentrecords",
+						"licensefile",
+						"componentproperties"	
+					};
+			}
 			
 			@Override
 			public void onSuccess() {
@@ -269,14 +351,41 @@ public class ServerContext
 			public void onServerFQDN(String fqdn) {
 				ServerRepository repo =
 						ctx.getAttribute(ServerRepository.class);
-				repo.rename(serverRecord, fqdn);
+				if (repo.rename(serverRecord, fqdn)) {
+					store();
+				}
 			}
 			
 		});
 	}
 	
+	public void store() {
+		ServerRepository repo =
+				ctx.getAttribute(ServerRepository.class);
+			XMLServerRepository xmlServerRepository = new XMLServerRepository();
+			Collection<ServerRecord> serverRecords = repo.getServerRecords();
+			Collection<ServerRecord> clonedServerRecords = new ArrayList<>();
+			for (ServerRecord serverRecord : serverRecords) {
+				ServerRecord clonedServerRecord = serverRecord.clone();
+				ctx.log(Level.INFO, serverRecord.getName());
+				clonedServerRecord.encrypt();
+				clonedServerRecords.add(clonedServerRecord);
+			}
+			xmlServerRepository.setServerRecords(clonedServerRecords);
+			File storageFolder = ctx.getStorageFolder();
+			storageFolder.mkdirs();
+			File storageServersXml = new File(storageFolder, "servers.xml");
+			ctx.log(Level.INFO, storageServersXml.toString());
+			try (OutputStream out = new FileOutputStream(storageServersXml)) {
+				XMLUtil.serialize(xmlServerRepository, out);
+			} catch (IOException e) {
+				ctx.log(Level.WARNING, "Unable to persist servers.xml");
+			}
+	}
+	
 	@Override
 	public void refreshIncidentReferences() {
+//		LOGGER.log(Level.INFO, "refreshIncidentReferences");
 		Collection<IncidentRule> incidentRules = serverRecord.getIncidentRules();
 		if (incidentRules.isEmpty()) {
 			return;
@@ -340,6 +449,8 @@ public class ServerContext
 	}
 	
 	public final void close() {
+		store();		
+		serverRecord.close();
 		LOGGER.log(Level.INFO, "Shutting down " + toString());
 		try {
 			executorService.shutdownNow();
@@ -501,6 +612,35 @@ public class ServerContext
 	@Override
 	public Availability getHealthDashboardAvailability() {
 		return serverRecord.getHealthDashboardAvailability();
+	}
+	
+	@Override
+	public Availability getMoMConnectorAvailability() {
+		return serverRecord.getMomConnectorAvailability();
+	}
+	
+	@Override
+	public void setMoMConnectorAvailability(Availability availability) {
+		synchronized (this) {
+			serverRecord.setMomConnectorAvailability(availability);
+		}
+	}
+	
+	@Override
+	public void setMoMConnectorVersion(Version version) {
+		LOGGER.log(Level.INFO, "[" + getName() + "] MoM Connector Version " + version + " available.");
+		synchronized (this) {
+			serverRecord.setMoMConnectorVersion(version);
+			Availability connectorAvailability = serverRecord.getMomConnectorAvailability();
+			if (connectorAvailability != Availability.Available) {
+				serverRecord.setMomConnectorAvailability(Availability.Available);
+				refreshSelfMonitoringProfile();
+			}
+		}
+	}
+
+	public Version getMoMConnectorVersion() {
+		return serverRecord.getMoMConnectorVersion();
 	}
 
 	@Override

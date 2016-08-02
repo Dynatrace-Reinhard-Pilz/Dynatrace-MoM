@@ -27,7 +27,8 @@ import com.dynatrace.http.Protocol;
 import com.dynatrace.http.config.ConnectionConfig;
 import com.dynatrace.http.config.Credentials;
 import com.dynatrace.http.config.ServerConfig;
-import com.dynatrace.profiles.SystemProfile;
+import com.dynatrace.monitors.license.usage.api.AgentGroup;
+import com.dynatrace.monitors.license.usage.api.Profile;
 import com.dynatrace.profiles.metainfo.MetaInfo;
 import com.dynatrace.rest.Agent;
 import com.dynatrace.rest.Agents;
@@ -57,38 +58,45 @@ public class UsageMonitor implements Monitor {
 	
 	private final String OTHER = "Other";
 	
-	final static ProfileCache PROFILE_CACHE = new ProfileCache();
-
+	private final ServerConfig getServerConfig(MonitorEnvironment env) throws ConfigurationException {
+		Host host = env.getHost();
+		if (host == null) {
+			LOGGER.log(Level.SEVERE, "Configuration option for dynaTrace Server Host is null");
+			throw new ConfigurationException("configured host is null");
+		}
+		String address = host.getAddress();
+		if (address == null) {
+			LOGGER.log(Level.SEVERE, "Configuration option for dynaTrace Server Host Address is null");
+			throw new ConfigurationException("configured host address is null");
+		}
+		String sProtocol = env.getConfigString(CONFIGID_PROTOCOL);
+		if (sProtocol == null) {
+			LOGGER.log(Level.SEVERE, "Configuration option for dynaTrace Server HTTP Protocol is null");
+			throw new ConfigurationException("configured protocol is null");
+		}
+		int port = env.getConfigLong(CONFIGID_PORT).intValue();
+		String user = env.getConfigString(CONFIGID_USER);
+		if (user == null) {
+			LOGGER.log(Level.SEVERE, "Configured user name is null");
+			throw new ConfigurationException("configured user name is null");
+		}
+		String pass = env.getConfigPassword(CONFIGID_PASS);
+		if (pass == null) {
+			LOGGER.log(Level.SEVERE, "Configured password is null");
+			throw new ConfigurationException("configured password is null");
+		}
+		
+		Credentials credentials = new Credentials(user, pass);
+		
+        Protocol protocol = Protocol.fromString(sProtocol);
+        ConnectionConfig connectionConfig = new ConnectionConfig(protocol, address, port);
+        return new ServerConfig(connectionConfig, credentials);
+	}
+	
 	@Override
 	public Status execute(MonitorEnvironment env) throws Exception {
 		try {
 			Objects.requireNonNull(env);
-			Host host = env.getHost();
-			if (host == null) {
-				LOGGER.log(Level.SEVERE, "Configuration option for dynaTrace Server Host is null");
-				return new Status(StatusCode.ErrorInternalConfigurationProblem, "configured host is null");
-			}
-			String address = host.getAddress();
-			if (address == null) {
-				LOGGER.log(Level.SEVERE, "Configuration option for dynaTrace Server Host Address is null");
-				return new Status(StatusCode.ErrorInternalConfigurationProblem, "configured host address is null");
-			}
-			String sProtocol = env.getConfigString(CONFIGID_PROTOCOL);
-			if (sProtocol == null) {
-				LOGGER.log(Level.SEVERE, "Configuration option for dynaTrace Server HTTP Protocol is null");
-				return new Status(StatusCode.ErrorInternalConfigurationProblem, "configured protocol is null");
-			}
-			int port = env.getConfigLong(CONFIGID_PORT).intValue();
-			String user = env.getConfigString(CONFIGID_USER);
-			if (user == null) {
-				LOGGER.log(Level.SEVERE, "Configured user name is null");
-				return new Status(StatusCode.ErrorInternalConfigurationProblem, "configured user name is null");
-			}
-			String pass = env.getConfigPassword(CONFIGID_PASS);
-			if (pass == null) {
-				LOGGER.log(Level.SEVERE, "Configured password is null");
-				return new Status(StatusCode.ErrorInternalConfigurationProblem, "configured password is null");
-			}
 			long maxAge = DEFAULT_MAX_AGE;
 			try {
 				maxAge = env.getConfigLong(CONFIGID_MAX_AGE);
@@ -99,15 +107,24 @@ public class UsageMonitor implements Monitor {
 				maxAge = DEFAULT_MAX_AGE;
 			}
 			
-			Credentials credentials = new Credentials(user, pass);
+			ServerConfig serverConfig = null;
+			try {
+				serverConfig = getServerConfig(env);
+			} catch (ConfigurationException e) {
+				return new Status(StatusCode.Uninitialized, e.getMessage());
+			}
+			ProfileCache PROFILE_CACHE = new ProfileCache(serverConfig);
 			
-	        Protocol protocol = Protocol.fromString(sProtocol);
-	        ConnectionConfig connectionConfig = new ConnectionConfig(protocol, address, port);
-	        ServerConfig serverConfig = new ServerConfig(connectionConfig, credentials);
-			PROFILE_CACHE.refresh(serverConfig, 1000 * 60 * maxAge);
+			Credentials credentials = serverConfig.getCredentials();
 			
 			HttpClient httpClient = Http.client();
-			URL url = new URL(sProtocol, address, port, "/rest/management/agents");
+			ConnectionConfig connConfig = serverConfig.getConnectionConfig();
+			URL url = new URL(
+				connConfig.getProtocol().name(),
+				connConfig.getHost(),
+				connConfig.getPort(),
+				"/rest/management/agents"
+			);
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			int responseCode = httpClient.request(url, Method.GET, credentials, out);
 			if (responseCode != HttpURLConnection.HTTP_OK) {
@@ -129,37 +146,61 @@ public class UsageMonitor implements Monitor {
 				if (agent == null) {
 					continue;
 				}
-				if (agent.isMasterAgent()) {
+//				LOGGER.log(Level.INFO, "Agent: " + agent.getName());
+//				if (agent.isMasterAgent()) {
+//					continue;
+//				}
+				if (!agent.isLicenseOk()) {
 					continue;
 				}
 				String agentGroupId = agent.getAgentGroup();
+				if (agentGroupId == null) {
+					LOGGER.log(Level.WARNING, "Agent without Agent GroupId discovered - ignoring");
+					continue;
+				}
 				String systemProfileId = agent.getSystemProfile();
+				if (systemProfileId == null) {
+					LOGGER.log(Level.WARNING, "Agent without System ProfileId discovered - ignoring");
+					continue;
+				}
 				
 				if ("dynaTrace Self-Monitoring".equals(systemProfileId)) {
 					continue;
 				}
-//				LOGGER.log(Level.INFO, "agentGroupId: " + agentGroupId);
-//				LOGGER.log(Level.INFO, "systemProfileId: " + systemProfileId);
-				SystemProfile systemProfile = PROFILE_CACHE.get(systemProfileId);
-				MetaInfo metaInfo = systemProfile.getMetaInfo();
-				Iterable<String> metaInfoKeys = metaInfo.keys();
-				for (String metaInfoKey : metaInfoKeys) {
-					if (Strings.isNullOrEmpty(metaInfoKey)) {
-						continue;
+				Profile systemProfile = PROFILE_CACHE.get(systemProfileId);
+				if (systemProfile == null) {
+					LOGGER.log(Level.WARNING, "Profile Cache did not contain an entry for System Profile '" + systemProfileId + "' - ignoring Agent");
+					continue;
+				}
+				MetaInfo profileMetaInfo = systemProfile.getMetaInfo();
+				
+				AgentGroup agentGroup = systemProfile.getAgentGroup(agentGroupId);
+				MetaInfo agentGroupMetaInfo = agentGroup.getMetaInfo();
+				MetaInfo metaInfo = MetaInfo.merge(
+					profileMetaInfo,
+					agentGroupMetaInfo
+				);
+				
+				if (metaInfo != null) {
+					Iterable<String> metaInfoKeys = metaInfo.keys();
+					for (String metaInfoKey : metaInfoKeys) {
+						if (Strings.isNullOrEmpty(metaInfoKey)) {
+							continue;
+						}
+//						LOGGER.log(Level.INFO, "    metaInfoKey: " + metaInfoKey);
+						LicenseStatistics statistics =
+							statisticsMap.get(metaInfoKey);
+						String metaInfoValue = PROFILE_CACHE.getMetaInfo(
+							systemProfileId,
+							agentGroupId,
+							metaInfoKey,
+							OTHER
+						);
+						if (Strings.isNullOrEmpty(metaInfoValue)) {
+							metaInfoValue = OTHER;
+						}
+						statistics.inc(metaInfoValue);
 					}
-//					LOGGER.log(Level.INFO, "    metaInfoKey: " + metaInfoKey);
-					LicenseStatistics statistics =
-						statisticsMap.get(metaInfoKey);
-					String metaInfoValue = PROFILE_CACHE.getMetaInfo(
-						systemProfileId,
-						agentGroupId,
-						metaInfoKey,
-						OTHER
-					);
-					if (Strings.isNullOrEmpty(metaInfoValue)) {
-						metaInfoValue = OTHER;
-					}
-					statistics.inc(metaInfoValue);
 				}
 				LicenseStatistics techTypeStatistics =
 						statisticsMap.get("techType");
@@ -168,6 +209,17 @@ public class UsageMonitor implements Monitor {
 					techType = OTHER;
 				}
 				techTypeStatistics.inc(techType);
+				LicenseStatistics profileStatistics =
+						statisticsMap.get("profile");
+				profileStatistics.inc(systemProfileId);
+				
+				LicenseStatistics operatingSystemStatistics =
+						statisticsMap.get("operating system");
+				operatingSystemStatistics.inc(agent.getOperatingSystem());
+				
+				LicenseStatistics versionStatistics =
+						statisticsMap.get("version");
+				versionStatistics.inc(agent.getVersion());
 			}
 			
 			Iterable<LicenseStatistics> statisticsList = statisticsMap.getStatistics();
@@ -257,7 +309,7 @@ public class UsageMonitor implements Monitor {
 
 	@Override
 	public void teardown(MonitorEnvironment env) throws Exception {
-		PROFILE_CACHE.clear();
+		// nothing to do
 	}
 	
 	public static final String stackTraceToString(Throwable throwable) {
