@@ -1,6 +1,7 @@
 package com.dynatrace.onboarding;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,6 +18,8 @@ import com.dynatrace.onboarding.serverconfig.ServerProperties;
 import com.dynatrace.security.Persister;
 import com.dynatrace.utils.Logging;
 import com.dynatrace.utils.TempFiles;
+import com.dynatrace.utils.Version;
+import com.dynatrace.utils.jar.Jars;
 
 /**
  * 
@@ -34,6 +37,13 @@ public class OnBoardingMain {
 	 * 		system properties
 	 */
 	public static void main(String[] args) {
+		ClassLoader ccl = OnBoardingMain.class.getClassLoader();
+		try (InputStream min = ccl.getResourceAsStream("META-INF/MANIFEST.MF")) {
+			Version version = Jars.getBundleVersion(min);
+			System.out.println("--  Dynatrace onboarding utility version " + version);
+		} catch (IOException ioe) {
+			ioe.printStackTrace(System.err);
+		}
 		System.setProperty(TempFiles.PROPERTY_TMP_DIR_NAME, ".dt-onboarding");
 		Logging.init();
 

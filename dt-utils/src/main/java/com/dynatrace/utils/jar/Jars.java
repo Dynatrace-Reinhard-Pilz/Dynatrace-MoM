@@ -21,7 +21,7 @@ public final class Jars {
 	
 	private static final Logger LOGGER = Logger.getLogger(Jars.class.getName());
 	
-	private static final String ATTRIBUTE_BUNDLE_VERSION =
+	public static final String ATTRIBUTE_BUNDLE_VERSION =
 			"Bundle-Version".intern();
 
 	private Jars() {
@@ -33,6 +33,10 @@ public final class Jars {
 			jarFile,
 			ATTRIBUTE_BUNDLE_VERSION
 		);
+		return resolveVersion(sBundleVersion);
+	}
+	
+	private static Version resolveVersion(String sBundleVersion) {
 		if (sBundleVersion == null) {
 			LOGGER.log(Level.SEVERE, "Unable to determine Bundle Version");
 			return Version.UNDEFINED;
@@ -46,6 +50,14 @@ public final class Jars {
 			);
 			return Version.UNDEFINED;
 		}
+	}
+	
+	public static Version getBundleVersion(InputStream manifest) {
+		String sBundleVersion = getManifestAttribute(
+			manifest,
+			ATTRIBUTE_BUNDLE_VERSION
+		);
+		return resolveVersion(sBundleVersion);
 	}
 	
 	public static String getManifestAttribute(File jarFile, String attributeName) {
@@ -75,6 +87,24 @@ public final class Jars {
 			LOGGER.log(Level.WARNING, "Unable to access JAR file '" + jarFile.getAbsolutePath() + "'", e);
 			return null;
 		}
+	}
+	
+	public static String getManifestAttribute(InputStream in, String attributeName) {
+		try {
+			Manifest manifest = new Manifest(in);
+			return getManifestAttribute(manifest, attributeName);
+		} catch (IOException e) {
+			LOGGER.log(Level.WARNING, "Unable to resolve Manifest from input stream", e);
+			return null;
+		}
+	}
+	
+	public static String getManifestAttribute(Manifest manifest, String attributeName) {
+		Attributes attributes = manifest.getMainAttributes();
+		if (attributes == null) {
+			return null;
+		}
+		return attributes.getValue(attributeName);
 	}
 	
 	public static File extractResource(ClassLoader c, String project, String bundleName) {
