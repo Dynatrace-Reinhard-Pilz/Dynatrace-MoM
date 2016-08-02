@@ -11,7 +11,9 @@ $RECYCLE.BIN/
 
 target/
 build/
+build-bundled/
 lastbuild.properties
+bin/
 
 .metadata/
 .recommenders/
