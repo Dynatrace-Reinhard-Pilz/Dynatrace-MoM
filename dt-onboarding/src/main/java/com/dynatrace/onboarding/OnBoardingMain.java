@@ -40,7 +40,7 @@ public class OnBoardingMain {
 		ClassLoader ccl = OnBoardingMain.class.getClassLoader();
 		try (InputStream min = ccl.getResourceAsStream("META-INF/MANIFEST.MF")) {
 			Version version = Jars.getBundleVersion(min);
-			System.out.println("--  Dynatrace onboarding utility version " + version);
+			//System.out.println("--  Dynatrace onboarding utility version " + version);
 		} catch (IOException ioe) {
 			ioe.printStackTrace(System.err);
 		}

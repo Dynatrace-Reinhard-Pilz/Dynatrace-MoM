@@ -156,13 +156,6 @@ public class LocalProfileTemplate implements ProfileTemplate {
 	}
 	
 	private String tokenize(Element element, Node attribute) {
-		if (element.getTagName().equals("agentmapping")) {
-			if (attribute.getNodeName().equals("namepattern")) {
-				return correct(
-					tokenize(element, element.getAttributeNode("id"))
-				);
-			}
-		}
 		return attribute.getNodeValue();
 	}
 	
@@ -173,6 +166,16 @@ public class LocalProfileTemplate implements ProfileTemplate {
 			for (int i = 0; i < attributeCount; i++) {
 				Node attribute = attributes.item(i);
 				String attributeValue = tokenize(element, attribute);
+				if (element.getTagName().equals("agentmapping")) {
+					if (attribute.getNodeName().equals("namepattern")) {
+						if (!"regex".equals(element.getAttribute("namematch"))) {
+							attributeValue = correct(
+								tokenize(element, element.getAttributeNode("id"))
+							);
+						}
+					}
+				}
+				
 				attribute.setNodeValue(variables.resolve(attributeValue));
 			}
 		}

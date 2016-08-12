@@ -54,7 +54,7 @@ public abstract class AbstractRemoteProfile<T extends VersionedSource<T>> implem
 		File hostFolder = new File(tempFolder, getServerConfig().getHost());
 		File portFolder = new File(hostFolder, String.valueOf(getServerConfig().getPort()));
 		portFolder.mkdirs();
-		LOGGER.log(Level.INFO, "TODO: ensure that temporary System Profile Name does not created troubles with file name");
+		// LOGGER.log(Level.INFO, "TODO: ensure that temporary System Profile Name does not created troubles with file name");
 		File profileFile = new File(portFolder, getName());
 		try (
 			OutputStream out = new FileOutputStream(profileFile);
