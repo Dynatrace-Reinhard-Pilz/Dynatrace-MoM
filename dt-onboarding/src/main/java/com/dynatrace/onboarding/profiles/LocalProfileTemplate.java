@@ -168,14 +168,16 @@ public class LocalProfileTemplate implements ProfileTemplate {
 				String attributeValue = tokenize(element, attribute);
 				if (element.getTagName().equals("agentmapping")) {
 					if (attribute.getNodeName().equals("namepattern")) {
-						if (!"regex".equals(element.getAttribute("namematch"))) {
-							attributeValue = correct(
-								tokenize(element, element.getAttributeNode("id"))
-							);
+						if (!"false".equals(System.getProperty("config.namepatterns.alias"))) {
+							String resolved = variables.resolve(attributeValue);
+							if (attributeValue.equals(resolved) && !"regex".equals(element.getAttribute("namematch"))) {
+								attributeValue = correct(
+									tokenize(element, element.getAttributeNode("id"))
+								);
+							}
 						}
 					}
 				}
-				
 				attribute.setNodeValue(variables.resolve(attributeValue));
 			}
 		}

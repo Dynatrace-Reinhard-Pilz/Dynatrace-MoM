@@ -227,10 +227,59 @@ public class DefaultVariables implements Variables {
 			text = before + token + after;
 			startIdx = text.indexOf("{@");
 		}
+		Collection<String> dashVariables = getDashVariables(s);
+		if (dashVariables != null) {
+			variables.addAll(dashVariables);
+		}
+		return variables;
+	}
+	
+	private static boolean isDash(String text, int idx) {
+		if (text == null) {
+			return false;
+		}
+		if (idx < 0) {
+			return false;
+		}
+		if (idx == text.length()) {
+			return false;
+		}
+		if (text.charAt(idx) == '-') {
+			return true;
+		}
+		return false;
+	}
+	
+	private static Collection<String> getDashVariables(String s) {
+		if (s == null) {
+			return null;
+		}
+		Collection<String> variables = new HashSet<>();
+		String text = s;
+		int startIdx = text.indexOf("---");
+		while (startIdx >= 0) {
+			while (isDash(text, startIdx + 3)) {
+				startIdx++;
+			}
+			int endIdx = text.indexOf("---", startIdx + 1);
+			if (endIdx < 0) {
+				return variables;
+			}
+			String token = text.substring(startIdx + 3, endIdx).trim();
+			variables.add(token);
+			String before = text.substring(0, startIdx);
+			String after = text.substring(endIdx + 3);
+			text = before + token + after;
+			startIdx = text.indexOf("---");
+		}
 		return variables;
 	}
 	
 	public String resolve(String s) throws UnresolvedVariableException {
+		return resolveDash(resolveClassic(s));
+	}
+	
+	private String resolveClassic(String s) throws UnresolvedVariableException {
 		if (s == null) {
 			return null;
 		}
@@ -250,6 +299,33 @@ public class DefaultVariables implements Variables {
 			String after = text.substring(endIdx + 1);
 			text = before + resolvedToken + after;
 			startIdx = text.indexOf("{@");
+		}
+		return text;
+	}
+	
+	private String resolveDash(String s) throws UnresolvedVariableException {
+		if (s == null) {
+			return null;
+		}
+		String text = s;
+		int startIdx = text.indexOf("---");
+		while (startIdx >= 0) {
+			while (isDash(text, startIdx + 3)) {
+				startIdx++;
+			}
+			int endIdx = text.indexOf("---", startIdx + 1);
+			if (endIdx < 0) {
+				return text;
+			}
+			String token = text.substring(startIdx + 3, endIdx);
+			String resolvedToken = get(token);
+			if (resolvedToken == null) {
+				throw new UnresolvedVariableException(token);
+			}
+			String before = text.substring(0, startIdx);
+			String after = text.substring(endIdx + 3);
+			text = before + resolvedToken + after;
+			startIdx = text.indexOf("---");
 		}
 		return text;
 	}
