@@ -41,7 +41,7 @@ public class MoMConnector extends AbstractPluginPeer {
 	
 	@Override
 	public boolean install() {
-		System.out.println("installing");
+//		System.out.println("installing");
 		ConnectorClient client = new ConnectorClient(serverConfig);
 		Version remoteVersion = null;
 		File pluginFile = Jars.extractResource(
@@ -153,7 +153,7 @@ public class MoMConnector extends AbstractPluginPeer {
 			}
 		}
 		boolean equals = new Version(1,0,0,0).equals(response.getData());
-		System.out.println(("isInstalled: " + equals));
+//		System.out.println(("isInstalled: " + equals));
 		return equals;
 	}
 	
