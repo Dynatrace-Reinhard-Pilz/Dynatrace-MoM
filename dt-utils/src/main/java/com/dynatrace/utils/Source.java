@@ -5,8 +5,8 @@ import java.io.InputStream;
 
 public interface Source<T extends Source<T>> {
 
-	String getId();
-	String getName();
+	String id();
+	String name();
 	InputStream openStream() throws IOException;
 	long length();
 	long lastModified();

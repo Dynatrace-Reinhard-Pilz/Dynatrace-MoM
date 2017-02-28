@@ -38,7 +38,7 @@ public final class PWHChecker extends Thread implements AutoCloseable {
 	public PWHChecker(Labelled label, PWHConfig config, PWHAware pwhAware) {
 		String lbl = "undefined";
 		if (label != null) {
-			lbl = label.getName();
+			lbl = label.name();
 		}
 		if (config != null) {
 			setName("PWH Checker[" + lbl + " -> "+ config.toString() + "]");

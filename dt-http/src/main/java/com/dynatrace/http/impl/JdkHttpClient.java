@@ -64,8 +64,10 @@ public final class JdkHttpClient implements HttpClient {
 		int status = 0;
 		T response = null;
 		try {
+//			System.out.println(url);
 			out = new ByteArrayOutputStream();
 			status = request(url, m, auth, out);
+//			System.out.println("status: " + status);
 			switch (status) {
 			case HttpURLConnection.HTTP_FORBIDDEN:
 			case HttpURLConnection.HTTP_UNAUTHORIZED:
@@ -81,13 +83,33 @@ public final class JdkHttpClient implements HttpClient {
 					new PermissionDeniedException(missingPermission)
 				);
 			default:
+//				System.out.println("JdkHttpClient" + "." + "A");
 				in = new ByteArrayInputStream(out.toByteArray());
-				response = XMLUtil.<T>deserialize(in, responseClass);
-				return new HttpResponse<T>(status, response, null);
+//				System.out.println("JdkHttpClient" + "." + "B");
+				try {
+					response = XMLUtil.<T>deserialize(in, responseClass);
+//					System.out.println("JdkHttpClient" + "." + "response: " + response);
+				} catch (RuntimeException re) {
+					re.printStackTrace(System.err);
+					throw re;
+				} catch (Error err) {
+					err.printStackTrace(System.err);
+					throw err;
+				}
+//				System.out.println("JdkHttpClient" + "." + "C");
+				HttpResponse<T> httpResponse = new HttpResponse<T>(status, response, null);
+//				System.out.println("JdkHttpClient" + "." + "D");
+				return httpResponse;
 			}
 		} catch (IOException e) {
-//			LOGGER.log(Level.WARNING, "Unable to get response for " + url, e);
+			LOGGER.log(Level.WARNING, "Unable to get response for " + url, e);
 			return new HttpResponse<T>(status, response, e);
+		} catch (RuntimeException re) {
+			re.printStackTrace(System.err);
+			throw re;
+		} catch (Error err) {
+			err.printStackTrace(System.err);
+			throw err;
 		} finally {
 			Closeables.close(in);
 			Closeables.close(out);
@@ -126,6 +148,7 @@ public final class JdkHttpClient implements HttpClient {
 		try {
 			HttpURLConnection con =
 					(HttpURLConnection) url.openConnection();
+//			System.out.println(url.toString());
 			con.setConnectTimeout(50000);
 			con.setReadTimeout(50000);
 			TrustAllCertsManager.handleSecurity(con);
@@ -141,10 +164,13 @@ public final class JdkHttpClient implements HttpClient {
 			try {
 				in = con.getInputStream();
 			} catch (IOException ioe) {
-				in = con.getErrorStream();
+				ioe.printStackTrace(System.err);
+				if (in == null) {
+					in = con.getErrorStream();
+				}
 			}
 			if (verifier != null) {
-				verifier.verifyResponseHeader("Content-Type", con.getHeaderField("Content-Type"));
+				verifier.verifyResponseHeader(url, "Content-Type", con.getHeaderField("Content-Type"));
 			}
 			if (contentLength > 0) {
 				int maxBufferSize = 1024 * 1024 * 10;

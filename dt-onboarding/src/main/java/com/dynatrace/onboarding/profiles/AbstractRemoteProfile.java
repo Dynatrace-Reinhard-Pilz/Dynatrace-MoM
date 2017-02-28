@@ -25,17 +25,17 @@ public abstract class AbstractRemoteProfile<T extends VersionedSource<T>> implem
 			Logger.getLogger(AbstractRemoteProfile.class.getName());
 	
 	private final SystemProfileReference reference;
-	private final ServerConfig serverConfig;
+	private final ServerConfig srvConf;
 	
-	public AbstractRemoteProfile(SystemProfileReference reference, ServerConfig serverConfig) {
-		Objects.requireNonNull(reference);
-		Objects.requireNonNull(serverConfig);
-		this.reference = reference;
-		this.serverConfig = serverConfig;
+	public AbstractRemoteProfile(SystemProfileReference ref, ServerConfig srvConf) {
+		Objects.requireNonNull(ref);
+		Objects.requireNonNull(srvConf);
+		this.reference = ref;
+		this.srvConf = srvConf;
 	}
 	
 	public final ServerConfig getServerConfig() {
-		return serverConfig;
+		return srvConf;
 	}
 	
 	public final SystemProfileReference getReference() {
@@ -49,27 +49,27 @@ public abstract class AbstractRemoteProfile<T extends VersionedSource<T>> implem
 	 */
 	@Override
 	public T localize() throws IOException {
-		LOGGER.log(Level.FINER, "Localizing System Profile '" + getId() + "'");
+		LOGGER.log(Level.FINER, "Localizing System Profile '" + id() + "'");
 		File tempFolder = Config.temp();
 		File hostFolder = new File(tempFolder, getServerConfig().getHost());
 		File portFolder = new File(hostFolder, String.valueOf(getServerConfig().getPort()));
 		portFolder.mkdirs();
 		// LOGGER.log(Level.INFO, "TODO: ensure that temporary System Profile Name does not created troubles with file name");
-		File profileFile = new File(portFolder, getName());
+		File profileFile = new File(portFolder, name());
 		try (
 			OutputStream out = new FileOutputStream(profileFile);
 			InputStream in = openStream();
 		) {
 			Closeables.copy(in, out);
 		}
-		return createLocalizedInstance(profileFile, getVersion());
+		return createLocalizedInstance(profileFile, version());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getId() {
+	public String id() {
 		return reference.getId();
 	}
 
@@ -77,8 +77,8 @@ public abstract class AbstractRemoteProfile<T extends VersionedSource<T>> implem
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getName() {
-		return getId() + Profile.FILE_EXTENSION;
+	public String name() {
+		return id() + Profile.FILE_EXTENSION;
 	}
 
 	/**
@@ -86,8 +86,8 @@ public abstract class AbstractRemoteProfile<T extends VersionedSource<T>> implem
 	 */
 	@Override
 	public InputStream openStream() throws IOException {
-		LOGGER.log(Level.FINER, "Opening remote stream to '" + getId() + "'");
-		ConnectorClient client = new ConnectorClient(serverConfig);
+		LOGGER.log(Level.FINER, "Opening remote stream to '" + id() + "'");
+		ConnectorClient client = new ConnectorClient(srvConf);
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			client.getProfile(reference, out);
 			return new ByteArrayInputStream(out.toByteArray());
@@ -114,7 +114,7 @@ public abstract class AbstractRemoteProfile<T extends VersionedSource<T>> implem
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Version getVersion() {
+	public Version version() {
 		return Version.parse(reference.getVersion());
 	}
 	
@@ -123,7 +123,7 @@ public abstract class AbstractRemoteProfile<T extends VersionedSource<T>> implem
 	 */
 	@Override
 	public String toString() {
-		return getName();
+		return name();
 	}
 
 }

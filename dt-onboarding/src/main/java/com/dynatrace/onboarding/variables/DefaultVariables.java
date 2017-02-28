@@ -56,10 +56,7 @@ public class DefaultVariables implements Variables {
 			return null;
 		}
 		int modifiers = clazz.getModifiers();
-		if (Modifier.isAbstract(modifiers)) {
-			return null;
-		}
-		if (Modifier.isInterface(modifiers)) {
+		if (Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)) {
 			return null;
 		}
 		try {

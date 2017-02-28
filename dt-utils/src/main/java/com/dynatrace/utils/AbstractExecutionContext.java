@@ -14,7 +14,8 @@ import java.util.logging.Logger;
 public abstract class AbstractExecutionContext implements ExecutionContext, ThreadFactory {
 	
 	@SuppressWarnings("unused")
-	private static final Logger LOGGER = Logger.getLogger(AbstractExecutionContext.class.getName());
+	private static final Logger LOGGER =
+	Logger.getLogger(AbstractExecutionContext.class.getName());
 	
 	protected abstract Logger logger();
 	
@@ -54,7 +55,6 @@ public abstract class AbstractExecutionContext implements ExecutionContext, Thre
 		File storageFolder =
 			getAttribute(ATTRIBUTE_STORAGE_FOLDER);
 		if (storageFolder != null) {
-//			LOGGER.info("AbstractExecutionContext.getStorageFolder() (1): " + storageFolder);
 			return storageFolder;
 		}
 		
@@ -67,7 +67,6 @@ public abstract class AbstractExecutionContext implements ExecutionContext, Thre
 			ATTRIBUTE_STORAGE_FOLDER,
 			webAppFolder
 		);
-//		LOGGER.info("AbstractExecutionContext.getStorageFolder() (2): " + storageFolder);
 	    return webAppFolder;
 	}
 	

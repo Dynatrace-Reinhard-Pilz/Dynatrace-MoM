@@ -1,8 +1,10 @@
 package com.dynatrace.http;
 
+import java.net.URL;
+
 public interface ResponseVerifier {
 
-	public void verifyResponseHeader(String name, String value)
+	public void verifyResponseHeader(URL url, String name, String value)
 			throws VerificationException;
 	
 }

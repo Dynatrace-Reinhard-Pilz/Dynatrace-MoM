@@ -30,7 +30,7 @@ public class TemplatesHttpServletCtx extends XmlFileHttpServletCtx<ProfileTempla
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getContext() {
+	public String getContext() {
 		return HTTP_CONTEXT;
 	}
 

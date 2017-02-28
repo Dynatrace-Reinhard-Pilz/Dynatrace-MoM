@@ -28,8 +28,8 @@ public class FastPackUpload extends AbstractServerOperation {
 	
 	private static final String FASTPACK_PATH = "/mom-health-fastpack.dtp";
 	
-	public FastPackUpload(ExecutionContext ctx, ServerConfig scfg) {
-		super(ctx, scfg);
+	public FastPackUpload(ExecutionContext ctx, ServerConfig sscfg) {
+		super(ctx, sscfg);
 	}
 	
 	private InputStream getResourceAsStream(String path) {

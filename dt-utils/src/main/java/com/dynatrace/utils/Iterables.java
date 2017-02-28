@@ -36,16 +36,16 @@ public class Iterables {
 	}
 	
 	/**
-	 * Checks if the given {@link SizedIterable} is either {@code null} or does
+	 * Checks if the given {@link Batch} is either {@code null} or does
 	 * not contain any entries.
 	 * 
-	 * @param i the {@link SizedIterable} to check whether it actually contains
+	 * @param i the {@link Batch} to check whether it actually contains
 	 * 		any entries
 	 * 
-	 * @return {@code true} if the given {@link SizedIterable} is either
+	 * @return {@code true} if the given {@link Batch} is either
 	 * 		{@code null} or does not have any entries, {@code false} otherwise
 	 */
-	public static boolean isNullOrEmpty(SizedIterable<?> i) {
+	public static boolean isNullOrEmpty(Batch<?> i) {
 		return (i == null) || (i.size() == 0);
 	}
 	
@@ -86,8 +86,8 @@ public class Iterables {
 		if (iterable instanceof Collection) {
 			return isNullOrEmpty((Collection<?>) iterable);
 		}
-		if (iterable instanceof SizedIterable) {
-			return isNullOrEmpty((SizedIterable<?>) iterable);
+		if (iterable instanceof Batch) {
+			return isNullOrEmpty((Batch<?>) iterable);
 		}
 		Iterator<?> it = iterable.iterator();
 		if (it == null) {
@@ -368,11 +368,20 @@ public class Iterables {
 		return false;
 	}
 	
-	public static <T, E extends T> void addAll(Collection<T> c, Enumeration<E> e) {
-		if (c == null) {
-			return;
-		}
-		if (e == null) {
+	/**
+	 * Adds all objects available within the given {@link Enumeration} to the
+	 * given {@link Collection}
+	 * 
+	 * @param c the {@link Collection} to add the objects available within the
+	 * 		given {@link Enumeration} to
+	 * @param e the {@link Enumeration} which offers the objects to add to the
+	 * 		given {@link Collection}.
+	 */
+	public static <T, E extends T> void addAll(
+		Collection<T> c,
+		Enumeration<E> e
+	) {
+		if ((c == null) || (e == null)) {
 			return;
 		}
 		while (e.hasMoreElements()) {
@@ -380,13 +389,25 @@ public class Iterables {
 		}
 	}
 	
-	public static <T> Collection<T> asCollection(SizedIterable<T> iterable) {
-		if (iterable == null) {
+	/**
+	 * Converts the given {@link Batch} on demand to a {@link Collection} unless
+	 * it is already one.
+	 * 
+	 * @param batch the {@link Batch} to convert into a {@link Collection} if
+	 * 		necessary
+	 * 
+	 * @return the given {@link Batch} in case it is already a
+	 * 		{@link Collection} or a {@link Collection} holding the same elements
+	 * 		in the same order than the given {@link Batch} otherwise.
+	 */
+	public static <T> Collection<T> asCollection(Batch<T> batch) {
+		if (batch == null) {
 			return null;
 		}
-		if (iterable instanceof Collection) {
-			return Unchecked.cast(iterable);
+		if (batch instanceof Collection) {
+			return Unchecked.cast(batch);
 		}
-		return addAll(new ArrayList<T>(iterable.size()), iterable);
+		return addAll(new ArrayList<T>(batch.size()), batch);
 	}
+	
 }

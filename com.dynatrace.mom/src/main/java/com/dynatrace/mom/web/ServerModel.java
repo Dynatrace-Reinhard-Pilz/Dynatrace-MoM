@@ -25,7 +25,7 @@ public class ServerModel extends Model {
 	
 	@Override
 	public String getServerName() {
-		return serverRecord.getName();
+		return serverRecord.name();
 	}
 	
 	public void setFixPackActions(FixPackActions fixPackActions) {

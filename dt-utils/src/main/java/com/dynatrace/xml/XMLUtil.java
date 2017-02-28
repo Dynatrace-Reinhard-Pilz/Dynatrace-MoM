@@ -299,11 +299,16 @@ public class XMLUtil {
 			return null;
 		}
 		try {
+//			System.out.println("XMLUtil" + "." + "A");
 			final Unmarshaller unmarshaller = 
 					createContext(classes).createUnmarshaller();
+//			System.out.println("XMLUtil" + "." + "B");
 			XMLInputFactory xif = XMLInputFactory.newFactory();
+//			System.out.println("XMLUtil" + "." + "C");
 	        xif.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
+//			System.out.println("XMLUtil" + "." + "D");
 	        XMLStreamReader xsr = xif.createXMLStreamReader(in);
+//			System.out.println("XMLUtil" + "." + "E");
 	        return Unchecked.cast(unmarshaller.unmarshal(xsr));	
 		} catch (final JAXBException | XMLStreamException e) {
 			throw new IOException(e);

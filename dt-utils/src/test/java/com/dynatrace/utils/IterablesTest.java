@@ -310,7 +310,7 @@ public class IterablesTest extends Coverage<Iterables> {
 	
 	@Test
 	public void testIsNullOrEmpty() {
-		Assert.assertTrue(Iterables.isNullOrEmpty(new SizedIterable<Object>() {
+		Assert.assertTrue(Iterables.isNullOrEmpty(new Batch<Object>() {
 
 			@Override
 			public Iterator<Object> iterator() {
@@ -323,7 +323,7 @@ public class IterablesTest extends Coverage<Iterables> {
 			}
 			
 		}));
-		Assert.assertTrue(Iterables.isNullOrEmpty((Iterable<Object>) new SizedIterable<Object>() {
+		Assert.assertTrue(Iterables.isNullOrEmpty((Iterable<Object>) new Batch<Object>() {
 
 			@Override
 			public Iterator<Object> iterator() {
@@ -336,7 +336,7 @@ public class IterablesTest extends Coverage<Iterables> {
 			}
 			
 		}));
-		Assert.assertFalse(Iterables.isNullOrEmpty(new SizedIterable<Object>() {
+		Assert.assertFalse(Iterables.isNullOrEmpty(new Batch<Object>() {
 
 			@Override
 			public Iterator<Object> iterator() {
@@ -349,7 +349,7 @@ public class IterablesTest extends Coverage<Iterables> {
 			}
 			
 		}));
-		Assert.assertFalse(Iterables.isNullOrEmpty((Iterable<Object>)new SizedIterable<Object>() {
+		Assert.assertFalse(Iterables.isNullOrEmpty((Iterable<Object>)new Batch<Object>() {
 
 			@Override
 			public Iterator<Object> iterator() {
@@ -363,7 +363,7 @@ public class IterablesTest extends Coverage<Iterables> {
 			
 		}));
 		Assert.assertTrue(
-			Iterables.isNullOrEmpty((SizedIterable<Object>) null)
+			Iterables.isNullOrEmpty((Batch<Object>) null)
 		);
 	}
 	

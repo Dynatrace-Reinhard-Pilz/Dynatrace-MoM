@@ -41,7 +41,7 @@ public abstract class AbstractHttpServletCtx extends SecureHttpServletCtx {
 	 * @return a non {@code null} string URLs have to start with in order to
 	 * 		be taken care of by this implementation of {@link HttpContext}.
 	 */
-	protected abstract String getContext();
+	public abstract String getContext();
 	
 	/**
 	 * {@inheritDoc}

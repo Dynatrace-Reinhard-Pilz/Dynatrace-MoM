@@ -11,7 +11,7 @@ import java.util.Iterator;
  * 
  * @param <T> the type of elements returned by the iterator
  */
-public interface SizedIterable<T> extends Iterable<T> {
+public interface Batch<T> extends Iterable<T> {
 
 	int size();
 	

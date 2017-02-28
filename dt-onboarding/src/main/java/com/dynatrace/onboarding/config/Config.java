@@ -445,7 +445,7 @@ public class Config {
 			if (template == null) {
 				continue;
 			}
-			Version templateVersion = template.getVersion();
+			Version templateVersion = template.version();
 			if (!Version.isValid(templateVersion)) {
 				LOGGER.log(Level.WARNING, "The System Profile Template '" + templateName + "' embedded within dt-onboarding.jar does not have a valid dynaTrace Version - this Template will be ignored");
 			}
@@ -469,7 +469,7 @@ public class Config {
 			if (template == null) {
 				continue;
 			}
-			Version templateVersion = template.getVersion();
+			Version templateVersion = template.version();
 			if (!Version.isValid(templateVersion)) {
 				LOGGER.log(Level.WARNING, "The Dashboard Template '" + templateName + "' embedded within dt-onboarding.jar does not have a valid dynaTrace Version - this Template will be ignored");
 			}

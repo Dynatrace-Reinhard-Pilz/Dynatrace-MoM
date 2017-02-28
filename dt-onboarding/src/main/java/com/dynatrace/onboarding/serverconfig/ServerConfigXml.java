@@ -1,7 +1,5 @@
 package com.dynatrace.onboarding.serverconfig;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,9 +15,15 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.dynatrace.http.config.ServerConfig;
 import com.dynatrace.mom.connector.client.ConnectorClient;
+import com.dynatrace.utils.Strings;
 import com.dynatrace.utils.Version;
 
-public class ServerConfigXml {
+public class ServerConfigXml extends DefaultHandler {
+	
+	private static final String EXMSG_CANNOT_PARSE =
+			"Unable to parse collector.config.xml";
+	
+	private static final String NAME_PERM_TASK = "Permission User Group Task";
 	
 	private static final Logger LOGGER =
 			Logger.getLogger(ServerConfigXml.class.getName());
@@ -35,11 +39,17 @@ public class ServerConfigXml {
 	
 	private ServerConfigXml(String contents) {
 		this.contents = contents;
-		foo();
+		init();
 	}
 	
-	public static ServerConfigXml get(ServerConfig serverConfig) throws IOException {
-		ConnectorClient client = new ConnectorClient(serverConfig);
+	/**
+	 * 
+	 * @param srvConf
+	 * @return
+	 * @throws IOException
+	 */
+	public static ServerConfigXml get(ServerConfig srvConf) throws IOException {
+		ConnectorClient client = new ConnectorClient(srvConf);
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			client.getServerConfig(out);
 			return new ServerConfigXml(new String(out.toByteArray()));
@@ -50,36 +60,39 @@ public class ServerConfigXml {
 		return permissionTaskVersion;
 	}
 	
-	public void foo() {
-		SAXParserFactory factory = SAXParserFactory.newInstance();
-		SAXParser saxParser = null;
+	public void init() {
+		SAXParserFactory spf = SAXParserFactory.newInstance();
+		SAXParser sp = null;
 		try {
-			saxParser = factory.newSAXParser();
+			sp = spf.newSAXParser();
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Unable to parse collector.config.xml", e);
+			LOGGER.log(Level.WARNING, EXMSG_CANNOT_PARSE, e);
 			return;
 		}
-		DefaultHandler handler = new DefaultHandler() {
-			
-			@Override
-			public void startElement(String uri, String localName,	String qName, Attributes attributes) throws SAXException {
-				if ("plugintypeconfig".equals(qName)) {
-					String name = attributes.getValue("name");
-					if ("Permission User Group Task".equals(name)) {
-						permissionTaskVersion = Version.parse(attributes.getValue("bundleversion"));
-					}
-				}
-			}
-			
-		};
-		try (InputStream xmlIn = new ByteArrayInputStream(contents.getBytes())) {
-			saxParser.parse(new BufferedInputStream(xmlIn) {
-				@Override
-				public void close() throws IOException {
-				}
-			}, handler);
+		try (InputStream in = Strings.openBuffered(contents)) {
+			sp.parse(in, this);
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Unable to parse server.config.xml", e);
+			LOGGER.log(Level.WARNING, EXMSG_CANNOT_PARSE, e);
 		}		
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void startElement(
+		String uri,
+		String localName,
+		String qName,
+		Attributes attributes
+	) throws SAXException {
+		if ("plugintypeconfig".equals(qName)) {
+			String name = attributes.getValue("name");
+			if (NAME_PERM_TASK.equals(name)) {
+				permissionTaskVersion =
+						Version.parse(attributes.getValue("bundleversion"));
+			}
+		}
+	}
+	
 }

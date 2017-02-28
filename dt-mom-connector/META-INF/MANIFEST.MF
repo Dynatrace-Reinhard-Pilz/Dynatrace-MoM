@@ -5,6 +5,8 @@ Bundle-SymbolicName: dt-mom-connector;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: com.dynatrace.diagnostics.sdk,
  com.dynatrace.diagnostics.server,
+ com.dynatrace.diagnostics.server.shared,
+ com.dynatrace.diagnostics.jetty;resolution:=optional,
  javax.servlet,
  com.dynatrace.diagnostics.webservices
 Bundle-Vendor: Dynatrace LLC

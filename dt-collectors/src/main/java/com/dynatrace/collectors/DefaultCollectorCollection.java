@@ -125,7 +125,7 @@ public class DefaultCollectorCollection implements CollectorCollection {
 			return null;
 		}
 		for (CollectorRecord collectorRecord : collectors) {
-			String collectorName = collectorRecord.getName();
+			String collectorName = collectorRecord.name();
 			if (!collectorName.equals(name)) {
 				continue;
 			}

@@ -1,0 +1,7 @@
+<project name="micro-http-server" default="link">
+
+	<import file="../build-ant/build-common.xml" />
+	<property name="dependencies" value="" />
+	<property name="main.class" value="microservices.http.Server" />
+	
+</project>

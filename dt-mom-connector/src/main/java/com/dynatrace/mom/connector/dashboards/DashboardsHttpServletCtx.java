@@ -28,7 +28,7 @@ public class DashboardsHttpServletCtx extends XmlFileHttpServletCtx<DashboardRef
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getContext() {
+	public String getContext() {
 		return HTTP_CONTEXT;
 	}
 

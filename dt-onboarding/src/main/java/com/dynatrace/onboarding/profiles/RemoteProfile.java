@@ -18,7 +18,7 @@ public class RemoteProfile extends AbstractRemoteProfile<Profile> implements Pro
 	 */
 	@Override
 	public Profile createLocalizedInstance(File file, Version version) throws IOException {
-		return new LocalProfile(file, getVersion());
+		return new LocalProfile(file, version());
 	}
 
 	/**

@@ -58,7 +58,7 @@ public final class XmlOnboarding {
 					XmlDashboardPermission dashboardPermission = new XmlDashboardPermission();
 					Config.dashboardAutoOpen(userGroupKey, dashboard.getKey());
 					dashboardPermission.setAutoopen(Config.dashboardAutoOpen(userGroupKey, dashboard.getKey()));
-					dashboardPermission.setDashboard(dashboard.getId());
+					dashboardPermission.setDashboard(dashboard.id());
 					Config.dashboardPermission(userGroupKey, dashboard.getKey());
 					dashboardPermission.setPermission(Config.dashboardPermission(userGroupKey, dashboard.getKey()));
 					if (dashboardPermission.getPermission() != DashboardPermission.None) {

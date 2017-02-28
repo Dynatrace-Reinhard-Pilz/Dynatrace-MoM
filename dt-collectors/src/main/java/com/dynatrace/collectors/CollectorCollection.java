@@ -2,9 +2,9 @@ package com.dynatrace.collectors;
 
 import java.util.Collection;
 
-import com.dynatrace.utils.SizedIterable;
+import com.dynatrace.utils.Batch;
 
-public interface CollectorCollection extends SizedIterable<CollectorRecord> {
+public interface CollectorCollection extends Batch<CollectorRecord> {
 	
 	void addAll(Iterable<CollectorInfo> collectorInfos);
 	void add(CollectorInfo collectorInfo);

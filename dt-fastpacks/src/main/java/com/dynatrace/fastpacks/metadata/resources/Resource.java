@@ -44,7 +44,7 @@ public class Resource {
 		Objects.requireNonNull(source);
 		ResourceType.validate(type);
 		this.source = source;
-		this.name = source.getName();
+		this.name = source.name();
 		this.type = type;
 	}
 

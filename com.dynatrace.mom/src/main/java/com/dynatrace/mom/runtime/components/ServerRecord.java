@@ -54,7 +54,7 @@ import com.dynatrace.reporting.Measure;
 import com.dynatrace.reporting.MeasureAware;
 import com.dynatrace.utils.Iterables;
 import com.dynatrace.utils.Labelled;
-import com.dynatrace.utils.SizedIterable;
+import com.dynatrace.utils.Batch;
 import com.dynatrace.utils.Strings;
 import com.dynatrace.utils.Version;
 import com.dynatrace.utils.Versionable;
@@ -532,7 +532,7 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 	
 	@Override
 	@XmlAttribute(name = "name")
-	public String getName() {
+	public String name() {
 		synchronized (this) {
 			if (this.name == null) {
 				return config.toString();
@@ -549,7 +549,7 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 
 	@Override
 	public String toString() {
-		return getName();
+		return name();
 	}
 	
 	@Override
@@ -582,14 +582,14 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 	}
 
 	@XmlTransient
-	public SizedIterable<Dashboard> getDashboards() {
+	public Batch<Dashboard> getDashboards() {
 		synchronized (this) {
 			return dashboards;
 		}
 	}
 	
 	@XmlTransient
-	public SizedIterable<SystemProfile> getProfiles() {
+	public Batch<SystemProfile> getProfiles() {
 		return profiles;
 	}
 
@@ -714,7 +714,7 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 	}
 	
 	@XmlTransient
-	public SizedIterable<CollectorRecord> getCollectors() {
+	public Batch<CollectorRecord> getCollectors() {
 		return collectors;
 	}
 	
@@ -727,15 +727,15 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 		synchronized (this) {
 			if (status != null) {
 				if (this.fixPackInstallStatus == null) {
-					LOGGER.info("[" + getName() + "] Setting FPIS to " + status.getVersion());
+					LOGGER.info("[" + name() + "] Setting FPIS to " + status.getVersion());
 				} else {
 					Version curVersion = this.fixPackInstallStatus.getVersion();
 					if (!curVersion.equals(status.getVersion())) {
-						LOGGER.info("[" + getName() + "] Setting FPIS to " + status.getVersion());
+						LOGGER.info("[" + name() + "] Setting FPIS to " + status.getVersion());
 					}
 				}
 			} else if (this.fixPackInstallStatus != null) {
-				LOGGER.info("[" + getName() + "] Clearing FPIS");
+				LOGGER.info("[" + name() + "] Clearing FPIS");
 			}
 			this.fixPackInstallStatus = status;
 		}
@@ -778,7 +778,7 @@ implements Versionable, ConnectionAware, LicenseAware, HealthDashboardAware, Fix
 			ServerRecord clone = (ServerRecord) super.clone();
 			clone.pwhChecker = PWHChecker.NONE;
 			clone.setConfig(config.clone());
-			clone.setName(getName());
+			clone.setName(name());
 			clone.setVersion(version);
 			return clone;
 		} catch (CloneNotSupportedException e) {

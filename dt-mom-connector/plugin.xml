@@ -4,4 +4,13 @@
   <extension id="com.dynatrace.mom.connector.serverstartup" name="com.dynatrace.mom.connector.serverstartup" point="com.dynatrace.diagnostics.server.startup">
     <handler class="com.dynatrace.mom.connector.MoMConnector" />
   </extension>
-</plugin>
+   <extension
+         id="com.dynatrace.diagnostics.server.rest.mom"
+         name="MoM REST API"
+         point="com.dynatrace.diagnostics.webservices.content">
+      <content
+            name="MoM REST API"
+            protected="true"
+            registrator="com.dynatrace.mom.MomRestActivator">
+      </content>
+   </extension></plugin>

@@ -23,6 +23,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import com.dynatrace.diagnostics.server.interfaces.ServerAccessProvider;
 import com.dynatrace.diagnostics.server.startup.ServerStartupHandler;
+import com.dynatrace.mom.MomRestActivator;
 import com.dynatrace.mom.connector.dashboards.DashboardsHttpServletCtx;
 import com.dynatrace.mom.connector.profiles.ProfilesHttpServletCtx;
 import com.dynatrace.mom.connector.serverconfig.ServerConfigHttpServletCtx;
@@ -70,7 +71,7 @@ public class MoMConnector implements
 			"other.info";
 	
 	
-	private static final AbstractHttpServletCtx[] SERVLETS =
+	public static final AbstractHttpServletCtx[] SERVLETS =
 		new AbstractHttpServletCtx[] { null, null, null, null };
 	
 	private ServiceTracker<?,?> httpServiceTracker = null;
@@ -92,6 +93,36 @@ public class MoMConnector implements
 			SERVLETS[1] = new DashboardsHttpServletCtx(serverAccess);
 			SERVLETS[2] = new TemplatesHttpServletCtx(serverAccess);
 			SERVLETS[3] = new ServerConfigHttpServletCtx(serverAccess);
+
+			Version version = ctx.getBundle().getVersion();
+			int major = version.getMajor();
+			int minor = version.getMinor();
+			int micro = version.getMicro();
+			String sQualifier = version.getQualifier();
+			int qualifier = 0;
+			try {
+				qualifier = Integer.parseInt(sQualifier);
+			} catch (Throwable t) {
+				t.printStackTrace(System.err);
+			}
+			com.dynatrace.utils.Version utilsVersion = new com.dynatrace.utils.Version(major, minor, micro, qualifier);
+			String sVersion = "1.0.0.0";
+			try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+				XMLUtil.serialize(utilsVersion, out);
+				sVersion = new String(out.toByteArray());
+			} catch (IOException e) {
+				LOGGER.log(Level.WARNING, "Unable to serialize MoM Connector Version", e);
+			}
+			VersionServlet versionServlet = new VersionServlet(sVersion, serverAccess);
+
+			
+			try {
+				MomRestActivator.version = versionServlet;
+				MomRestActivator momRestActivator = new MomRestActivator();
+				momRestActivator.start(ctx);
+			} catch (Throwable t2) {
+				LOGGER.log(Level.SEVERE, "Unable to start MomConnector Bundle", t2);
+			}
 			
 			Collection<ServiceReference<HttpService>> refs =
 					ctx.getServiceReferences(HttpService.class, null);
@@ -114,8 +145,9 @@ public class MoMConnector implements
 			serverAccessProviderTracker.open();
 			httpServiceTracker.open();
 		} catch (Throwable t) {
-			LOGGER.log(Level.SEVERE, "Unable to start MomConnector Bundle", t);
+			// LOGGER.log(Level.SEVERE, "Unable to start MomConnector Bundle", t);
 		}
+		
 	}
 
 	/**

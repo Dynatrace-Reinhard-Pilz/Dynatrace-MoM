@@ -42,7 +42,7 @@ public class RemoteDashboard implements Dashboard {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Version getVersion() {
+	public Version version() {
 		return Version.parse(xmlProfile.getVersion());
 	}
 
@@ -50,7 +50,7 @@ public class RemoteDashboard implements Dashboard {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getId() {
+	public String id() {
 		return xmlProfile.getId();
 	}
 
@@ -58,8 +58,8 @@ public class RemoteDashboard implements Dashboard {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getName() {
-		return getId() + Dashboard.FILE_EXTENSION;
+	public String name() {
+		return id() + Dashboard.FILE_EXTENSION;
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class RemoteDashboard implements Dashboard {
 	 */
 	@Override
 	public InputStream openStream() throws IOException {
-		LOGGER.log(Level.INFO, "Opening remote stream to '" + getId() + "'");
+		LOGGER.log(Level.INFO, "Opening remote stream to '" + id() + "'");
 		ConnectorClient client = new ConnectorClient(serverConfig);
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			client.getDashboard(xmlProfile, out);
@@ -96,13 +96,13 @@ public class RemoteDashboard implements Dashboard {
 	 */
 	@Override
 	public Dashboard localize() throws IOException {
-		LOGGER.log(Level.INFO, "Localizing Dashboard '" + getId() + "'");
+		LOGGER.log(Level.INFO, "Localizing Dashboard '" + id() + "'");
 		File tempFolder = Config.temp();
 		File hostFolder = new File(tempFolder, serverConfig.getHost());
 		File portFolder = new File(hostFolder, String.valueOf(serverConfig.getPort()));
 		portFolder.mkdirs();
 		LOGGER.log(Level.INFO, "TODO: ensure that temporary System Profile Name does not created troubles with file name");
-		File profileFile = new File(portFolder, getName());
+		File profileFile = new File(portFolder, name());
 		try (
 			OutputStream out = new FileOutputStream(profileFile);
 			InputStream in = openStream();

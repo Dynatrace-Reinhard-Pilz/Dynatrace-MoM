@@ -1,6 +1,7 @@
 package com.dynatrace.onboarding;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Objects;
@@ -13,7 +14,6 @@ import com.dynatrace.http.config.ServerConfig;
 import com.dynatrace.onboarding.config.Config;
 import com.dynatrace.onboarding.fastpacks.OnBoardingTaskVerifier;
 import com.dynatrace.onboarding.profiles.Profile;
-import com.dynatrace.onboarding.serverconfig.ServerProperties;
 
 /**
  * 
@@ -22,16 +22,22 @@ import com.dynatrace.onboarding.serverconfig.ServerProperties;
  */
 public class OnBoardingTask {
 	
+	private static final String EXMSG_EXEC_UNSUCCESSFUL =
+			"Executing the Onboarding task was not successful";
+	
+	private static final String MSG_TRIGGERING = "Triggering Onboarding Task";
+	private static final String TASK_NAME = "Automatic Onboarding Task";
+	
 	private static final Logger LOGGER =
 			Logger.getLogger(OnBoardingTask.class.getName());
 
 	public static boolean trigger(Profile profile) {
-		LOGGER.log(Level.INFO, "Triggering Onboarding Task");
+		LOGGER.log(Level.INFO, MSG_TRIGGERING);
 		Objects.requireNonNull(profile);
-		String profileName = profile.getId();
+		String profileName = profile.id();
 		try {
-			String encProfileName = URLEncoder.encode(profileName, "UTF-8").replace("+", "%20");
-			String encTask = URLEncoder.encode("Automatic Onboarding Task", "UTF-8").replace("+", "%20");
+			String encProfileName = encode(profileName);
+			String encTask = encode(TASK_NAME);
 			URL execTaskMethod = Config.serverConfig().createURL("/rest/management/profiles/" + encProfileName + "/tasks/" + encTask + "/run");
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			Http.client().request(execTaskMethod, Method.GET, Config.serverConfig().getCredentials(), baos);
@@ -39,15 +45,29 @@ public class OnBoardingTask {
 			if (!response.equals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><result value=\"true\"/>")) {
 				LOGGER.log(Level.SEVERE, "Executing the Onboarding task was not successful (response was: " + response + ")");
 			}
-		} catch (Throwable t) {
-			LOGGER.log(Level.SEVERE, "Executing the Onboarding task was not successful", t);
+		} catch (IOException ioe) {
+			LOGGER.log(Level.SEVERE, EXMSG_EXEC_UNSUCCESSFUL, ioe);
 			return false;
 		}
 		return true;
 	}
 	
-	public static boolean ensureInstalled(ServerProperties serverProperties, ServerConfig serverConfig) {
-		OnBoardingTaskVerifier verifier = new OnBoardingTaskVerifier(serverConfig);
+	private static String encode(String profileName) throws IOException {
+		if (profileName == null) {
+			return null;
+		}
+		return URLEncoder.encode(profileName, "UTF-8").replace("+", "%20");
+	}
+	
+	/**
+	 * Ensures that the Onboarding Task is installed on the Dynatrace Server
+	 * referred to by <tt>srvConfg</tt> and on demand installs it.
+	 * 
+	 * @param srvConf
+	 * @return
+	 */
+	public static boolean ensure(ServerConfig srvConf) {
+		OnBoardingTaskVerifier verifier = new OnBoardingTaskVerifier(srvConf);
 		return verifier.install();
 	}
 	

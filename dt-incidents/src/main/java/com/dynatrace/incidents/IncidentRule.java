@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.dynatrace.utils.Iterables;
-import com.dynatrace.utils.SizedIterable;
+import com.dynatrace.utils.Batch;
 import com.dynatrace.utils.Strings;
 import com.dynatrace.utils.Unique;
 
@@ -31,7 +31,7 @@ import com.dynatrace.utils.Unique;
 @XmlRootElement(name = "incidents")
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class IncidentRule
-implements SizedIterable<IncidentReference>, Unique<String> {
+implements Batch<IncidentReference>, Unique<String> {
 	
 	private String name = null;
 	private Collection<IncidentReference> incidents =

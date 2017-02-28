@@ -30,7 +30,7 @@ public class ProfilesHttpServletCtx extends XmlFileHttpServletCtx<SystemProfileR
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getContext() {
+	public String getContext() {
 		return HTTP_CONTEXT;
 	}
 

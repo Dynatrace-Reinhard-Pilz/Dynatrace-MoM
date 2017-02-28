@@ -5,6 +5,7 @@ import java.io.IOException;
 public class PermissionDeniedException extends IOException {
 
 	private static final long serialVersionUID = 1L;
+	private static final String MSG_MISSING = "Missing Permission: %s";
 	
 	private final String permission;
 	
@@ -13,7 +14,7 @@ public class PermissionDeniedException extends IOException {
 	}
 	
 	public PermissionDeniedException(String permission, Throwable t) {
-		super("Missing Permission: " + permission, t);
+		super(String.format(MSG_MISSING, permission), t);
 		this.permission = permission;
 	}
 	

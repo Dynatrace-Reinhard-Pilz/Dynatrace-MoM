@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 /**
  * An implementation of {@link ServletOutputStream} that does not directly write
@@ -65,6 +66,13 @@ public final class BufferedServletOutputStream extends ServletOutputStream {
 	 */
 	public InputStream getContent() {
 		return new ByteArrayInputStream(out.toByteArray());
+	}
+
+	public boolean isReady() {
+		return true;
+	}
+
+	public void setWriteListener(WriteListener arg0) {
 	}
 
 }

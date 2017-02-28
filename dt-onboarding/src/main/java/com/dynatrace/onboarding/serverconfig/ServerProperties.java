@@ -1,7 +1,6 @@
 package com.dynatrace.onboarding.serverconfig;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -15,10 +14,16 @@ import com.dynatrace.onboarding.dashboards.Dashboard;
 import com.dynatrace.onboarding.dashboards.RemoteDashboard;
 import com.dynatrace.onboarding.profiles.Profile;
 import com.dynatrace.onboarding.profiles.RemoteProfile;
-import com.dynatrace.utils.SizedIterable;
+import com.dynatrace.utils.Batch;
+import com.dynatrace.utils.Iterables;
 
 public class ServerProperties {
 	
+	private static final String EXM_CANNOT_FETCH =
+			"Unable to fetch configuration files from dynaTrace Server";
+	private static final String MSG_FETCHING =
+			"Fetching System Profile, Dashboards and Server Configuration from dynaTrace Server";
+
 	private static final Logger LOGGER =
 			Logger.getLogger(ServerProperties.class.getName());
 	
@@ -26,55 +31,69 @@ public class ServerProperties {
 	private final Map<String, Profile> profiles = new HashMap<>();
 	private final Map<String, Dashboard> dashboards = new HashMap<>();
 	
-	public static ServerProperties load(ServerConfig serverConfig) {
-		return load(serverConfig, true);
+	public static ServerProperties load(ServerConfig srvConf) {
+		return load(srvConf, true);
 	}
 	
-	public static ServerProperties load(ServerConfig serverConfig, boolean silently) {
-		ServerProperties serverProperties = new ServerProperties();
+	public static ServerProperties load(ServerConfig srvConf, boolean silent) {
+		ServerProperties srvProps = new ServerProperties();
 		try {
-			serverProperties.fetch(serverConfig, silently);
+			srvProps.fetch(srvConf, silent);
 		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, "Unable to fetch configuration files from dynaTrace Server", e);
+			LOGGER.log(Level.SEVERE, EXM_CANNOT_FETCH, e);
 			return null;
 		}
-		return serverProperties;
+		return srvProps;
 	}
 	
-	private void fetchProfiles(ServerConfig serverConfig) throws IOException {
-		ConnectorClient connectorClient = new ConnectorClient(serverConfig);
-		SizedIterable<SystemProfileReference> xmlProfiles = connectorClient.getProfiles();
-		if (xmlProfiles == null) {
+	private void fetchProfiles(ServerConfig srvConf) throws IOException {
+		ConnectorClient client = new ConnectorClient(srvConf);
+		Batch<SystemProfileReference> xmlProfiles =	client.getProfiles();
+		if (Iterables.isNullOrEmpty(xmlProfiles)) {
 			return;
 		}
 		for (SystemProfileReference xmlProfile : xmlProfiles) {
-			RemoteProfile metaProfile =
-					new RemoteProfile(xmlProfile, serverConfig);
-			profiles.put(metaProfile.getId(), metaProfile);
+			put(xmlProfile, srvConf);
 		}
 	}
 	
-	private void fetchDashboards(ServerConfig serverConfig) throws IOException {
-		ConnectorClient connectorClient = new ConnectorClient(serverConfig);
-		SizedIterable<DashboardReference> dashboards = connectorClient.getDashboards();
-		if (dashboards == null) {
+	private void put(SystemProfileReference xmlProfile, ServerConfig srvConf) {
+		if (xmlProfile == null) {
+			return;
+		}
+		RemoteProfile metaProfile =	new RemoteProfile(xmlProfile, srvConf);
+		profiles.put(metaProfile.id(), metaProfile);
+	}
+	
+	private void fetchDashboards(ServerConfig srvConf) throws IOException {
+		ConnectorClient client = new ConnectorClient(srvConf);
+		Batch<DashboardReference> dashboards = client.getDashboards();
+		if (Iterables.isNullOrEmpty(dashboards)) {
 			return;
 		}
 		for (DashboardReference dashboard : dashboards) {
-			RemoteDashboard metaProfile =
-					new RemoteDashboard(dashboard, serverConfig);
-			this.dashboards.put(metaProfile.getId(), metaProfile);
+			put(dashboard, srvConf);
 		}
 	}
 	
-	private void fetch(ServerConfig serverConfig, boolean silently) throws IOException {
-		if (!silently) {
-			LOGGER.log(Level.INFO, "Fetching System Profile, Dashboards and Server Configuration from dynaTrace Server");
+	private void put(DashboardReference dashboard, ServerConfig srvConf) {
+		if (dashboard == null) {
+			return;
+		}
+		RemoteDashboard metaProfile = new RemoteDashboard(dashboard, srvConf);
+		this.dashboards.put(metaProfile.id(), metaProfile);
+	}
+	
+	private void fetch(ServerConfig srvConf, boolean silent)
+			throws IOException
+	{
+		if (!silent) {
+			LOGGER.log(Level.INFO, MSG_FETCHING);
 		}
 		
-		serverConfigXml = ServerConfigXml.get(serverConfig);
-		fetchProfiles(serverConfig);
-		fetchDashboards(serverConfig);
+		serverConfigXml = ServerConfigXml.get(srvConf);
+		fetchProfiles(srvConf);
+		fetchDashboards(srvConf);
 	}
 	
 	public Profile profiles(String name) {
@@ -84,12 +103,18 @@ public class ServerProperties {
 		return profiles.get(name);
 	}
 	
-	public Collection<Profile> profiles() {
-		return profiles.values();
+	public Profile[] profiles() {
+		if (profiles == null) {
+			return new Profile[0];
+		}
+		return profiles.values().toArray(new Profile[profiles.size()]);  
 	}
 	
-	public Collection<Dashboard> dashboards() {
-		return dashboards.values();
+	public Dashboard[] dashboards() {
+		if (dashboards == null) {
+			return new Dashboard[0];
+		}
+		return dashboards.values().toArray(new Dashboard[dashboards.size()]);  
 	}
 
 }

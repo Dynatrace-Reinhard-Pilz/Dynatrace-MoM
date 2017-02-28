@@ -2,7 +2,7 @@ package com.dynatrace.utils.files;
 
 import java.util.Collection;
 
-import com.dynatrace.utils.SizedIterable;
+import com.dynatrace.utils.Batch;
 
 /**
  * Classes implementing {@link FileReferences} are offering a typed list of
@@ -12,7 +12,7 @@ import com.dynatrace.utils.SizedIterable;
  *
  * @param <T> a class extending / implementing {@link FileReference}
  */
-public interface FileReferences<T extends FileReference> extends SizedIterable<T> {
+public interface FileReferences<T extends FileReference> extends Batch<T> {
 
 	/**
 	 * @return a URL offering a XML representation of this object
@@ -20,8 +20,8 @@ public interface FileReferences<T extends FileReference> extends SizedIterable<T
 	String getHref();
 	
 	/**
-	 * @return the {@link FileReference}s representing the list of XML configuration
-	 * 	files within this {@link FileReferences}
+	 * @return the {@link FileReference}s representing the list of XML
+	 * 		configuration files within this {@link FileReferences}
 	 */
 	Collection<T> getFiles();
 	

@@ -38,6 +38,7 @@ public abstract class BufferedHttpServletCtx
 	protected final void doGet(HttpServletRequest req, HttpServletResponse res)
 		throws ServletException, IOException
 	{
+		handleSecurity(req, res);
 		BufferedHttpServletResponse bRes = new BufferedHttpServletResponse(res);
 		get(req, bRes);
 		res.setContentLength(bRes.size());

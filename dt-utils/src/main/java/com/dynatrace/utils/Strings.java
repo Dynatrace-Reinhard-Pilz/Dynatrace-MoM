@@ -1,5 +1,9 @@
 package com.dynatrace.utils;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -295,6 +299,23 @@ public final class Strings {
 			s = s.substring(1);
 		}
 		return s;
+	}
+	
+	public static InputStream openStream(byte[] bytes) {
+		return new ByteArrayInputStream(bytes);
+	}
+	
+	public static InputStream openStream(String s) {
+		return openStream(s.getBytes());
+	}
+	
+	public static InputStream openBuffered(String s) {
+		return new BufferedInputStream(openStream(s)) {
+			@Override
+			public void close() throws IOException {
+				// ignore
+			}
+		};
 	}
 	
 }

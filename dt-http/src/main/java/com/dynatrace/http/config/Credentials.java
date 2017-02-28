@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -27,6 +28,8 @@ import com.dynatrace.utils.Base64;
 import com.dynatrace.utils.Base64Output;
 import com.dynatrace.utils.Strings;
 import com.dynatrace.utils.encryption.Encryptable;
+
+import sun.misc.BASE64Encoder;
 
 /**
  * A configuration object holding user credentials
@@ -271,7 +274,11 @@ public final class Credentials implements Authenticator, Cloneable, Encryptable 
 				userPassword.getBytes(Base64.UTF8)
 			);
 		) {
-			base64Out.write(in, in.available());
+			BASE64Encoder encoder = new sun.misc.BASE64Encoder();
+			String encode = encoder.encode(userPassword.getBytes(Base64.UTF8));
+			PrintStream ps = new PrintStream(out);
+			ps.print(encode);
+//			base64Out.write(in, in.available());
 		}
 	}
 	

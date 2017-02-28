@@ -22,7 +22,7 @@ public class AgentRecord implements Unique<AgentInfo>, Labelled {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return agentInfo.getAgentInstanceName();
 	}
 	

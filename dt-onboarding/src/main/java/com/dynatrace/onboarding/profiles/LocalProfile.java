@@ -26,7 +26,7 @@ public class LocalProfile implements Profile {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getId() {
+	public String id() {
 		String filename = file.getName();
 		return filename.substring(0, filename.length() - FILE_EXTENSION.length());
 	}
@@ -35,7 +35,7 @@ public class LocalProfile implements Profile {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Version getVersion() {
+	public Version version() {
 		return version;
 	}
 
@@ -83,8 +83,8 @@ public class LocalProfile implements Profile {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getName() {
-		return getId() + Profile.FILE_EXTENSION;
+	public String name() {
+		return id() + Profile.FILE_EXTENSION;
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class LocalProfile implements Profile {
 	 */
 	@Override
 	public String toString() {
-		return getName();
+		return name();
 	}
 
 }

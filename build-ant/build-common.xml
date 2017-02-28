@@ -82,15 +82,25 @@
 			token="1.0.0.qualifier"
 			value="${version}" />
 		<mkdir dir="${dir-build-resources}/META-INF" />
-		<copy todir="${dir-build-resources}/META-INF">
+		<copy todir="${dir-build-resources}/META-INF" failonerror="false">
 			<fileset dir="META-INF">
 				<include name="MANIFEST.MF"/>
+				<include name="persistence.xml"/>
+			</fileset>
+			<fileset dir="${dir-resources-src}/META-INF">
+				<include name="MANIFEST.MF"/>
+				<include name="persistence.xml"/>
 			</fileset>
 		</copy>
 		<mkdir dir="${dir-build-resources-bundled}/META-INF" />
-		<copy todir="${dir-build-resources-bundled}/META-INF">
+		<copy todir="${dir-build-resources-bundled}/META-INF" failonerror="false">
 			<fileset dir="META-INF">
 				<include name="MANIFEST.MF"/>
+				<include name="persistence.xml"/>
+			</fileset>
+			<fileset dir="${dir-resources-src}/META-INF">
+				<include name="MANIFEST.MF"/>
+				<include name="persistence.xml"/>
 			</fileset>
 		</copy>
 		<copy todir="${dir-build-resources}">

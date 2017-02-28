@@ -10,7 +10,7 @@ import com.dynatrace.http.config.ConnectionConfig;
 import com.dynatrace.http.config.Credentials;
 import com.dynatrace.http.config.ServerConfig;
 import com.dynatrace.mom.connector.model.profiles.SystemProfileReference;
-import com.dynatrace.utils.SizedIterable;
+import com.dynatrace.utils.Batch;
 import com.dynatrace.utils.Version;
 
 
@@ -35,7 +35,7 @@ public class ConnectorClientTest {
 	
 	@Test
 	public void testGetProfiles() throws Exception {
-		SizedIterable<SystemProfileReference> profiles = CLIENT.getProfiles();
+		Batch<SystemProfileReference> profiles = CLIENT.getProfiles();
 		for (SystemProfileReference profile : profiles) {
 			long size = profile.getSize();
 			try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {

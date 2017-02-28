@@ -35,49 +35,70 @@ public class MoMConnector extends AbstractPluginPeer {
 	
 	private final ServerConfig serverConfig;
 	
-	public MoMConnector(ServerConfig serverConfig) {
-		this.serverConfig = serverConfig;
+	public MoMConnector(ServerConfig srvConf) {
+		this.serverConfig = srvConf;
 	}
 	
-	public boolean install0() {
+	@Override
+	public boolean install() {
+		System.out.println("installing");
 		ConnectorClient client = new ConnectorClient(serverConfig);
 		Version remoteVersion = null;
-		File connectorPluginFile = Jars.extractResource(ConnectorClientMain.class.getClassLoader(), "dt-mom-connector-client", "dt-mom-connector");
-		if (connectorPluginFile == null) {
-			LOGGER.log(Level.SEVERE, "Unable to extract the MoM Connector Plugin");
+		File pluginFile = Jars.extractResource(
+			ConnectorClientMain.class.getClassLoader(),
+			"dt-mom-connector-client",
+			"dt-mom-connector"
+		);
+		if (pluginFile == null) {
+			LOGGER.log(
+				Level.SEVERE,
+				"Unable to extract the MoM Connector Plugin"
+			);
 			return false;
 		}
-		Version bundleVersion = Jars.getBundleVersion(connectorPluginFile);
+		Version bundleVersion = Jars.getBundleVersion(pluginFile);
 		try {
 			remoteVersion = client.getVersion();
 			boolean needsFastPack = false;
 			if (Version.UNDEFINED.equals(remoteVersion)) {
-				LOGGER.log(Level.INFO, "MoM Connector Plugin not installed on the dynaTrace Server - installing it");
+				LOGGER.log(
+					Level.INFO,
+					"MoM Connector Plugin not installed on the dynaTrace Server - installing it"
+				);
 				needsFastPack = true;
 			} else if (bundleVersion.compareTo(remoteVersion, true) > 0) {
-				LOGGER.log(Level.INFO, "MoM Connector Plugin installed on the dynaTrace Server (Version " + remoteVersion + ") is outdated - updating");
+				LOGGER.log(
+					Level.INFO,
+					"MoM Connector Plugin installed on the dynaTrace Server (Version " + remoteVersion + ") is outdated - updating"
+				);
 				needsFastPack = true;
 			}
-			if (needsFastPack) {
-				String fastPackId = UUID.randomUUID().toString();
-				FastpackBuilder fastPack = new FastpackBuilder(fastPackId, fastPackId);
-				if (connectorPluginFile != null) {
-					fastPack.addUserPlugin(FileSource.create(connectorPluginFile));
-					final File tmpFile = File.createTempFile(ConnectorClient.class.getSimpleName(), ".tmp");
-					tmpFile.deleteOnExit();
-					try (OutputStream out = new FileOutputStream(tmpFile)) {
-						fastPack.build(out);
+			if (!needsFastPack) {
+				return true;
+			}
+			String fastPackId = UUID.randomUUID().toString();
+			FastpackBuilder fastPack = new FastpackBuilder(
+				fastPackId,
+				fastPackId
+			);
+			if (pluginFile != null) {
+				fastPack.addUserPlugin(FileSource.create(pluginFile));
+				final File tmpFile = createTempFile();
+				tmpFile.deleteOnExit();
+				try (OutputStream out = new FileOutputStream(tmpFile)) {
+					fastPack.build(out);
+				}
+				FastPackUpload fpUpload = new FastPackUpload(
+					new DefaultExecutionContext(), serverConfig
+				) {
+					@Override
+					protected InputStream openStream() throws IOException {
+						return new FileInputStream(tmpFile);
 					}
-					FastPackUpload fastPackUpload = new FastPackUpload(new DefaultExecutionContext(), serverConfig) {
-						@Override
-						protected InputStream openStream() throws IOException {
-							return new FileInputStream(tmpFile);
-						}
-					};
-					
-					if (fastPackUpload.execute()) {
-						remoteVersion = client.getVersion();
-					}
+				};
+				
+				if (fpUpload.execute()) {
+					remoteVersion = client.getVersion();
 				}
 			}
 			System.out.println(remoteVersion);
@@ -85,11 +106,13 @@ public class MoMConnector extends AbstractPluginPeer {
 			e.printStackTrace(System.err);
 		}
 		return true;
-	}	
-
-	@Override
-	public boolean install() {
-		return install0();
+	}
+	
+	private static File createTempFile() throws IOException {
+		return File.createTempFile(
+			ConnectorClient.class.getSimpleName(),
+			".tmp"
+		);		
 	}
 
 	@Override
@@ -98,7 +121,11 @@ public class MoMConnector extends AbstractPluginPeer {
 		try {
 			url = serverConfig.getConnectionConfig().createURL("/mom/version");
 		} catch (MalformedURLException e) {
-			LOGGER.log(Level.WARNING, "Unable to create URL for version check of MoMConnector", e);
+			LOGGER.log(
+				Level.WARNING,
+				"Unable to create URL for version check of MoMConnector",
+				e
+			);
 		}
 		HttpResponse<Version> response = null;
 		try {
@@ -109,7 +136,11 @@ public class MoMConnector extends AbstractPluginPeer {
 				Version.class
 			);
 		} catch (IOException e) {
-			LOGGER.log(Level.INFO, "Unable to check for installation status of MoMConnector", e);
+			LOGGER.log(
+				Level.INFO,
+				"Unable to check for installation status of MoMConnector",
+				e
+			);
 			return false;
 		}
 		Throwable exception = response.getException();
@@ -121,7 +152,9 @@ public class MoMConnector extends AbstractPluginPeer {
 				return false;
 			}
 		}
-		return new Version(1,0,0,0).equals(response.getData());
+		boolean equals = new Version(1,0,0,0).equals(response.getData());
+		System.out.println(("isInstalled: " + equals));
+		return equals;
 	}
 	
 }

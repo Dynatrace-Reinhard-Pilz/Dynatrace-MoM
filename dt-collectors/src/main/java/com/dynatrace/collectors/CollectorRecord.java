@@ -87,7 +87,7 @@ public class CollectorRecord implements Labelled, Unique<CollectorInfo>, Version
 	}
 	
 	public String getServerName() {
-		return parent.getName();
+		return parent.name();
 	}
 	
 	public CollectorInfo getCollectorInfo() {
@@ -121,7 +121,7 @@ public class CollectorRecord implements Labelled, Unique<CollectorInfo>, Version
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return collectorInfo.getName();
 	}
 

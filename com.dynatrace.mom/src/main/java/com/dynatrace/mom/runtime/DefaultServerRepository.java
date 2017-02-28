@@ -53,7 +53,7 @@ public final class DefaultServerRepository implements ServerRepository {
 	@Override
 	public void add(final ServerRecord serverRecord) {
 		Objects.requireNonNull(serverRecord);
-		String serverName = serverRecord.getName();
+		String serverName = serverRecord.name();
 		synchronized (serverContexts) {
 			ServerContext serverContext = serverContexts.get(serverName);
 			if (serverContext != null) {
@@ -138,7 +138,7 @@ public final class DefaultServerRepository implements ServerRepository {
 	@Override
 	public final void remove(final ServerRecord server) {
 		Objects.requireNonNull(server);
-		final String serverName = server.getName();
+		final String serverName = server.name();
 		synchronized (serverContexts) {
 			serverContexts.remove(serverName);
 		}
@@ -223,7 +223,7 @@ public final class DefaultServerRepository implements ServerRepository {
 			if (serverRecord == null) {
 				return false;
 			}
-			String oldName = serverRecord.getName();
+			String oldName = serverRecord.name();
 			if (oldName == null) {
 				return false;
 			}

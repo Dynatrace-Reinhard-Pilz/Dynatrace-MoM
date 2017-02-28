@@ -189,6 +189,9 @@ public abstract class SecureHttpServletCtx extends BufferedHttpServletCtx {
 		SessionReference sessionReference,
 		Permission...permission
 	) {
+		if (login == null) {
+			return true;
+		}
 		login.hasSystemPermission(sessionReference, permission);
 		return true;
 	}

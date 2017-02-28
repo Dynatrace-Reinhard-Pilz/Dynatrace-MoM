@@ -56,7 +56,7 @@ public class LocalDashboardTemplate implements DashboardTemplate {
 	}
 	
 	@Override
-	public Version getVersion() {
+	public Version version() {
 		return version;
 	}
 	
@@ -213,13 +213,13 @@ public class LocalDashboardTemplate implements DashboardTemplate {
 	}
 
 	@Override
-	public String getId() {
+	public String id() {
 		String filename = source.getName();
 		return filename.substring(0, filename.length() - FILE_EXTENSION.length());
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return source.getName();
 	}
 

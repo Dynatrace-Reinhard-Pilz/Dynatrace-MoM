@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: micro-http-server
+Bundle-SymbolicName: micro-http-server
+Bundle-Version: 1.0.0.qualifier
+Export-Package: com.dynatrace,
+ com.dynatrace.utils,
+ com.dynatrace.version,
+ com.dynatrace.xml,
+ com.dynatrace.xml.classes,
+ com.dynatrace.xml.mock
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8

@@ -20,7 +20,7 @@ import com.dynatrace.mom.connector.model.profiles.SystemProfileReference;
 import com.dynatrace.mom.connector.model.profiles.SystemProfileReferences;
 import com.dynatrace.mom.connector.model.profiletemplates.ProfileTemplateReference;
 import com.dynatrace.mom.connector.model.profiletemplates.ProfileTemplateReferences;
-import com.dynatrace.utils.SizedIterable;
+import com.dynatrace.utils.Batch;
 import com.dynatrace.utils.Version;
 import com.dynatrace.utils.files.FileReference;
 
@@ -56,7 +56,7 @@ public class ConnectorClient implements ResponseVerifier {
 		return response.getData();
 	}
 	
-	public SizedIterable<ProfileTemplateReference> getProfileTemplates() throws IOException {
+	public Batch<ProfileTemplateReference> getProfileTemplates() throws IOException {
 		ConnectionConfig connectionConfig = serverConfig.getConnectionConfig();
 		final URL url = connectionConfig.createURL("/mom/profiles");
 		final Credentials credentials = serverConfig.getCredentials();
@@ -75,7 +75,7 @@ public class ConnectorClient implements ResponseVerifier {
 		getXmlFile(template, out);
 	}
 	
-	public SizedIterable<SystemProfileReference> getProfiles() throws IOException {
+	public Batch<SystemProfileReference> getProfiles() throws IOException {
 		ConnectionConfig connectionConfig = serverConfig.getConnectionConfig();
 		final URL url = connectionConfig.createURL("/mom/profiles");
 		final Credentials credentials = serverConfig.getCredentials();
@@ -100,7 +100,7 @@ public class ConnectorClient implements ResponseVerifier {
 		getXmlFile(dashboard, out);
 	}
 	
-	public SizedIterable<DashboardReference> getDashboards() throws IOException {
+	public Batch<DashboardReference> getDashboards() throws IOException {
 		ConnectionConfig connectionConfig = serverConfig.getConnectionConfig();
 		final URL url = connectionConfig.createURL("/mom/dashboards");
 		final Credentials credentials = serverConfig.getCredentials();
@@ -131,13 +131,13 @@ public class ConnectorClient implements ResponseVerifier {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void verifyResponseHeader(String name, String value) throws VerificationException {
+	public void verifyResponseHeader(URL url, String name, String value) throws VerificationException {
 		if (name == null) {
 			return;
 		}
 		if ("Content-Type".equals(name)) {
 			if (!"application/xml".equals(value)) {
-				throw new VerificationException("Content-Type is not application/xml");
+				throw new VerificationException("Content-Type '" + value + "' is not application/xml (" + url + ")");
 			}
 		}
 	}

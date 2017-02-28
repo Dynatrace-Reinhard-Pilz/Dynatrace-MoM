@@ -368,13 +368,13 @@ public class Resources {
 		return resources;
 	}
 	
-	public void publishDashboards(Collection<Dashboard> dashboards) {
+	public void publish(Dashboard...dashboards) {
 		if (Iterables.isNullOrEmpty(profileTemplates)) {
 			return;
 		}
 		DefaultVariables variables = new DefaultVariables(new Properties());
 		for (Dashboard dashboard : dashboards) {
-			String name = dashboard.getId();
+			String name = dashboard.id();
 			try {
 				variables.resolve(name);
 			} catch (UnresolvedVariableException e) {
@@ -404,29 +404,32 @@ public class Resources {
 		}
 	}
 	
-	public void publishProfiles(Collection<Profile> profiles) throws IOException {
+	private static final String TPL_OVERRIDEN_FROM_SERVER = "The embedded System Profile Template '%s' also exists on the dynaTrace Server - using the Template located on the dynaTrace Server";
+	private static final String TPL_DISCOVERED_ON_SERVER = "Discovered System Profile Template '%s' located on the dynaTrace Server";
+	
+	public void publish(Profile...profiles) throws IOException {
 		if (Iterables.isNullOrEmpty(profiles)) {
 			return;
 		}
 		DefaultVariables variables = new DefaultVariables(new Properties());
 		for (Profile profile : profiles) {
-			String name = profile.getId();
+			String name = profile.id();
 			try {
 				variables.resolve(name);
 			} catch (UnresolvedVariableException e) {
-//				File templateFile = metaProfile.getFile();
-//				try {
-					ProfileTemplate embeddedTemplate = this.profileTemplates.get(name);
-					this.profileTemplates.put(name, profile.asTemplate());
-//					this.profiles.put(name, new LocalMetaProfileTemplate(new ProfileTemplate(templateFile)));
-					if (embeddedTemplate != null) {
-						LOGGER.log(Level.INFO, "The embedded System Profile Template '" + name + "' also exists on the dynaTrace Server - using the Template located on the dynaTrace Server");
-					} else {
-						LOGGER.log(Level.INFO, "Discovered System Profile Template '" + name + "' located on the dynaTrace Server");
-					}
-//				} catch (IOException ioe) {
-//					LOGGER.log(Level.WARNING, "Discovered a System Profile Template '" + name + "' located on the dynaTrace Server, but unable to resolve it properly - ignoring this resource");
-//				}
+				ProfileTemplate embeddedTpl = this.profileTemplates.get(name);
+				this.profileTemplates.put(name, profile.asTemplate());
+				if (embeddedTpl != null) {
+					LOGGER.log(
+						Level.INFO,
+						String.format(TPL_OVERRIDEN_FROM_SERVER, name)
+					);
+				} else {
+					LOGGER.log(
+						Level.INFO,
+						String.format(TPL_DISCOVERED_ON_SERVER, name)
+					);
+				}
 			}
 		}
 	}

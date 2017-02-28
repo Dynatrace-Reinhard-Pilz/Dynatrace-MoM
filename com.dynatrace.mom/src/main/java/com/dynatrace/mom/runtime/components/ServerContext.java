@@ -97,7 +97,7 @@ public class ServerContext
 		Objects.requireNonNull(serverRecord);
 		this.serverRecord = serverRecord;
 		this.ctx = ctx;
-		this.ctx.register(this, serverRecord.getName());
+		this.ctx.register(this, serverRecord.name());
 		setAttribute(ServerConfig.class, serverRecord.getConfig());
 		setAttribute(
 			CollectorCollection.class,
@@ -367,7 +367,7 @@ public class ServerContext
 			Collection<ServerRecord> clonedServerRecords = new ArrayList<>();
 			for (ServerRecord serverRecord : serverRecords) {
 				ServerRecord clonedServerRecord = serverRecord.clone();
-				ctx.log(Level.INFO, serverRecord.getName());
+				ctx.log(Level.INFO, serverRecord.name());
 				clonedServerRecord.encrypt();
 				clonedServerRecords.add(clonedServerRecord);
 			}
@@ -445,7 +445,7 @@ public class ServerContext
 	}
 	
 	public final String getName() {
-		return serverRecord.getName();
+		return serverRecord.name();
 	}
 	
 	public final void close() {
@@ -470,7 +470,7 @@ public class ServerContext
 		final Thread thread = new Thread(
 				runnable,
 				ServerRecord.class.getSimpleName() +
-				"[" + serverRecord.getName() + "][" + ServerContext.class.getSimpleName() + "]"
+				"[" + serverRecord.name() + "][" + ServerContext.class.getSimpleName() + "]"
 		);
 		thread.setDaemon(true);
 		return thread;
@@ -674,7 +674,7 @@ public class ServerContext
 	}
 	
 	public void rename(String name) {
-		this.ctx.unregister(serverRecord.getName());
+		this.ctx.unregister(serverRecord.name());
 		serverRecord.setName(name);
 		this.ctx.register(this, name);
 	}

@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -42,6 +41,7 @@ import com.dynatrace.variables.UnresolvedVariableException;
 
 public class LocalProfileTemplate implements ProfileTemplate {
 	
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER =
 			Logger.getLogger(LocalProfileTemplate.class.getName());
 	
@@ -51,7 +51,9 @@ public class LocalProfileTemplate implements ProfileTemplate {
 	private final Version version;
 	
 	private synchronized File createTempFolder() {
-		return TempFiles.getTempFolder(LocalProfileTemplate.class.getSimpleName());
+		return TempFiles.getTempFolder(
+			LocalProfileTemplate.class.getSimpleName()
+		);
 	}
 	
 	public LocalProfileTemplate(File source) throws IOException {
@@ -64,7 +66,7 @@ public class LocalProfileTemplate implements ProfileTemplate {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Version getVersion() {
+	public Version version() {
 		return version;
 	}
 	
@@ -79,12 +81,16 @@ public class LocalProfileTemplate implements ProfileTemplate {
 	public Iterable<String> getVariables() throws IOException, ParserConfigurationException, SAXException {
 		Collection<String> variables = new HashSet<>();
 		try (InputStream in = openStream()) {
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilderFactory dbFactory =
+					DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document document = dBuilder.parse(in);
 			Iterables.addAll(variables, getVariables(document));
 		}
-		Iterables.addAll(variables, DefaultVariables.getVariables(getFilename()));
+		Iterables.addAll(
+			variables,
+			DefaultVariables.getVariables(getFilename())
+		);
 		return variables;
 	}
 	
@@ -120,10 +126,10 @@ public class LocalProfileTemplate implements ProfileTemplate {
 		return variables;
 	}
 	
-	private Document resolve(Document document, DefaultVariables variables) throws UnresolvedVariableException {
-		Objects.requireNonNull(document);
+	private Document resolve(Document doc, DefaultVariables variables) throws UnresolvedVariableException {
+		Objects.requireNonNull(doc);
 		Objects.requireNonNull(variables);
-		Document clone = (Document) document.cloneNode(true);
+		Document clone = (Document) doc.cloneNode(true);
 		resolve(clone.getDocumentElement(), variables);
 		return clone;
 	}
@@ -557,7 +563,7 @@ public class LocalProfileTemplate implements ProfileTemplate {
 			throw new InvalidProfileNameException("The System Profile '" + profileName + "' exceeds the 50 character limit for its name. Please choose different values for your variables.");
 		}
 		if (profile != null) {
-			filename = profile.getName();
+			filename = profile.name();
 		}
 		File profileFile = new File(tempFolder, filename);
 		profileFile.deleteOnExit();
@@ -570,7 +576,7 @@ public class LocalProfileTemplate implements ProfileTemplate {
 		} catch (TransformerException e) {
 			throw new IOException(e);
 		}
-		return new LocalProfile(profileFile, getVersion());
+		return new LocalProfile(profileFile, version());
 	}
 
 	private void appendOnboardingTask(Document resolvedDocument) {
@@ -624,7 +630,7 @@ public class LocalProfileTemplate implements ProfileTemplate {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getId() {
+	public String id() {
 		return getTemplateName();
 	}
 
@@ -656,7 +662,7 @@ public class LocalProfileTemplate implements ProfileTemplate {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getName() {
+	public String name() {
 		return source.getName();
 	}
 

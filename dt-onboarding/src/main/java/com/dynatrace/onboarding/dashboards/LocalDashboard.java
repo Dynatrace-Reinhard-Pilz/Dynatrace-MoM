@@ -35,7 +35,7 @@ public class LocalDashboard implements Dashboard {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Version getVersion() {
+	public Version version() {
 		return version;
 	}
 	
@@ -55,7 +55,7 @@ public class LocalDashboard implements Dashboard {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getName() {
+	public String name() {
 		return file.getName();
 	}
 
@@ -63,8 +63,8 @@ public class LocalDashboard implements Dashboard {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getId() {
-		String name = getName();
+	public String id() {
+		String name = name();
 		return name.substring(0, name.length() - FILE_EXTENSION.length());
 	}
 

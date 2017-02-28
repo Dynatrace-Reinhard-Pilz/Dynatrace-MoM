@@ -29,7 +29,7 @@ public class FileSource implements Source<FileSource> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getId() {
+	public String id() {
 		return file.getName();
 	}
 
@@ -69,7 +69,7 @@ public class FileSource implements Source<FileSource> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getName() {
-		return getId();
+	public String name() {
+		return id();
 	}
 }

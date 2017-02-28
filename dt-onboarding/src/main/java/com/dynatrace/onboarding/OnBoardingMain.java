@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import com.dynatrace.fastpacks.FastpackBuilder;
 import com.dynatrace.http.config.ServerConfig;
 import com.dynatrace.onboarding.config.Config;
+import com.dynatrace.onboarding.config.SourceConfig;
 import com.dynatrace.onboarding.dashboards.LocalDashboard;
 import com.dynatrace.onboarding.fastpacks.FastPackHelper;
 import com.dynatrace.onboarding.fastpacks.FastPackHelper.NextStep;
@@ -40,7 +41,10 @@ public class OnBoardingMain {
 		ClassLoader ccl = OnBoardingMain.class.getClassLoader();
 		try (InputStream min = ccl.getResourceAsStream("META-INF/MANIFEST.MF")) {
 			Version version = Jars.getBundleVersion(min);
-			//System.out.println("--  Dynatrace onboarding utility version " + version);
+			LOGGER.log(
+				Level.FINEST,
+				"--  Dynatrace onboarding utility version " + version
+			);
 		} catch (IOException ioe) {
 			ioe.printStackTrace(System.err);
 		}
@@ -248,26 +252,41 @@ public class OnBoardingMain {
 		// exiting early if there are configuration parameters missing
 		// exiting early if the dynaTrace Server cannot be reached
 		// exiting early if user credentials are not valid
+		if (!SourceConfig.isValid()) {
+			return false;
+		}
+		
 		if (!Config.isValid()) {
 			return false;
 		}
 		
-		// keeping connection information locally
-		ServerConfig serverConfig = Config.serverConfig();
 		
-		MoMConnector moMConnector = new MoMConnector(serverConfig);
+		
+		// keeping connection information locally
+		ServerConfig tgtSrvConf = Config.serverConfig();
+		ServerConfig srcSrvConf = SourceConfig.serverConfig();
+		
+		MoMConnector moMConnector = new MoMConnector(tgtSrvConf);
 		if (!moMConnector.ensureInstalled()) {
 			return false;
 		}
+		
+		moMConnector = new MoMConnector(srcSrvConf);
+		if (!moMConnector.ensureInstalled()) {
+			return false;
+		}
+		
 		
 		// querying for information from dynaTrace Server
 		// A: is the onboarding task plugin already installed?
 		// B: downloading System Profiles
 		// C: downloading Dashboards
-		ServerProperties serverProperties = ServerProperties.load(
-			serverConfig
-		);
-		if (serverProperties == null) {
+		ServerProperties srcSrvProps = ServerProperties.load(srcSrvConf);
+		ServerProperties tgtSrvProps = ServerProperties.load(tgtSrvConf);
+		if (srcSrvProps == null) {
+			return false;
+		}
+		if (tgtSrvProps == null) {
 			return false;
 		}
 		
@@ -276,7 +295,7 @@ public class OnBoardingMain {
 		// Templates on the dynaTrace Server which are matching the name of
 		// and embedded Template will supersede the embedded ones.
 		try {
-			Config.resources().publishProfiles(serverProperties.profiles());
+			SourceConfig.resources().publish(srcSrvProps.profiles());
 		} catch (IOException ioe) {
 			ioe.printStackTrace(System.err);
 			return false;
@@ -285,10 +304,13 @@ public class OnBoardingMain {
 		// dynaTrace Server, they should be available for deployment
 		// Templates on the dynaTrace Server which are matching the name of
 		// and embedded Template will supersede the embedded ones.
-		Config.resources().publishDashboards(serverProperties.dashboards());
+		SourceConfig.resources().publish(srcSrvProps.dashboards());
 		
 		// if the onboarding task plugin is not installed, upload it
-		if (!OnBoardingTask.ensureInstalled(serverProperties, serverConfig)) {
+		if (!OnBoardingTask.ensure(srcSrvConf)) {
+			return false;
+		}
+		if (!OnBoardingTask.ensure(tgtSrvConf)) {
 			return false;
 		}
 		
@@ -296,11 +318,11 @@ public class OnBoardingMain {
 		// A: System Profile (preconfigured with Onboarding Task)
 		// B: Dashboard
 		// C: Configuration File for the Onboarding Task
-		String fastPackId = UUID.randomUUID().toString();
-		FastpackBuilder fpb = new FastpackBuilder(fastPackId, fastPackId);
+		String fpId = UUID.randomUUID().toString();
+		FastpackBuilder fpb = new FastpackBuilder(fpId, fpId);
 		
 		// appending System Profile to the Fast Pack
-		Profile profile = FastPackHelper.appendProfile(fpb, serverProperties);
+		Profile profile = FastPackHelper.appendProfile(fpb, srcSrvProps);
 		if (profile == null) {
 			return false;
 		}
@@ -317,7 +339,7 @@ public class OnBoardingMain {
 		nextStep = FastPackHelper.appendOnboardingConfig(fpb, dashboards, profile);
 		
 		// finally uploading Fast Pack
-		if (!FastPackHelper.createAndUploadFastPack(fpb, serverConfig, new InstallationVerifier() {
+		if (!FastPackHelper.createAndUploadFastPack(fpb, srcSrvConf, tgtSrvConf, new InstallationVerifier() {
 			
 			@Override
 			public boolean isInstalled() {

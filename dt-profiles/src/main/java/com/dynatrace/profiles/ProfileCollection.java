@@ -1,8 +1,8 @@
 package com.dynatrace.profiles;
 
-import com.dynatrace.utils.SizedIterable;
+import com.dynatrace.utils.Batch;
 
-public interface ProfileCollection extends SizedIterable<SystemProfile> {
+public interface ProfileCollection extends Batch<SystemProfile> {
 
 	SystemProfile get(String profileName);
 	SystemProfile getSelfMonitoringProfile();
