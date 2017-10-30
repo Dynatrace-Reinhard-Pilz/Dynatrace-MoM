@@ -1,6 +1,8 @@
 package com.dynatrace.mom.utils;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.dynatrace.diagnostics.sdk.security.LoginCredentials;
 import com.dynatrace.diagnostics.sdk.security.Permission;
 import com.dynatrace.diagnostics.sdk.sessions.SessionReference;
+import com.dynatrace.diagnostics.server.security.AbstractSessionContext;
 import com.dynatrace.diagnostics.server.security.PermissionManager;
 import com.dynatrace.diagnostics.server.security.UserSessionContext;
 import com.dynatrace.diagnostics.server.shared.security.UserPermissionInfo;
@@ -100,15 +103,27 @@ public abstract class SecureHttpServletCtx extends BufferedHttpServletCtx {
     	return null;				
 	}
 	
+	private static Method getLoginMethod(String name) {
+    	try {
+    		return PermissionManager.class.getDeclaredMethod(name, new Class<?>[] { AbstractSessionContext.class });
+    	} catch (Throwable t) {
+    		return null;
+    	}
+	}
+	
 	private UserSessionContext checkUserSessionContext(
 		UserSessionContext userContext,
 		HttpServletResponse response
 	)
 			throws IOException
 	{
+    	Method loginMethod = getLoginMethod("synchronizedLogin");
+    	if (loginMethod == null) {
+    		loginMethod = getLoginMethod("login");
+    	}
         try {
-            PermissionManager.synchronizedLogin(userContext);
-        } catch (LoginException le) {
+        	loginMethod.invoke(null, new Object[] { userContext });
+        } catch (Exception ite) {
         	setAuthenticationHeader(response);
         	sendError(
         		response,

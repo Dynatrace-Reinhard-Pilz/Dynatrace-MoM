@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -154,12 +155,13 @@ public class FastPackHelper {
 		String[] dbKeys = Config.dashboardKeys();
 		for (String dbKey : dbKeys) {
 			String dbName = Config.dashboardTemplate(dbKey);
-			DashboardTemplate dbTplFile = Config.dashboardTemplates(dbName);
+			DashboardTemplate dbTplFile = SourceConfig.dashboardTemplates(dbName);
 			if (dbTplFile == null) {
 				LOGGER.log(
 					Level.SEVERE,
 					"No Dashboard Template found with name '" + dbName + "'"
 				);
+				LOGGER.log(Level.SEVERE, Config.dashboardTemplates().size() + " dashboards in cache");
 				for (String curDbName : Config.dashboardTemplates().keySet()) {
 					LOGGER.log(Level.SEVERE, curDbName);
 				}

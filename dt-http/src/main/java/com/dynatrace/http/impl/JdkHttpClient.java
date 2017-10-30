@@ -59,6 +59,7 @@ public final class JdkHttpClient implements HttpClient {
 		Authenticator auth,
 		Class<T> responseClass
 	) throws IOException {
+//		System.out.println("## HTTP ## " + url);
 		ByteArrayOutputStream out = null;
 		InputStream in = null;
 		int status = 0;
@@ -175,8 +176,17 @@ public final class JdkHttpClient implements HttpClient {
 			if (contentLength > 0) {
 				int maxBufferSize = 1024 * 1024 * 10;
 				Closeables.copy(maxBufferSize, in, out, contentLength);
-			} else {
+			} else if (in != null) {
 				Closeables.copy(in, out);
+			} else {
+				try {
+					String responseMessage = con.getResponseMessage();
+					try (ByteArrayInputStream bin = new ByteArrayInputStream(responseMessage.getBytes())) {
+						Closeables.copy(bin, out);
+					}
+				} catch (Throwable t) {
+					t.printStackTrace(System.err);
+				}
 			}
 		} catch (NoRouteToHostException nrthe) {
 			return Integer.MIN_VALUE;

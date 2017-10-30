@@ -3,7 +3,7 @@
 	<import file="../build-ant/build-common.xml" />
 	
 	<property name="dependencies" value="dt-utils dt-mom-connector-model" />
-	<property name="dir-osgi-plugins" value="C:/Program Files/dynaTrace/DynaTrace 6.5/server/plugins" />
+	<property name="dir-osgi-plugins" value="C:/Program Files/dynaTrace/DynaTrace 7.0/server/plugins" />
 	<path id="osgi.classpath">
 		<fileset dir="${dir-osgi-plugins}">
 			<include name="*.jar" />
@@ -12,10 +12,16 @@
 		<fileset dir="${dir-osgi-plugins}/dynatrace-jetty-jersey-6.5.3.20160718-173307/lib-gen">
 			<include name="*.jar" />
 		</fileset>
--->
 		<fileset dir="${dir-osgi-plugins}/dynatrace-jetty-jersey-6.5.3.20160804-134625/lib-gen">
 			<include name="*.jar" />
 		</fileset>
+-->
+		
+		<fileset dir="${dir-osgi-plugins}/dynatrace-jetty-jersey-7.0.5.20170403-083349/lib-gen">
+			<include name="*.jar" />
+		</fileset>
+		
+		
 		
 	</path>
 	
