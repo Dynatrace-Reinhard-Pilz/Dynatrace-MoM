@@ -208,7 +208,6 @@ public class Config {
 	}
 	
 	public static String[] discoverDashboardKeys(Properties properties) {
-		System.out.println("discoverDashboardKeys");
 		Collection<String> dashboardKeys = new ArrayList<>();
 		for (Object name : properties.keySet()) {
 			if (name == null) {
@@ -220,10 +219,6 @@ public class Config {
 			}
 		}
 		String[] result = dashboardKeys.toArray(new String[dashboardKeys.size()]);
-		for (String string : result) {
-			System.out.println(string);
-		}
-
 		return result;
 	}
 	
