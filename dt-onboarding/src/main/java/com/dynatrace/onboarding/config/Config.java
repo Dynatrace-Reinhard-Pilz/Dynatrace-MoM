@@ -169,6 +169,16 @@ public class Config {
 		if (!strTok.hasMoreTokens()) {
 			return null;
 		}
+		
+		token = strTok.nextToken();
+		if (!"templates".equals(token)) {
+			return null;
+		}
+		
+		if (!strTok.hasMoreTokens()) {
+			return null;
+		}
+		
 		token = strTok.nextToken();
 		if (!"dashboards".equals(token)) {
 			return null;
@@ -177,6 +187,7 @@ public class Config {
 		if (!strTok.hasMoreTokens()) {
 			return null;
 		}
+
 		String dashboardKey = strTok.nextToken().trim();
 		if (dashboardKey.isEmpty()) {
 			return null;
@@ -197,6 +208,7 @@ public class Config {
 	}
 	
 	public static String[] discoverDashboardKeys(Properties properties) {
+		System.out.println("discoverDashboardKeys");
 		Collection<String> dashboardKeys = new ArrayList<>();
 		for (Object name : properties.keySet()) {
 			if (name == null) {
@@ -207,7 +219,12 @@ public class Config {
 				dashboardKeys.add(dashboardKey);
 			}
 		}
-		return dashboardKeys.toArray(new String[dashboardKeys.size()]);
+		String[] result = dashboardKeys.toArray(new String[dashboardKeys.size()]);
+		for (String string : result) {
+			System.out.println(string);
+		}
+
+		return result;
 	}
 	
 	public static void setDefaultValues(Properties properties) {
@@ -287,7 +304,7 @@ public class Config {
 	}
 	
 	public static String dashboardProp(String dashboardKey) {
-		return "config.dashboards." + dashboardKey + ".name";
+		return "config.templates.dashboards." + dashboardKey + ".name";
 	}
 	
 	private static String groupProp(String userGroupKey) {
